@@ -1,0 +1,9 @@
+npm install react-native-screens react-native-safe-area-context
+npm install react-native-safe-area-context
+npm install @react-navigation/native-stack
+npm install @react-navigation/native
+npm instal firebase
+npx expo install react-native-web react-dom @expo/metro-runtime   
+
+
+Van a la inversa
