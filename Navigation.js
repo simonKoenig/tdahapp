@@ -21,6 +21,9 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+
+const AuthStack = createStackNavigator();
+
 const HomeStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
 const RewardsStack = createStackNavigator();
@@ -110,21 +113,35 @@ function ProfileStackScreen() {
 }
 
 
-
-function MyStack() {
+function AuthStackScreen() {
     return (
-        <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Main" component={MyTabs} />
-            <Stack.Screen name="SignUp" component={SignUpScreen} />
-        </Stack.Navigator>
+        <AuthStack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
+            <AuthStack.Screen name="Login" component={LoginScreen} />
+            <AuthStack.Screen name="Signup" component={SignUpScreen} />
+        </AuthStack.Navigator>
     );
 }
 
+
+
+
+
+// function MyStack() {
+//     return (
+//         <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
+//             <Stack.Screen name="Login" component={LoginScreen} />
+//             <Stack.Screen name="Main" component={MyTabs} />
+//             <Stack.Screen name="SignUp" component={SignUpScreen} />
+//         </Stack.Navigator>
+//     );
+// }
+
 export default function Navigation() {
+    const { isAuthenticated } = useContext(AuthContext);
+
     return (
         <NavigationContainer>
-            <MyStack />
+            {isAuthenticated ? <MyTabs /> : <AuthStackScreen />}
         </NavigationContainer>
     );
 }

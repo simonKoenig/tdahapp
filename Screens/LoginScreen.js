@@ -25,7 +25,7 @@ function LoginScreen() {
 
 
     const crearCuenta = () => {
-        navigation.navigate('SignUp');
+        navigation.navigate('Signup');
     }
 
     const iniciarSesion = () => {
@@ -34,7 +34,6 @@ function LoginScreen() {
                 console.log('Sesión iniciada');
                 const user = userCredential.user;
                 console.log(user);
-                navigation.navigate('Main');
             })
             .catch((error) => {
                 console.log(error);
