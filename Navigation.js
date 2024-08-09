@@ -10,6 +10,8 @@ import ProfileScreen from "./Screens/ProfileScreen";
 import RewardsScreen from "./Screens/RewardsScreen";
 import StatisticsScreen from "./Screens/StatisticsScreen";
 
+import SignUpScreen from "./Screens/SingUpScreen";
+
 // Icons
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -98,6 +100,7 @@ function MyStack() {
         <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Main" component={MyTabs} />
+            <Stack.Screen name="SignUp" component={SignUpScreen} />
         </Stack.Navigator>
     );
 }

@@ -23,16 +23,7 @@ function LoginScreen() {
     const auth = getAuth(app);
 
     const crearCuenta = () => {
-        createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                console.log('Cuenta creado');
-                const user = userCredential.user;
-                console.log(user);
-            })
-            .catch((error) => {
-                console.log(error);
-                Alert.alert(error.message);
-            })
+        navigation.navigate('SignUp');
     }
 
     const iniciarSesion = () => {
