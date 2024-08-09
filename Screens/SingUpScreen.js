@@ -1,39 +1,37 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from '../firebase-config';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../firebase-config';
 
-initializeApp(firebaseConfig);
-const auth = getAuth();
-
-export default function SignUpScreen({ navigation }) {
-    const [fullName, setFullName] = useState('');
+function SignUpScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('');
+    const [nombreApellido, setNombreApellido] = useState('');
+    const [role, setRole] = useState('paciente'); // Valor predeterminado
 
-    const handleSignUp = () => {
-        createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                const user = userCredential.user;
-                return updateProfile(user, {
-                    displayName: fullName,
-                    // You can store the role in the user's displayName or use Firestore to store additional user data
-                });
-            })
-            .then(() => {
-                Alert.alert("Usuario registrado", "El usuario ha sido registrado exitosamente.");
-                navigation.navigate('Login');
-            })
-            .catch((error) => {
-                Alert.alert("Error", error.message);
+    const handleSignUp = async () => {
+        const auth = getAuth();
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // Guardar el rol y nombreApellido en Firestore
+            await setDoc(doc(db, 'usuarios', user.uid), {
+                email: user.email,
+                nombreApellido: nombreApellido,
+                rol: role,
             });
+
+            console.log('Usuario registrado con éxito:', user.uid);
+        } catch (error) {
+            console.error('Error al registrar el usuario:', error);
+        }
     };
 
     const handleCancel = () => {
-        navigation.goBack();
+        // Lógica para cancelar el registro
     };
 
     return (
@@ -41,8 +39,8 @@ export default function SignUpScreen({ navigation }) {
             <Text style={styles.label}>Nombre y apellido</Text>
             <TextInput
                 style={styles.input}
-                value={fullName}
-                onChangeText={setFullName}
+                value={nombreApellido}
+                onChangeText={setNombreApellido}
             />
             <Text style={styles.label}>Correo electrónico</Text>
             <TextInput
@@ -53,7 +51,6 @@ export default function SignUpScreen({ navigation }) {
             <Text style={styles.label}>Contraseña</Text>
             <TextInput
                 style={styles.input}
-
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
@@ -86,9 +83,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#FFFFFF',
-
     },
-
     label: {
         width: '80%',
         marginLeft: 10,
@@ -136,3 +131,5 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
 });
+
+export default SignUpScreen;
