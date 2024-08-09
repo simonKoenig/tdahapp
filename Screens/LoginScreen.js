@@ -22,10 +22,16 @@ function LoginScreen() {
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
+
+
     const crearCuenta = () => {
-        createUserWithEmailAndPassword(auth, email, password)
+        navigation.navigate('Signup');
+    }
+
+    const iniciarSesion = () => {
+        signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
-                console.log('Cuenta creado');
+                console.log('Sesión iniciada');
                 const user = userCredential.user;
                 console.log(user);
             })
@@ -35,19 +41,6 @@ function LoginScreen() {
             })
     }
 
-    const iniciarSesion = () => {
-        signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                console.log('Sesión iniciada');
-                const user = userCredential.user;
-                console.log(user);
-                navigation.navigate('Main');
-            })
-            .catch((error) => {
-                console.log(error);
-                Alert.alert(error.message);
-            })
-    }
     return (
         <View style={styles.mainContainer}>
             <View style={styles.container}>
@@ -71,6 +64,7 @@ function LoginScreen() {
             </View>
         </View>
     );
+
 }
 
 
