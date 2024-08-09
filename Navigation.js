@@ -36,23 +36,22 @@ function MyTabs() {
                 tabBarIcon: ({ color, size }) => (
                     <MaterialCommunityIcons name="home" color={color} size={size} />
                 ),
-
             }} />
             {role === 'administrador' && (
-                <Tab.Screen name="Estadísticas" component={StatisticsStackScreen} options={{
-                    tabBarLabel: 'Estadísticas',
-                    tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="chart-bar" color={color} size={size} />
-                    ),
-                }} />
-            )}
-            {role === 'administrador' && (
-                <Tab.Screen name="Recompensas" component={RewardsStackScreen} options={{
-                    tabBarLabel: 'Recompensas',
-                    tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="gift" color={color} size={size} />
-                    ),
-                }} />
+                <>
+                    <Tab.Screen name="Estadísticas" component={StatisticsStackScreen} options={{
+                        tabBarLabel: 'Estadísticas',
+                        tabBarIcon: ({ color, size }) => (
+                            <MaterialCommunityIcons name="chart-bar" color={color} size={size} />
+                        ),
+                    }} />
+                    <Tab.Screen name="Recompensas" component={RewardsStackScreen} options={{
+                        tabBarLabel: 'Recompensas',
+                        tabBarIcon: ({ color, size }) => (
+                            <MaterialCommunityIcons name="gift" color={color} size={size} />
+                        ),
+                    }} />
+                </>
             )}
             <Tab.Screen name="Perfil" component={ProfileStackScreen} options={{
                 tabBarLabel: 'Perfil',
@@ -60,7 +59,6 @@ function MyTabs() {
                     <MaterialCommunityIcons name="account" color={color} size={size} />
                 ),
             }} />
-
         </Tab.Navigator>
     );
 }
