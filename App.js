@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Navigation from './Navigation';
-import { AuthProvider } from './Context/AuthProvider'; // Asegúrate de que la ruta sea correcta
+import { AuthProvider } from './Context/AuthProvider';
 
 export default function App() {
   return (

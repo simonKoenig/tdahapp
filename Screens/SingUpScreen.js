@@ -4,8 +4,12 @@ import { Picker } from '@react-native-picker/picker';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase-config';
+import { useNavigation } from '@react-navigation/native';
 
 function SignUpScreen() {
+
+    const navigation = useNavigation();
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [nombreApellido, setNombreApellido] = useState('');
@@ -14,7 +18,7 @@ function SignUpScreen() {
     const handleSignUp = async () => {
         const auth = getAuth();
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password); // Crear usuario con correo y contraseña
             const user = userCredential.user;
 
             // Guardar el rol y nombreApellido en Firestore
@@ -25,13 +29,21 @@ function SignUpScreen() {
             });
 
             console.log('Usuario registrado con éxito:', user.uid);
+            await signInWithEmailAndPassword(auth, email, password);
         } catch (error) {
             console.error('Error al registrar el usuario:', error);
         }
     };
 
     const handleCancel = () => {
-        // Lógica para cancelar el registro
+        setEmail('');
+        setPassword('');
+        setNombreApellido('');
+        setRole('paciente');
+        navigation.goBack();
+
+
+
     };
 
     return (

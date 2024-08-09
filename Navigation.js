@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from 'react';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -12,8 +12,11 @@ import StatisticsScreen from "./Screens/StatisticsScreen";
 
 import SignUpScreen from "./Screens/SingUpScreen";
 
+import { AuthContext } from './Context/AuthProvider';
+
 // Icons
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 
 
 const Tab = createBottomTabNavigator();
@@ -25,6 +28,7 @@ const StatisticsStack = createStackNavigator();
 
 
 function MyTabs() {
+    const { role } = useContext(AuthContext);
     return (
         <Tab.Navigator initialRouteName="Home">
             <Tab.Screen name="Inicio" component={HomeStackScreen} options={{
@@ -34,18 +38,22 @@ function MyTabs() {
                 ),
 
             }} />
-            <Tab.Screen name="Estadísticas" component={StatisticsStackScreen} options={{
-                tabBarLabel: 'Estadísticas',
-                tabBarIcon: ({ color, size }) => (
-                    <MaterialCommunityIcons name="chart-bar" color={color} size={size} />
-                ),
-            }} />
-            <Tab.Screen name="Recompensas" component={RewardsStackScreen} options={{
-                tabBarLabel: 'Recompensas',
-                tabBarIcon: ({ color, size }) => (
-                    <MaterialCommunityIcons name="gift" color={color} size={size} />
-                ),
-            }} />
+            {role === 'administrador' && (
+                <Tab.Screen name="Estadísticas" component={StatisticsStackScreen} options={{
+                    tabBarLabel: 'Estadísticas',
+                    tabBarIcon: ({ color, size }) => (
+                        <MaterialCommunityIcons name="chart-bar" color={color} size={size} />
+                    ),
+                }} />
+            )}
+            {role === 'administrador' && (
+                <Tab.Screen name="Recompensas" component={RewardsStackScreen} options={{
+                    tabBarLabel: 'Recompensas',
+                    tabBarIcon: ({ color, size }) => (
+                        <MaterialCommunityIcons name="gift" color={color} size={size} />
+                    ),
+                }} />
+            )}
             <Tab.Screen name="Perfil" component={ProfileStackScreen} options={{
                 tabBarLabel: 'Perfil',
                 tabBarIcon: ({ color, size }) => (
@@ -67,6 +75,11 @@ function HomeStackScreen() {
 }
 
 function StatisticsStackScreen() {
+    const { role } = useContext(AuthContext);
+    if (role !== 'administrador') {
+        return null; // No renderizar si el rol no es admin
+    }
+
     return (
         <StatisticsStack.Navigator initialRouteName="Statistics" screenOptions={{ headerShown: false }}>
             <StatisticsStack.Screen name="Statistics" component={StatisticsScreen} />
@@ -76,6 +89,11 @@ function StatisticsStackScreen() {
 }
 
 function RewardsStackScreen() {
+    const { role } = useContext(AuthContext);
+    if (role !== 'administrador') {
+        return null; // No renderizar si el rol no es admin
+    }
+
     return (
         <RewardsStack.Navigator initialRouteName="Rewards" screenOptions={{ headerShown: false }}>
             <RewardsStack.Screen name="Rewards" component={RewardsScreen} />

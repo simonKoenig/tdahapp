@@ -22,6 +22,8 @@ function LoginScreen() {
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
+
+
     const crearCuenta = () => {
         navigation.navigate('SignUp');
     }
@@ -39,6 +41,7 @@ function LoginScreen() {
                 Alert.alert(error.message);
             })
     }
+
     return (
         <View style={styles.mainContainer}>
             <View style={styles.container}>
@@ -62,6 +65,7 @@ function LoginScreen() {
             </View>
         </View>
     );
+
 }
 
 
