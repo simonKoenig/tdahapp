@@ -7,15 +7,23 @@ import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "./Screens/HomeScreen";
 import LoginScreen from "./Screens/LoginScreen";
 import ProfileScreen from "./Screens/ProfileScreen";
-import RewardsScreen from "./Screens/RewardsScreen";
 import StatisticsScreen from "./Screens/StatisticsScreen";
+
+
+
+
+
+import RewardsListScreen from './Screens/RewardsListScreen';
+import AddRewardScreen from './Screens/AddRewardScreen';
+import RewardDetailScreen from './Screens/RewardDetailScreen';
 
 import SignUpScreen from "./Screens/SingUpScreen";
 
 import { AuthContext } from './Context/AuthProvider';
+import { AccountIcon, ChartBarIcon, GiftIcon, HomeIcon } from './Components/Icons';
 
 // Icons
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 
 
 
@@ -37,7 +45,7 @@ function MyTabs() {
             <Tab.Screen name="Inicio" component={HomeStackScreen} options={{
                 tabBarLabel: 'Inicio',
                 tabBarIcon: ({ color, size }) => (
-                    <MaterialCommunityIcons name="home" color={color} size={size} />
+                    <HomeIcon color={color} size={size} />
                 ),
             }} />
             {role === 'administrador' && (
@@ -45,13 +53,13 @@ function MyTabs() {
                     <Tab.Screen name="Estadísticas" component={StatisticsStackScreen} options={{
                         tabBarLabel: 'Estadísticas',
                         tabBarIcon: ({ color, size }) => (
-                            <MaterialCommunityIcons name="chart-bar" color={color} size={size} />
+                            <ChartBarIcon color={color} size={size} />
                         ),
                     }} />
                     <Tab.Screen name="Recompensas" component={RewardsStackScreen} options={{
                         tabBarLabel: 'Recompensas',
                         tabBarIcon: ({ color, size }) => (
-                            <MaterialCommunityIcons name="gift" color={color} size={size} />
+                            <GiftIcon color={color} size={size} />
                         ),
                     }} />
                 </>
@@ -59,7 +67,7 @@ function MyTabs() {
             <Tab.Screen name="Perfil" component={ProfileStackScreen} options={{
                 tabBarLabel: 'Perfil',
                 tabBarIcon: ({ color, size }) => (
-                    <MaterialCommunityIcons name="account" color={color} size={size} />
+                    <AccountIcon color={color} size={size} />
                 ),
             }} />
         </Tab.Navigator>
@@ -96,9 +104,10 @@ function RewardsStackScreen() {
     }
 
     return (
-        <RewardsStack.Navigator initialRouteName="Rewards" screenOptions={{ headerShown: false }}>
-            <RewardsStack.Screen name="Rewards" component={RewardsScreen} />
-            {/* Agrega más pantallas al stack de Rewards aquí si es necesario */}
+        <RewardsStack.Navigator initialRouteName="RewardsList" screenOptions={{ headerShown: false }}>
+            <RewardsStack.Screen name="RewardsList" component={RewardsListScreen} />
+            <RewardsStack.Screen name="AddReward" component={AddRewardScreen} />
+            <RewardsStack.Screen name="RewardDetail" component={RewardDetailScreen} />
         </RewardsStack.Navigator>
     );
 }
