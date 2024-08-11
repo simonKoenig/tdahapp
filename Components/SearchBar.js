@@ -24,15 +24,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 10,
         marginVertical: 10,
-        borderRadius: 25, // Bordes redondeados
-        backgroundColor: '#E0E0E0', // Color de fondo gris claro
+        borderRadius: 25,
+        backgroundColor: '#E0E0E0',
     },
     input: {
         flex: 1,
         height: 40,
         fontSize: 16,
         paddingHorizontal: 10,
-        color: '#000000', // Color del texto ingresado
+        color: '#000000',
     },
 });
 

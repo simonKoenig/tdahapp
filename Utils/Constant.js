@@ -1,8 +1,8 @@
 // ../Utils/Constant.js
 export const dificultades = [
-    { label: 'Fácil', value: 'Fácil' },
+    { label: 'Baja', value: 'Baja' },
     { label: 'Media', value: 'Media' },
-    { label: 'Difícil', value: 'Difícil' }
+    { label: 'Alta', value: 'Alta' }
 ];
 
 export const filtradoDificultades = [

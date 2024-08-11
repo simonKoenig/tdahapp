@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet, RefreshControl } from 'react-native';
 import { RewardsContext } from '../Context/RewardsProvider';
 import { useNavigation } from '@react-navigation/native';
@@ -26,8 +26,9 @@ const RewardsListScreen = () => {
         setRefreshing(false);
     };
 
-    return (
-        <View style={styles.container}>
+    // Renderiza SearchBar y Dropdown como encabezado fijo
+    const renderHeader = () => (
+        <View style={styles.header}>
             <SearchBar
                 searchTerm={searchTerm}
                 onSearch={setSearchTerm}
@@ -38,7 +39,13 @@ const RewardsListScreen = () => {
                 setValue={setSelectedDifficulty}
                 placeholder="Selecciona una dificultad"
             />
+        </View>
+    );
+
+    return (
+        <View style={styles.container}>
             <FlatList
+                ListHeaderComponent={renderHeader}
                 data={filteredRewards}
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => (
@@ -67,14 +74,19 @@ const RewardsListScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#ffffff',
+    },
+    header: {
         padding: 16,
         backgroundColor: '#ffffff',
+        // Eliminamos la línea gris
+        borderBottomWidth: 0,
     },
     addButton: {
         position: 'absolute',
         bottom: 30,
         right: 30,
-        backgroundColor: '#d32f2f',
+        backgroundColor: '#4c669f',
         width: 60,
         height: 60,
         borderRadius: 30,
@@ -88,5 +100,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
 });
+
 
 export default RewardsListScreen;
