@@ -13,3 +13,7 @@ export const GiftIcon = ({ color, size }) => <MaterialCommunityIcons name="gift"
 export const SearchIcon = ({ color, size }) => <MaterialCommunityIcons name="magnify" color={color} size={size} />;
 
 export const AccountIcon = ({ color, size }) => <MaterialCommunityIcons name="account" color={color} size={size} />;
+
+
+
+export const DeleteIcon = ({ color, size }) => <MaterialCommunityIcons name="delete" color={color} size={size} />;

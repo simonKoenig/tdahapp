@@ -9,7 +9,8 @@ function ProfileScreen() {
 
     const handleLogout = async () => {
         await logout();
-        navigation.navigate('Login'); // Navega a la pantalla de inicio de sesión
+        // navigation.navigate('Login'); // Navega a la pantalla de inicio de sesión
+        navigation.navigate('Login');
     };
 
     return (

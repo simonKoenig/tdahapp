@@ -9,16 +9,16 @@ export const RewardsProvider = ({ children }) => {
     const { user } = useContext(AuthContext);
     const [rewards, setRewards] = useState([]);
 
-    useEffect(() => {
-        const fetchRewards = async () => {
-            if (user) {
-                const rewardsRef = collection(db, 'usuarios', user.uid, 'recompensas');
-                const rewardsSnapshot = await getDocs(rewardsRef);
-                const rewardsList = rewardsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                setRewards(rewardsList);
-            }
-        };
+    const fetchRewards = async () => {
+        if (user) {
+            const rewardsRef = collection(db, 'usuarios', user.uid, 'recompensas');
+            const rewardsSnapshot = await getDocs(rewardsRef);
+            const rewardsList = rewardsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setRewards(rewardsList);
+        }
+    };
 
+    useEffect(() => {
         fetchRewards();
     }, [user]);
 
@@ -46,8 +46,20 @@ export const RewardsProvider = ({ children }) => {
         }
     };
 
+    const getReward = async (id) => {
+        if (user) {
+            const rewardRef = doc(db, 'usuarios', user.uid, 'recompensas', id);
+            const rewardDoc = await getDoc(rewardRef);
+            if (rewardDoc.exists()) {
+                return { id: rewardDoc.id, ...rewardDoc.data() };
+            } else {
+                throw new Error('Reward not found');
+            }
+        }
+    };
+
     return (
-        <RewardsContext.Provider value={{ rewards, addReward, updateReward, deleteReward }}>
+        <RewardsContext.Provider value={{ rewards, fetchRewards, addReward, updateReward, deleteReward, getReward }}>
             {children}
         </RewardsContext.Provider>
     );

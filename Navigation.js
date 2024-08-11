@@ -116,6 +116,8 @@ function ProfileStackScreen() {
     return (
         <ProfileStack.Navigator initialRouteName="Profile" screenOptions={{ headerShown: false }}>
             <ProfileStack.Screen name="Profile" component={ProfileScreen} />
+            <ProfileStack.Screen name="Login" component={LoginScreen} />
+
             {/* Agrega más pantallas al stack de Profile aquí si es necesario */}
         </ProfileStack.Navigator>
     );
@@ -135,15 +137,7 @@ function AuthStackScreen() {
 
 
 
-// function MyStack() {
-//     return (
-//         <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
-//             <Stack.Screen name="Login" component={LoginScreen} />
-//             <Stack.Screen name="Main" component={MyTabs} />
-//             <Stack.Screen name="SignUp" component={SignUpScreen} />
-//         </Stack.Navigator>
-//     );
-// }
+
 
 export default function Navigation() {
     const { isAuthenticated } = useContext(AuthContext);

@@ -1,35 +1,30 @@
-import React, { useContext, useState } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import React, { useContext, useState, useEffect } from 'react';
+import { View, FlatList, TouchableOpacity, Text, StyleSheet, RefreshControl } from 'react-native';
 import { RewardsContext } from '../Context/RewardsProvider';
 import { useNavigation } from '@react-navigation/native';
 import RewardItem from '../Components/RewardItem';
 import SearchBar from '../Components/SearchBar';
 import DropdownComponent from '../Components/Dropdown';
 import { filtradoDificultades } from '../Utils/Constant';
-import { SwipeListView } from 'react-native-swipe-list-view';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Importa el ícono
 
 const RewardsListScreen = () => {
-    const { rewards, deleteReward } = useContext(RewardsContext);
+    const { rewards, fetchRewards } = useContext(RewardsContext);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedDifficulty, setSelectedDifficulty] = useState('');
+    const [refreshing, setRefreshing] = useState(false);
     const navigation = useNavigation();
 
+    // Filtramos las recompensas en función del término de búsqueda y la dificultad seleccionada
     const filteredRewards = rewards.filter(reward =>
         reward.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (selectedDifficulty === '' || reward.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
     );
 
-    const renderHiddenItem = (data, rowMap) => (
-        <View style={styles.rowBack}>
-            <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={() => deleteReward(data.item.id)}
-            >
-                <Icon name="delete" size={24} color="#ffffff" /> {/* Ícono de tacho de basura */}
-            </TouchableOpacity>
-        </View>
-    );
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await fetchRewards(); // Suponiendo que fetchRewards es una función que obtiene las recompensas
+        setRefreshing(false);
+    };
 
     return (
         <View style={styles.container}>
@@ -43,7 +38,7 @@ const RewardsListScreen = () => {
                 setValue={setSelectedDifficulty}
                 placeholder="Selecciona una dificultad"
             />
-            <SwipeListView
+            <FlatList
                 data={filteredRewards}
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => (
@@ -52,9 +47,12 @@ const RewardsListScreen = () => {
                         onPress={() => navigation.navigate('RewardDetail', { rewardId: item.id })}
                     />
                 )}
-                renderHiddenItem={renderHiddenItem}
-                rightOpenValue={-75}
-                leftOpenValue={75} // Añade esta línea para permitir deslizar a la izquierda
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
+                }
             />
             <TouchableOpacity
                 style={styles.addButton}
@@ -76,7 +74,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 30,
         right: 30,
-        backgroundColor: '#f44336',
+        backgroundColor: '#d32f2f',
         width: 60,
         height: 60,
         borderRadius: 30,
@@ -88,22 +86,6 @@ const styles = StyleSheet.create({
         color: '#ffffff',
         fontSize: 24,
         fontWeight: 'bold',
-    },
-    rowBack: {
-        alignItems: 'center',
-        backgroundColor: '#d32f2f',
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        height: 70, // Ajustado para que coincida con RewardItem
-        borderRadius: 10, // Añadir un radio de borde para que coincida
-        marginVertical: 8, // Añadido para que coincida con el margen de RewardItem
-    },
-    deleteButton: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: 75,
-        height: '100%', // Hacer que el botón ocupe todo el alto del rowBack
     },
 });
 
