@@ -1,18 +1,55 @@
-import React, { useContext, useState } from 'react';
-import { View, FlatList, TouchableOpacity, Text, StyleSheet, RefreshControl } from 'react-native';
+// import React, { useContext } from 'react';
+// import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+// import { RewardsContext } from '../Context/RewardsProvider';
+// import { useNavigation } from '@react-navigation/native';
+
+// function RewardsListScreen() {
+//     const { rewards } = useContext(RewardsContext);
+//     const navigation = useNavigation();
+
+//     return (
+//         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+//             <FlatList
+//                 data={rewards}
+//                 keyExtractor={item => item.id}
+//                 renderItem={({ item }) => (
+//                     <TouchableOpacity onPress={() => navigation.navigate('RewardDetail', { rewardId: item.id })}>
+//                         <Text>{item.nombre}</Text>
+//                     </TouchableOpacity>
+//                 )}
+//             />
+//             <TouchableOpacity onPress={() => navigation.navigate('AddReward')}>
+//                 <Text style={{ fontSize: 30 }}>+</Text>
+//             </TouchableOpacity>
+//         </View>
+//     );
+// }
+
+// export default RewardsListScreen;
+
+import React, { useContext, useState, useEffect } from 'react';
+import { View, FlatList, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { RewardsContext } from '../Context/RewardsProvider';
 import { useNavigation } from '@react-navigation/native';
 import RewardItem from '../Components/RewardItem';
 import SearchBar from '../Components/SearchBar';
-import DropdownComponent from '../Components/Dropdown';
+import DropdownComponent from '../Components/Dropdown';  // Importamos DropdownCompone
+
 import { filtradoDificultades } from '../Utils/Constant';
 
-const RewardsListScreen = () => {
+const RewardsListScreen = ({ route }) => {
     const { rewards, fetchRewards } = useContext(RewardsContext);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedDifficulty, setSelectedDifficulty] = useState('');
-    const [refreshing, setRefreshing] = useState(false);
+    const [refreshing, setRefreshing] = useState(false); // Estado para controlar la actualización
     const navigation = useNavigation();
+
+    const { patientId } = route.params;
+    console.log(patientId);
+
+    useEffect(() => {
+        fetchRewards(patientId);
+    }, [patientId]);
 
     // Filtramos las recompensas en función del término de búsqueda y la dificultad seleccionada
     const filteredRewards = rewards.filter(reward =>
@@ -20,15 +57,14 @@ const RewardsListScreen = () => {
         (selectedDifficulty === '' || reward.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
     );
 
-    const onRefresh = async () => {
+    const handleRefresh = async () => {
         setRefreshing(true);
-        await fetchRewards(); // Suponiendo que fetchRewards es una función que obtiene las recompensas
+        await fetchRewards(patientId);
         setRefreshing(false);
     };
 
-    // Renderiza SearchBar y Dropdown como encabezado fijo
-    const renderHeader = () => (
-        <View style={styles.header}>
+    return (
+        <View style={styles.container}>
             <SearchBar
                 searchTerm={searchTerm}
                 onSearch={setSearchTerm}
@@ -39,13 +75,7 @@ const RewardsListScreen = () => {
                 setValue={setSelectedDifficulty}
                 placeholder="Selecciona una dificultad"
             />
-        </View>
-    );
-
-    return (
-        <View style={styles.container}>
             <FlatList
-                ListHeaderComponent={renderHeader}
                 data={filteredRewards}
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => (
@@ -54,12 +84,8 @@ const RewardsListScreen = () => {
                         onPress={() => navigation.navigate('RewardDetail', { rewardId: item.id })}
                     />
                 )}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                    />
-                }
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
             />
             <TouchableOpacity
                 style={styles.addButton}
@@ -74,19 +100,14 @@ const RewardsListScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#ffffff',
-    },
-    header: {
         padding: 16,
         backgroundColor: '#ffffff',
-        // Eliminamos la línea gris
-        borderBottomWidth: 0,
     },
     addButton: {
         position: 'absolute',
         bottom: 30,
         right: 30,
-        backgroundColor: '#4c669f',
+        backgroundColor: '#d32f2f',
         width: 60,
         height: 60,
         borderRadius: 30,
@@ -100,6 +121,5 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
 });
-
 
 export default RewardsListScreen;

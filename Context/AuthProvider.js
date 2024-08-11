@@ -3,6 +3,7 @@ import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase-config'; // Asegúrate de que la configuración de Firebase esté correctamente importada
 import LoadingScreen from '../Components/LoadingScreen'; // Asegúrate de que la pantalla de carga esté correctamente importada
+import { PatientsProvider } from './PatientsProvider'; // Importa el PatientsProvider
 
 export const AuthContext = createContext();
 
@@ -75,7 +76,9 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={{ user, role, isAuthenticated, login, logout }}>
-            {children}
+            <PatientsProvider>
+                {children}
+            </PatientsProvider>
         </AuthContext.Provider>
     );
 };

@@ -8,35 +8,23 @@ import HomeScreen from "./Screens/HomeScreen";
 import LoginScreen from "./Screens/LoginScreen";
 import ProfileScreen from "./Screens/ProfileScreen";
 import StatisticsScreen from "./Screens/StatisticsScreen";
-
-
-
-
-
 import RewardsListScreen from './Screens/RewardsListScreen';
 import AddRewardScreen from './Screens/AddRewardScreen';
 import RewardDetailScreen from './Screens/RewardDetailScreen';
-
 import SignUpScreen from "./Screens/SingUpScreen";
+import AddPatientScreen from "./Screens/AddPatientScreen"; // Importa la nueva pantalla
 
 import { AuthContext } from './Context/AuthProvider';
 import { AccountIcon, ChartBarIcon, GiftIcon, HomeIcon } from './Components/Icons';
-
-// Icons
-
-
-
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const AuthStack = createStackNavigator();
-
 const HomeStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
 const RewardsStack = createStackNavigator();
 const StatisticsStack = createStackNavigator();
-
 
 function MyTabs() {
     const { role } = useContext(AuthContext);
@@ -49,7 +37,7 @@ function MyTabs() {
                 ),
             }} />
             {role === 'administrador' && (
-                <>
+                <React.Fragment>
                     <Tab.Screen name="Estadísticas" component={StatisticsStackScreen} options={{
                         tabBarLabel: 'Estadísticas',
                         tabBarIcon: ({ color, size }) => (
@@ -62,7 +50,7 @@ function MyTabs() {
                             <GiftIcon color={color} size={size} />
                         ),
                     }} />
-                </>
+                </React.Fragment>
             )}
             <Tab.Screen name="Perfil" component={ProfileStackScreen} options={{
                 tabBarLabel: 'Perfil',
@@ -99,13 +87,19 @@ function StatisticsStackScreen() {
 
 function RewardsStackScreen() {
     const { role } = useContext(AuthContext);
+    const patientId = "j9ZfszJNZRRV6In1e3yZMYxiQky2"; // Reemplaza esto con el ID del paciente real
+
     if (role !== 'administrador') {
         return null; // No renderizar si el rol no es admin
     }
 
     return (
         <RewardsStack.Navigator initialRouteName="RewardsList" screenOptions={{ headerShown: false }}>
-            <RewardsStack.Screen name="RewardsList" component={RewardsListScreen} />
+            <RewardsStack.Screen
+                name="RewardsList"
+                component={RewardsListScreen}
+                initialParams={{ patientId }} // Pasar el ID del paciente aquí
+            />
             <RewardsStack.Screen name="AddReward" component={AddRewardScreen} />
             <RewardsStack.Screen name="RewardDetail" component={RewardDetailScreen} />
         </RewardsStack.Navigator>
@@ -117,12 +111,11 @@ function ProfileStackScreen() {
         <ProfileStack.Navigator initialRouteName="Profile" screenOptions={{ headerShown: false }}>
             <ProfileStack.Screen name="Profile" component={ProfileScreen} />
             <ProfileStack.Screen name="Login" component={LoginScreen} />
+            <ProfileStack.Screen name="AddPatient" component={AddPatientScreen} />
 
-            {/* Agrega más pantallas al stack de Profile aquí si es necesario */}
         </ProfileStack.Navigator>
     );
 }
-
 
 function AuthStackScreen() {
     return (
@@ -132,12 +125,6 @@ function AuthStackScreen() {
         </AuthStack.Navigator>
     );
 }
-
-
-
-
-
-
 
 export default function Navigation() {
     const { isAuthenticated } = useContext(AuthContext);
