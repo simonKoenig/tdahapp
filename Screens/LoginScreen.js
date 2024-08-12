@@ -32,8 +32,9 @@ function LoginScreen() {
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 console.log('Sesión iniciada');
+
                 const user = userCredential.user;
-                console.log(user);
+
             })
             .catch((error) => {
                 console.log(error);

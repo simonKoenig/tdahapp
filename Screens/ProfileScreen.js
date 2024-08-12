@@ -97,32 +97,156 @@
 
 // export default ProfileScreen;
 
-import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Button, SafeAreaView, FlatList } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+// import React, { useContext, useEffect, useState, useCallback } from 'react';
+// import { View, Text, TouchableOpacity, StyleSheet, Button, SafeAreaView } from 'react-native';
+// import { useNavigation, useFocusEffect } from '@react-navigation/native';
+// import { AuthContext } from '../Context/AuthProvider';
+// import { PatientsContext } from '../Context/PatientsProvider';
+// import DropdownComponent from '../Components/Dropdown';
+
+// const ProfileScreen = () => {
+//     const { logout, user } = useContext(AuthContext);
+//     const { getPatientsByUser } = useContext(PatientsContext);
+//     const navigation = useNavigation();
+//     const [patients, setPatients] = useState([]);
+//     const [selectedPatient, setSelectedPatient] = useState(null);
+
+//     const fetchPatients = async () => {
+//         if (user && user.uid) {
+//             const patientsList = await getPatientsByUser(user.uid);
+//             const formattedPatients = patientsList.map(patient => ({
+//                 label: patient.nombreApellido,
+//                 value: patient.patientId,
+//             }));
+//             setPatients(formattedPatients);
+//         }
+//     };
+
+//     useEffect(() => {
+//         fetchPatients();
+//     }, [user]);
+
+//     // useFocusEffect se utiliza para actualizar los pacientes cuando la pantalla se enfoca
+//     useFocusEffect(
+//         useCallback(() => {
+//             fetchPatients();
+//         }, [])
+//     );
+
+//     const handleLogout = async () => {
+//         await logout();
+//         navigation.navigate('Login');
+//     };
+
+//     return (
+//         <SafeAreaView style={styles.safeArea}>
+//             <View style={styles.container}>
+//                 <Text style={styles.title}>Lista de Pacientes</Text>
+
+//                 {/* Dropdown para seleccionar paciente */}
+//                 <DropdownComponent
+//                     data={patients}
+//                     value={selectedPatient}
+//                     setValue={setSelectedPatient}
+//                     placeholder="Seleccione un paciente"
+//                 />
+
+//                 {/* Botón para agregar paciente */}
+//                 <TouchableOpacity
+//                     style={styles.addButton}
+//                     onPress={() => navigation.navigate('AddPatient')}
+//                 >
+//                     <Text style={styles.addButtonText}>Agregar Paciente</Text>
+//                 </TouchableOpacity>
+//             </View>
+
+//             <View style={styles.logoutContainer}>
+//                 <Button
+//                     title="Cerrar Sesión"
+//                     onPress={handleLogout}
+//                 />
+//             </View>
+//         </SafeAreaView>
+//     );
+// };
+
+// const styles = StyleSheet.create({
+//     safeArea: {
+//         flex: 1,
+//         backgroundColor: '#ffffff',
+//     },
+//     container: {
+//         flex: 1,
+//         justifyContent: 'center',
+//         alignItems: 'center',
+//         padding: 16,
+//     },
+//     addButton: {
+//         backgroundColor: '#4c669f',
+//         padding: 10,
+//         borderRadius: 5,
+//         marginTop: 20,
+//     },
+//     addButtonText: {
+//         color: '#fff',
+//         fontSize: 18,
+//     },
+//     logoutContainer: {
+//         justifyContent: 'center',
+//         alignItems: 'center',
+//         padding: 16,
+//         marginBottom: 20,
+//     },
+//     title: {
+//         fontSize: 24,
+//         marginBottom: 20,
+//     },
+// });
+
+// export default ProfileScreen;
+
+
+import React, { useContext, useEffect, useState, useCallback } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Button, SafeAreaView } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { AuthContext } from '../Context/AuthProvider';
 import { PatientsContext } from '../Context/PatientsProvider';
+import { RewardsContext } from '../Context/RewardsProvider'; // <-- Importa el contexto de recompensas
+import DropdownComponent from '../Components/Dropdown';
 
 const ProfileScreen = () => {
     const { logout, user } = useContext(AuthContext);
-    const { getPatientsByUser } = useContext(PatientsContext);
+    const { getPatientsByUser, setSelectedPatientId } = useContext(PatientsContext);
+    const { fetchRewards } = useContext(RewardsContext); // <-- Utiliza fetchRewards
     const navigation = useNavigation();
     const [patients, setPatients] = useState([]);
+    const [selectedPatient, setSelectedPatient] = useState(null);
+    const { role } = useContext(AuthContext);
+
+    const fetchPatients = async () => {
+        if (user && user.uid) {
+            const patientsList = await getPatientsByUser(user.uid);
+            const formattedPatients = patientsList.map(patient => ({
+                label: patient.nombreApellido,
+                value: patient.patientId,
+            }));
+            setPatients(formattedPatients);
+        }
+    };
 
     useEffect(() => {
-        const fetchPatients = async () => {
-            if (user && user.uid) {
-                console.log('Fetching patients for user:', user.uid);
-                const patientsList = await getPatientsByUser(user.uid);
-                console.log('Fetched patients:', patientsList);
-                setPatients(patientsList);
-            } else {
-                console.log('User UID is not available');
-            }
-        };
+        if (selectedPatient) {
+            setSelectedPatientId(selectedPatient);
+            fetchRewards(selectedPatient); // <-- Llama a fetchRewards cada vez que cambia el paciente seleccionado
+        }
+    }, [selectedPatient, setSelectedPatientId, fetchRewards]);
 
-        fetchPatients();
-    }, [user]);
+    // useFocusEffect se utiliza para actualizar los pacientes cuando la pantalla se enfoca
+    useFocusEffect(
+        useCallback(() => {
+            fetchPatients();
+        }, [])
+    );
 
     const handleLogout = async () => {
         await logout();
@@ -131,30 +255,32 @@ const ProfileScreen = () => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <View style={styles.container}>
-                <Text style={styles.title}>Lista de Pacientes</Text>
-                <FlatList
-                    data={patients}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                        <View style={styles.patientItem}>
-                            <Text style={styles.patientInfo}>Nombre: {item.nombreApellido}</Text>
-                            <Text style={styles.patientInfo}>Email: {item.email}</Text>
-                            <Text style={styles.patientInfo}>Rol: {item.rol}</Text>
-                            <Text style={styles.patientId}>ID: {item.id}</Text>
-                            <Text style={styles.patientId}>Patient ID: {item.patientId}</Text>
-                        </View>
-                    )}
-                />
-                <TouchableOpacity
-                    style={styles.addButton}
-                    onPress={() => navigation.navigate('AddPatient')}
-                >
-                    <Text style={styles.addButtonText}>Agregar Paciente</Text>
-                </TouchableOpacity>
-            </View>
+            {role === 'administrador' && (
+                <React.Fragment>
+
+                    <View style={styles.container}>
+                        <Text style={styles.title}>Lista de Pacientes</Text>
+
+                        {/* Dropdown para seleccionar paciente */}
+                        <DropdownComponent
+                            data={patients}
+                            value={selectedPatient}
+                            setValue={setSelectedPatient}
+                            placeholder="Seleccione un paciente"
+                        />
+
+                        {/* Botón para agregar paciente */}
+                        <TouchableOpacity
+                            style={styles.addButton}
+                            onPress={() => navigation.navigate('AddPatient')}
+                        >
+                            <Text style={styles.addButtonText}>Agregar Paciente</Text>
+                        </TouchableOpacity>
+                    </View>
+                </React.Fragment>
+            )}
+
             <View style={styles.logoutContainer}>
-                <Text style={styles.title}>ProfileScreen</Text>
                 <Button
                     title="Cerrar Sesión"
                     onPress={handleLogout}
@@ -186,27 +312,14 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
     logoutContainer: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 16,
+        marginBottom: 20,
     },
     title: {
         fontSize: 24,
         marginBottom: 20,
-    },
-    patientItem: {
-        padding: 15,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-        width: '100%',
-    },
-    patientInfo: {
-        fontSize: 18,
-    },
-    patientId: {
-        fontSize: 16,
-        color: '#666',
     },
 });
 

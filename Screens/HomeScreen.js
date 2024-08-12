@@ -4,11 +4,12 @@ import { AuthContext } from '../Context/AuthProvider';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase-config';
 import LoadingScreen from '../Components/LoadingScreen'; // Asegúrate de ajustar la ruta según tu estructura de proyecto
-
+import { PatientsContext } from '../Context/PatientsProvider';
 function HomeScreen() {
     const { user } = useContext(AuthContext);
     const [role, setRole] = useState('');
     const [loading, setLoading] = useState(true);
+    const { setSelectedPatientId } = useContext(PatientsContext);
 
     useEffect(() => {
         const obtenerRol = async () => {
@@ -32,12 +33,15 @@ function HomeScreen() {
     }
 
     return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text>Home Screen</Text>
-            {user && <Text>Mail: {user.email}</Text>}
-            {user && <Text>UID: {user.uid}</Text>}
-            {user && <Text>Nombre y Apellido: {user.nombreApellido}</Text>}
-            {user && <Text>Rol: {role}</Text>}
+        <View>
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <Text>Home Screen</Text>
+                {user && <Text>Mail: {user.email}</Text>}
+                {user && <Text>UID: {user.uid}</Text>}
+                {user && <Text>Nombre y Apellido: {user.nombreApellido}</Text>}
+                {user && <Text>Rol: {role}</Text>}
+            </View>
+
         </View>
     );
 }

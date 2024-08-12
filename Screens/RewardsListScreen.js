@@ -45,7 +45,7 @@ const RewardsListScreen = ({ route }) => {
     const navigation = useNavigation();
 
     const { patientId } = route.params;
-    console.log(patientId);
+
 
     useEffect(() => {
         fetchRewards(patientId);
