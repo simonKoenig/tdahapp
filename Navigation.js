@@ -66,7 +66,7 @@ function HomeStackScreen() {
     return (
         <HomeStack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
             <HomeStack.Screen name="Home" component={HomeScreen} />
-            {/* Agrega más pantallas al stack de Home aquí si es necesario */}
+
         </HomeStack.Navigator>
     );
 }
@@ -80,14 +80,14 @@ function StatisticsStackScreen() {
     return (
         <StatisticsStack.Navigator initialRouteName="Statistics" screenOptions={{ headerShown: false }}>
             <StatisticsStack.Screen name="Statistics" component={StatisticsScreen} />
-            {/* Agrega más pantallas al stack de Statistics aquí si es necesario */}
+
         </StatisticsStack.Navigator>
     );
 }
 
 function RewardsStackScreen() {
     const { role } = useContext(AuthContext);
-    const patientId = "j9ZfszJNZRRV6In1e3yZMYxiQky2"; // Reemplaza esto con el ID del paciente real
+    const patientId = ''
 
     if (role !== 'administrador') {
         return null; // No renderizar si el rol no es admin

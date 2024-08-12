@@ -9,7 +9,8 @@ function HomeScreen() {
     const { user } = useContext(AuthContext);
     const [role, setRole] = useState('');
     const [loading, setLoading] = useState(true);
-    const { setSelectedPatientId } = useContext(PatientsContext);
+    const { selectedPatientId } = useContext(PatientsContext);
+    const [patientInfo, setPatientInfo] = useState(null);
 
     useEffect(() => {
         const obtenerRol = async () => {
@@ -28,6 +29,23 @@ function HomeScreen() {
         obtenerRol();
     }, [user]);
 
+    useEffect(() => {
+        const fetchPatientInfo = async () => {
+            if (selectedPatientId) {
+                const docRef = doc(db, 'usuarios', selectedPatientId); // Asume que 'usuarios' tiene info de pacientes
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    setPatientInfo(docSnap.data()); // Guardar la información del paciente seleccionado
+                } else {
+                    console.log('Paciente no encontrado');
+                }
+            }
+        };
+
+        fetchPatientInfo();
+    }, [selectedPatientId]);
+
+
     if (loading) {
         return <LoadingScreen />;
     }
@@ -40,6 +58,13 @@ function HomeScreen() {
                 {user && <Text>UID: {user.uid}</Text>}
                 {user && <Text>Nombre y Apellido: {user.nombreApellido}</Text>}
                 {user && <Text>Rol: {role}</Text>}
+                {patientInfo && (
+                    <>
+                        <Text>Paciente Seleccionado: {patientInfo.nombreApellido}</Text>
+                        <Text>Email del Paciente: {patientInfo.email}</Text>
+                        <Text>Rol del Paciente: {patientInfo.rol}</Text>
+                    </>
+                )}
             </View>
 
         </View>
