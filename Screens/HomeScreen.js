@@ -9,8 +9,7 @@ function HomeScreen() {
     const { user } = useContext(AuthContext);
     const [role, setRole] = useState('');
     const [loading, setLoading] = useState(true);
-    const { selectedPatientId } = useContext(PatientsContext);
-    const [patientInfo, setPatientInfo] = useState(null);
+    const { patients, setSelectedPatientId, addPatientByEmail, selectedPatientId, fetchPatients } = useContext(PatientsContext);
 
     useEffect(() => {
         const obtenerRol = async () => {
@@ -29,26 +28,12 @@ function HomeScreen() {
         obtenerRol();
     }, [user]);
 
-    useEffect(() => {
-        const fetchPatientInfo = async () => {
-            if (selectedPatientId) {
-                const docRef = doc(db, 'usuarios', selectedPatientId); // Asume que 'usuarios' tiene info de pacientes
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    setPatientInfo(docSnap.data()); // Guardar la información del paciente seleccionado
-                } else {
-                    console.log('Paciente no encontrado');
-                }
-            }
-        };
-
-        fetchPatientInfo();
-    }, [selectedPatientId]);
-
 
     if (loading) {
         return <LoadingScreen />;
     }
+
+    const selectedPatient = patients.find(patient => patient.id === selectedPatientId);
 
     return (
         <View>
@@ -58,12 +43,14 @@ function HomeScreen() {
                 {user && <Text>UID: {user.uid}</Text>}
                 {user && <Text>Nombre y Apellido: {user.nombreApellido}</Text>}
                 {user && <Text>Rol: {role}</Text>}
-                {patientInfo && (
-                    <>
-                        <Text>Paciente Seleccionado: {patientInfo.nombreApellido}</Text>
-                        <Text>Email del Paciente: {patientInfo.email}</Text>
-                        <Text>Rol del Paciente: {patientInfo.rol}</Text>
-                    </>
+                {selectedPatient ? (
+                    <View>
+                        <Text>Paciente Seleccionado:</Text>
+                        <Text>Nombre: {selectedPatient.nombreApellido}</Text>
+                        <Text>ID: {selectedPatient.id}</Text>
+                    </View>
+                ) : (
+                    <Text>No hay paciente seleccionado</Text>
                 )}
             </View>
 

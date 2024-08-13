@@ -18,6 +18,8 @@ import UserRewardsScreen from './Screens/UserRewardsScreen';
 import { AuthContext } from './Context/AuthProvider';
 import { AccountIcon, ChartBarIcon, GiftIcon, HomeIcon } from './Components/Icons';
 
+import { PatientsContext } from './Context/PatientsProvider';
+
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -28,11 +30,15 @@ const RewardsStack = createStackNavigator();
 const StatisticsStack = createStackNavigator();
 
 function MyTabs() {
-    const { role } = useContext(AuthContext);
+    const { role, user } = useContext(AuthContext);
+    const { patients, selectedPatientId } = useContext(PatientsContext);
+    const selectedPatient = patients.find(patient => patient.id === selectedPatientId);
+    // 
     return (
         <Tab.Navigator initialRouteName="Home">
             <Tab.Screen name="Inicio" component={HomeStackScreen} options={{
                 tabBarLabel: 'Inicio',
+                headerTitle: selectedPatient ? `Paciente: ${selectedPatient.nombreApellido}` : `Usuario: ${user.nombreApellido}`,
                 tabBarIcon: ({ color, size }) => (
                     <HomeIcon color={color} size={size} />
                 ),
@@ -41,12 +47,14 @@ function MyTabs() {
                 <React.Fragment>
                     <Tab.Screen name="Estadísticas" component={StatisticsStackScreen} options={{
                         tabBarLabel: 'Estadísticas',
+                        headerTitle: selectedPatient ? `Paciente: ${selectedPatient.nombreApellido}` : 'Estadísticas',
                         tabBarIcon: ({ color, size }) => (
                             <ChartBarIcon color={color} size={size} />
                         ),
                     }} />
                     <Tab.Screen name="Recompensas" component={RewardsStackScreen} options={{
                         tabBarLabel: 'Recompensas',
+                        headerTitle: selectedPatient ? `Paciente: ${selectedPatient.nombreApellido}` : 'Recompensas',
                         tabBarIcon: ({ color, size }) => (
                             <GiftIcon color={color} size={size} />
                         ),
@@ -55,6 +63,8 @@ function MyTabs() {
             )}
             <Tab.Screen name="Perfil" component={ProfileStackScreen} options={{
                 tabBarLabel: 'Perfil',
+                headerTitle: `Usuario: ${user.nombreApellido}`
+                ,
                 tabBarIcon: ({ color, size }) => (
                     <AccountIcon color={color} size={size} />
                 ),
