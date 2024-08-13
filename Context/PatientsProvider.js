@@ -43,11 +43,57 @@ export const PatientsProvider = ({ children }) => {
         }
     }, [user]);
 
+    // const addPatientByEmail = async (email) => {
+    //     try {
+    //         if (!user) {
+    //             console.error('No hay un usuario autenticado');
+    //             return null;
+    //         }
+
+    //         const usersRef = collection(db, 'usuarios');
+    //         const q = query(usersRef, where('email', '==', email));
+    //         const querySnapshot = await getDocs(q);
+
+    //         if (querySnapshot.empty) {
+    //             throw new Error('No se encontró un usuario con ese email');
+
+    //         }
+
+    //         const sourceDoc = querySnapshot.docs[0];
+    //         const sourceUserId = sourceDoc.id;
+    //         const sourceUserData = sourceDoc.data();
+
+    //         setSelectedPatientId(sourceUserId);
+
+    //         const patientsRef = doc(db, 'usuarios', user.uid, 'pacientes', sourceUserId);
+    //         const patientDoc = await getDoc(patientsRef);
+
+    //         if (!patientDoc.exists()) {
+    //             const newPatientData = {
+    //                 patientId: sourceUserId,
+    //                 nombreApellido: sourceUserData.nombreApellido || '',
+    //                 email: sourceUserData.email || email,
+    //                 rol: sourceUserData.rol || 'paciente',
+    //             };
+
+    //             await setDoc(patientsRef, newPatientData);
+    //             fetchPatients(); // Refresca la lista de pacientes después de agregar uno nuevo
+    //         }
+
+    //         return {
+    //             uid: sourceUserId,
+    //             ...sourceUserData,
+    //         };
+    //     } catch (error) {
+    //         console.error('Error al buscar o agregar paciente por email:', error);
+    //         return null;
+    //     }
+    // };
+
     const addPatientByEmail = async (email) => {
         try {
             if (!user) {
-                console.error('No hay un usuario autenticado');
-                return null;
+                throw new Error('No hay un usuario autenticado');
             }
 
             const usersRef = collection(db, 'usuarios');
@@ -55,7 +101,6 @@ export const PatientsProvider = ({ children }) => {
             const querySnapshot = await getDocs(q);
 
             if (querySnapshot.empty) {
-                console.error('No se encontró un usuario con ese email');
                 return null;
             }
 
@@ -85,50 +130,52 @@ export const PatientsProvider = ({ children }) => {
                 ...sourceUserData,
             };
         } catch (error) {
-            console.error('Error al buscar o agregar paciente por email:', error);
-            return null;
+            console.error('Error en addPatientByEmail:', error);
+            throw error; // Lanzar el error para que sea manejado en un nivel superior
         }
     };
 
-    const getPatient = async () => {
-        try {
-            if (!selectedPatientId) {
-                console.error('No patient ID selected.');
-                return null;
-            }
 
-            const patientRef = doc(db, 'usuarios', user.uid, 'pacientes', selectedPatientId);
-            const patientDoc = await getDoc(patientRef);
+    // const getPatient = async () => {
+    //     try {
+    //         if (!selectedPatientId) {
+    //             console.error('No patient ID selected.');
+    //             return null;
+    //         }
 
-            if (!patientDoc.exists()) {
-                console.error('No se encontró un paciente con ese ID');
-                return null;
-            }
+    //         const patientRef = doc(db, 'usuarios', user.uid, 'pacientes', selectedPatientId);
+    //         const patientDoc = await getDoc(patientRef);
 
-            const patientData = patientDoc.data();
-            setSelectedPatient({
-                nombreApellido: patientData.nombreApellido,
-                email: patientData.email,
-            });
+    //         if (!patientDoc.exists()) {
+    //             console.error('No se encontró un paciente con ese ID');
+    //             return null;
+    //         }
 
-            // Añadir console.log para mostrar los detalles del paciente seleccionado
-            console.log('Selected Patient:', {
-                nombreApellido: patientData.nombreApellido,
-                email: patientData.email,
-            });
-        } catch (error) {
-            console.error('Error getting patient:', error);
-            setSelectedPatient(null);
-        }
-    };
+    //         const patientData = patientDoc.data();
+    //         setSelectedPatient({
+    //             nombreApellido: patientData.nombreApellido,
+    //             email: patientData.email,
+    //         });
 
-    useEffect(() => {
-        if (selectedPatientId) {
-            getPatient();
-        }
-    }, [selectedPatientId]);
+    //         // Añadir console.log para mostrar los detalles del paciente seleccionado
+    //         console.log('Selected Patient:', {
+    //             nombreApellido: patientData.nombreApellido,
+    //             email: patientData.email,
+    //         });
+    //     } catch (error) {
+    //         console.error('Error getting patient:', error);
+    //         setSelectedPatient(null);
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     if (selectedPatientId) {
+    //         getPatient();
+    //     }
+    // }, [selectedPatientId]);
+
     return (
-        <PatientsContext.Provider value={{ patients, addPatientByEmail, selectedPatientId, setSelectedPatientId, getPatient }}>
+        <PatientsContext.Provider value={{ patients, addPatientByEmail, selectedPatientId, setSelectedPatientId }}>
             {children}
         </PatientsContext.Provider>
     );

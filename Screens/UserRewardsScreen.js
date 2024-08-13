@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'r
 import { RewardsContext } from '../Context/RewardsProvider';
 import { PatientsContext } from '../Context/PatientsProvider';
 import DropdownComponent from '../Components/Dropdown';
-
+import LoadingScreen from '../Components/LoadingScreen';
 
 import { useNavigation } from '@react-navigation/native';
 
@@ -14,19 +14,29 @@ const UserRewardsScreen = () => {
     const [email, setEmail] = useState('');
     const { patients, setSelectedPatientId, addPatientByEmail, selectedPatientId } = useContext(PatientsContext);
     const { fetchRewards, userRewards, setRewards } = useContext(RewardsContext);
-
+    const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     const handleFetchUserRewards = async () => {
         try {
             if (email) {
+                setLoading(true);
+                setErrorMessage(''); // Limpiar cualquier mensaje de error previo
                 const patientData = await addPatientByEmail(email);
 
                 if (patientData && patientData.uid) {
                     console.log('Patient data:', patientData);
                     handleSelectPatient(patientData.uid); // Llamar a handleSelectPatient con el UID del paciente encontrado
                 }
+                else {
+                    setErrorMessage('No se encontró un usuario con ese email.');
+                }
             }
         } catch (error) {
             console.error('Error fetching user rewards:', error);
+            setErrorMessage(error.message || 'Ocurrió un error al intentar buscar recompensas.');
+
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -44,17 +54,6 @@ const UserRewardsScreen = () => {
     }));
 
 
-    // <View>
-    //     <DropdownComponent
-    //         data={transformedPatients}
-    //         value={selectedPatient}
-    //         setValue={(value) => {
-    //             setSelectedPatient(value);
-    //             handleSelectPatient(value);
-    //         }}
-    //         placeholder="Seleccione un paciente"
-    //     />
-    // </View>
 
     return (
         <View style={styles.container}>
@@ -68,12 +67,6 @@ const UserRewardsScreen = () => {
             <TouchableOpacity style={styles.button} onPress={handleFetchUserRewards}>
                 <Text style={styles.buttonText}>Buscar Recompensas</Text>
             </TouchableOpacity>
-
-
-
-            {patients.length === 0 && email && (
-                <Text style={styles.noPatientsText}>No se encontraron pacientes para este correo electrónico.</Text>
-            )}
 
 
             {patients.length > 0 && (
@@ -94,6 +87,16 @@ const UserRewardsScreen = () => {
                     onSelect={handleSelectPatient} // Pasar handleSelectPatient como prop
                 />
             )}
+            {loading && <LoadingScreen />}
+            {typeof errorMessage === 'string' && errorMessage.length > 0 && (
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorMessage}>{errorMessage}</Text>
+                </View>
+            )}
+
+
+
+
 
             {/* {userRewards.length === 0 && (
                 <Text style={styles.noRewardsText}>No se encontraron recompensas para este correo electrónico.</Text>
@@ -141,6 +144,19 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: '#ccc',
     },
+    errorContainer: {
+        marginVertical: 8,
+        padding: 10,
+        backgroundColor: '#fee',
+        borderRadius: 5,
+    },
+
+    errorMessage: {
+        color: 'red',
+        fontSize: 16,
+        marginTop: 16,
+    },
+
 });
 
 export default UserRewardsScreen;
