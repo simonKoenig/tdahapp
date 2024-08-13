@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
-const DropdownComponent = ({ data, value, setValue, placeholder }) => {
+const DropdownComponent = ({ data, value, setValue, placeholder, onSelect }) => {
     return (
         <Dropdown
             style={styles.dropdown}
@@ -13,11 +13,13 @@ const DropdownComponent = ({ data, value, setValue, placeholder }) => {
             value={value}
             onChange={item => {
                 setValue(item.value);
+                if (onSelect) {
+                    onSelect(item.value);
+                }
             }}
         />
     );
 };
-
 const styles = StyleSheet.create({
     dropdown: {
         width: '80%',

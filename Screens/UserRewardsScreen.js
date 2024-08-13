@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { RewardsContext } from '../Context/RewardsProvider';
 import { PatientsContext } from '../Context/PatientsProvider';
+import DropdownComponent from '../Components/Dropdown';
 
 
 import { useNavigation } from '@react-navigation/native';
@@ -11,7 +12,7 @@ const UserRewardsScreen = () => {
     const navigation = useNavigation();
 
     const [email, setEmail] = useState('');
-    const { patients, setSelectedPatientId, addPatientByEmail } = useContext(PatientsContext);
+    const { patients, setSelectedPatientId, addPatientByEmail, selectedPatientId } = useContext(PatientsContext);
     const { fetchRewards, userRewards, setRewards } = useContext(RewardsContext);
 
     const handleFetchUserRewards = async () => {
@@ -30,14 +31,30 @@ const UserRewardsScreen = () => {
     };
 
     const handleSelectPatient = async (patientId) => {
-        setSelectedPatientId(patientId);
         const rewards = await fetchRewards(patientId);
         setRewards(rewards);
         console.log('User rewards:', rewards); // Imprimir recompensas por consola
         navigation.navigate('RewardsList');
     };
 
+    console.log('Patients:', patients);
+    const transformedPatients = patients.map(patient => ({
+        label: patient.nombreApellido,
+        value: patient.id,
+    }));
 
+
+    // <View>
+    //     <DropdownComponent
+    //         data={transformedPatients}
+    //         value={selectedPatient}
+    //         setValue={(value) => {
+    //             setSelectedPatient(value);
+    //             handleSelectPatient(value);
+    //         }}
+    //         placeholder="Seleccione un paciente"
+    //     />
+    // </View>
 
     return (
         <View style={styles.container}>
@@ -60,14 +77,21 @@ const UserRewardsScreen = () => {
 
 
             {patients.length > 0 && (
-                <FlatList
-                    data={patients}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity onPress={() => handleSelectPatient(item.id)}>
-                            <Text style={styles.patientItem}>{item.nombreApellido}</Text>
-                        </TouchableOpacity>
-                    )}
+                // <FlatList
+                //     data={patients}
+                //     keyExtractor={(item) => item.id}
+                //     renderItem={({ item }) => (
+                //         <TouchableOpacity onPress={() => handleSelectPatient(item.id)}>
+                //             <Text style={styles.patientItem}>{item.nombreApellido}</Text>
+                //         </TouchableOpacity>
+                //     )}
+                // />
+                <DropdownComponent
+                    data={transformedPatients}
+                    value={selectedPatientId}
+                    setValue={setSelectedPatientId}
+                    placeholder="Seleccione un paciente"
+                    onSelect={handleSelectPatient} // Pasar handleSelectPatient como prop
                 />
             )}
 
