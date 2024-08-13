@@ -6,16 +6,23 @@ import { dificultades } from '../Utils/Constant';
 
 import { RewardsContext } from '../Context/RewardsProvider';
 import { useNavigation } from '@react-navigation/native';
+import { PatientsContext } from '../Context/PatientsProvider';
 
 function AddRewardScreen() {
     const [nombre, setNombre] = useState('');
     const [dificultad, setDificultad] = useState('');
     const { addReward } = useContext(RewardsContext);
+    const { selectedPatientId } = useContext(PatientsContext);
+
     const navigation = useNavigation();
 
     const handleAddReward = async () => {
-        await addReward({ nombre, dificultad });
-        navigation.goBack();
+        if (selectedPatientId) {
+            await addReward({ nombre, dificultad }, selectedPatientId); // Pasa el UID del paciente seleccionado
+            navigation.goBack();
+        } else {
+            console.error('No patient selected');
+        }
     };
 
     // const dificultades = [

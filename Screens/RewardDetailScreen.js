@@ -5,39 +5,58 @@ import { dificultades } from '../Utils/Constant';
 import { RewardsContext } from '../Context/RewardsProvider';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import LoadingScreen from '../Components/LoadingScreen'; // Importar LoadingScreen
+import { PatientsContext } from '../Context/PatientsProvider';
 
 function RewardDetailScreen() {
     const route = useRoute();
-    const { rewardId } = route.params;
+    const { rewardId, uid } = route.params;
     const [nombre, setNombre] = useState('');
     const [dificultad, setDificultad] = useState('');
     const [loading, setLoading] = useState(true); // Estado de carga
     const { getReward, updateReward, deleteReward } = useContext(RewardsContext);
     const navigation = useNavigation();
+    const { selectedPatientId } = useContext(PatientsContext);
+
 
     useEffect(() => {
         const fetchReward = async () => {
             try {
-                const reward = await getReward(rewardId);
-                setNombre(reward.nombre);
-                setDificultad(reward.dificultad);
+                console.log('Fetching reward details for ID:', rewardId);
+                const reward = await getReward(rewardId, uid); // Asegúrate de pasar el UID correcto
+                if (reward) {
+                    setNombre(reward.nombre);
+                    setDificultad(reward.dificultad);
+                } else {
+                    console.error('Reward not found');
+                }
             } catch (error) {
                 console.error('Error fetching reward:', error);
             } finally {
-                setLoading(false); // Finalizar carga
+                setLoading(false);
             }
         };
         fetchReward();
-    }, [rewardId]);
+    }, [rewardId, uid]);
 
     const handleUpdateReward = async () => {
-        await updateReward(rewardId, { nombre, dificultad });
-        navigation.goBack();
+        try {
+            await updateReward(rewardId, { nombre, dificultad }, selectedPatientId);
+            navigation.goBack();
+
+        } catch (error) {
+            console.error('Error updating reward:', error);
+        }
     };
 
     const handleDeleteReward = async () => {
-        await deleteReward(rewardId);
-        navigation.goBack();
+        try {
+            await deleteReward(rewardId, selectedPatientId);
+            navigation.goBack();
+
+
+        } catch (error) {
+            console.error('Error deleting reward:', error);
+        }
     };
 
     if (loading) {
@@ -60,6 +79,7 @@ function RewardDetailScreen() {
                 setValue={setDificultad}
                 placeholder="Selecciona una dificultad"
             />
+
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleUpdateReward}>
                     <Text style={styles.buttonText}>Actualizar</Text>

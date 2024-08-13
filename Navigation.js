@@ -12,7 +12,8 @@ import RewardsListScreen from './Screens/RewardsListScreen';
 import AddRewardScreen from './Screens/AddRewardScreen';
 import RewardDetailScreen from './Screens/RewardDetailScreen';
 import SignUpScreen from "./Screens/SingUpScreen";
-import AddPatientScreen from "./Screens/AddPatientScreen"; // Importa la nueva pantalla
+
+import UserRewardsScreen from './Screens/UserRewardsScreen';
 
 import { AuthContext } from './Context/AuthProvider';
 import { AccountIcon, ChartBarIcon, GiftIcon, HomeIcon } from './Components/Icons';
@@ -87,7 +88,7 @@ function StatisticsStackScreen() {
 
 function RewardsStackScreen() {
     const { role } = useContext(AuthContext);
-    const patientId = ''
+
 
     if (role !== 'administrador') {
         return null; // No renderizar si el rol no es admin
@@ -98,10 +99,10 @@ function RewardsStackScreen() {
             <RewardsStack.Screen
                 name="RewardsList"
                 component={RewardsListScreen}
-                initialParams={{ patientId }} // Pasar el ID del paciente aquí
             />
             <RewardsStack.Screen name="AddReward" component={AddRewardScreen} />
             <RewardsStack.Screen name="RewardDetail" component={RewardDetailScreen} />
+            <RewardsStack.Screen name="UserRewards" component={UserRewardsScreen} />
         </RewardsStack.Navigator>
     );
 }
@@ -111,7 +112,6 @@ function ProfileStackScreen() {
         <ProfileStack.Navigator initialRouteName="Profile" screenOptions={{ headerShown: false }}>
             <ProfileStack.Screen name="Profile" component={ProfileScreen} />
             <ProfileStack.Screen name="Login" component={LoginScreen} />
-            <ProfileStack.Screen name="AddPatient" component={AddPatientScreen} />
 
         </ProfileStack.Navigator>
     );
