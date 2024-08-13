@@ -20,12 +20,8 @@ const UserRewardsScreen = () => {
                 const patientData = await addPatientByEmail(email);
 
                 if (patientData && patientData.uid) {
-                    const rewards = await fetchRewards(patientData.uid);
-                    setRewards(rewards);
-                    //ir a la pantalla de atras con goback
-
                     console.log('Patient data:', patientData);
-                    console.log('User rewards:', rewards);
+                    handleSelectPatient(patientData.uid); // Llamar a handleSelectPatient con el UID del paciente encontrado
                 }
             }
         } catch (error) {
@@ -37,11 +33,12 @@ const UserRewardsScreen = () => {
         setSelectedPatientId(patientId);
         const rewards = await fetchRewards(patientId);
         setRewards(rewards);
+        console.log('User rewards:', rewards); // Imprimir recompensas por consola
         navigation.navigate('RewardsList');
     };
 
-    console.log('Patients:', patients);
-    console.log(patients.length);
+
+
     return (
         <View style={styles.container}>
             <Text style={styles.label}>Ingrese correo electrónico del usuario</Text>
@@ -63,10 +60,6 @@ const UserRewardsScreen = () => {
 
 
             {patients.length > 0 && (
-
-
-
-
                 <FlatList
                     data={patients}
                     keyExtractor={(item) => item.id}
@@ -78,7 +71,7 @@ const UserRewardsScreen = () => {
                 />
             )}
 
-            {/* {userRewards.length === 0 && email && (
+            {/* {userRewards.length === 0 && (
                 <Text style={styles.noRewardsText}>No se encontraron recompensas para este correo electrónico.</Text>
             )} */}
         </View>
