@@ -136,46 +136,8 @@ export const PatientsProvider = ({ children }) => {
     };
 
 
-    // const getPatient = async () => {
-    //     try {
-    //         if (!selectedPatientId) {
-    //             console.error('No patient ID selected.');
-    //             return null;
-    //         }
-
-    //         const patientRef = doc(db, 'usuarios', user.uid, 'pacientes', selectedPatientId);
-    //         const patientDoc = await getDoc(patientRef);
-
-    //         if (!patientDoc.exists()) {
-    //             console.error('No se encontró un paciente con ese ID');
-    //             return null;
-    //         }
-
-    //         const patientData = patientDoc.data();
-    //         setSelectedPatient({
-    //             nombreApellido: patientData.nombreApellido,
-    //             email: patientData.email,
-    //         });
-
-    //         // Añadir console.log para mostrar los detalles del paciente seleccionado
-    //         console.log('Selected Patient:', {
-    //             nombreApellido: patientData.nombreApellido,
-    //             email: patientData.email,
-    //         });
-    //     } catch (error) {
-    //         console.error('Error getting patient:', error);
-    //         setSelectedPatient(null);
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     if (selectedPatientId) {
-    //         getPatient();
-    //     }
-    // }, [selectedPatientId]);
-
     return (
-        <PatientsContext.Provider value={{ patients, addPatientByEmail, selectedPatientId, setSelectedPatientId }}>
+        <PatientsContext.Provider value={{ patients, addPatientByEmail, selectedPatientId, setSelectedPatientId, fetchPatients }}>
             {children}
         </PatientsContext.Provider>
     );

@@ -1,21 +1,24 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import { RewardsContext } from '../Context/RewardsProvider';
 import { PatientsContext } from '../Context/PatientsProvider';
 import DropdownComponent from '../Components/Dropdown';
 import LoadingScreen from '../Components/LoadingScreen';
 
 import { useNavigation } from '@react-navigation/native';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
 const UserRewardsScreen = () => {
     const navigation = useNavigation();
 
     const [email, setEmail] = useState('');
-    const { patients, setSelectedPatientId, addPatientByEmail, selectedPatientId } = useContext(PatientsContext);
+    const { patients, setSelectedPatientId, addPatientByEmail, selectedPatientId, fetchPatients } = useContext(PatientsContext);
     const { fetchRewards, userRewards, setRewards } = useContext(RewardsContext);
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [refreshing, setRefreshing] = useState(false); // Estado para controlar la actualización
+
     const handleFetchUserRewards = async () => {
         try {
             if (email) {
@@ -53,54 +56,69 @@ const UserRewardsScreen = () => {
         value: patient.id,
     }));
 
+    const handleRefresh = async () => {
+        setRefreshing(true);
+        await fetchPatients(selectedPatientId);
+        setRefreshing(false);
+    };
+
 
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>Ingrese correo electrónico del usuario</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Correo electrónico del usuario"
-                value={email}
-                onChangeText={setEmail}
-            />
-            <TouchableOpacity style={styles.button} onPress={handleFetchUserRewards}>
-                <Text style={styles.buttonText}>Buscar Recompensas</Text>
-            </TouchableOpacity>
-
-
-            {patients.length > 0 && (
-                // <FlatList
-                //     data={patients}
-                //     keyExtractor={(item) => item.id}
-                //     renderItem={({ item }) => (
-                //         <TouchableOpacity onPress={() => handleSelectPatient(item.id)}>
-                //             <Text style={styles.patientItem}>{item.nombreApellido}</Text>
-                //         </TouchableOpacity>
-                //     )}
-                // />
-                <DropdownComponent
-                    data={transformedPatients}
-                    value={selectedPatientId}
-                    setValue={setSelectedPatientId}
-                    placeholder="Seleccione un paciente"
-                    onSelect={handleSelectPatient} // Pasar handleSelectPatient como prop
+            <ScrollView
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={handleRefresh}
+                    />
+                }
+            >
+                <Text style={styles.label}>Ingrese correo electrónico del usuario</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Correo electrónico del usuario"
+                    value={email}
+                    onChangeText={setEmail}
                 />
-            )}
-            {loading && <LoadingScreen />}
-            {typeof errorMessage === 'string' && errorMessage.length > 0 && (
-                <View style={styles.errorContainer}>
-                    <Text style={styles.errorMessage}>{errorMessage}</Text>
-                </View>
-            )}
+                <TouchableOpacity style={styles.button} onPress={handleFetchUserRewards}>
+                    <Text style={styles.buttonText}>Buscar Recompensas</Text>
+                </TouchableOpacity>
+
+
+                {patients.length > 0 && (
+                    // <FlatList
+                    //     data={patients}
+                    //     keyExtractor={(item) => item.id}
+                    //     renderItem={({ item }) => (
+                    //         <TouchableOpacity onPress={() => handleSelectPatient(item.id)}>
+                    //             <Text style={styles.patientItem}>{item.nombreApellido}</Text>
+                    //         </TouchableOpacity>
+                    //     )}
+                    // />
+                    <DropdownComponent
+                        data={transformedPatients}
+                        value={selectedPatientId}
+                        setValue={setSelectedPatientId}
+                        placeholder="Seleccione un paciente"
+                        onSelect={handleSelectPatient} // Pasar handleSelectPatient como prop
+                    />
+                )}
+                {loading && <LoadingScreen />}
+                {typeof errorMessage === 'string' && errorMessage.length > 0 && (
+                    <View style={styles.errorContainer}>
+                        <Text style={styles.errorMessage}>{errorMessage}</Text>
+                    </View>
+                )}
 
 
 
 
 
-            {/* {userRewards.length === 0 && (
+                {/* {userRewards.length === 0 && (
                 <Text style={styles.noRewardsText}>No se encontraron recompensas para este correo electrónico.</Text>
             )} */}
+            </ScrollView>
         </View>
     );
 };
