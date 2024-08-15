@@ -32,13 +32,17 @@ const StatisticsStack = createStackNavigator();
 function MyTabs() {
     const { role, user } = useContext(AuthContext);
     const { patients, selectedPatientId } = useContext(PatientsContext);
-    const selectedPatient = patients.find(patient => patient.id === selectedPatientId);
-    // 
+    const selectedPatient = patients.find(patient => patient.id === selectedPatientId)
+
     return (
-        <Tab.Navigator initialRouteName="Home">
+        <Tab.Navigator initialRouteName="Perfil">
             <Tab.Screen name="Inicio" component={HomeStackScreen} options={{
                 tabBarLabel: 'Inicio',
-                headerTitle: selectedPatient ? `Paciente: ${selectedPatient.nombreApellido}` : `Usuario: ${user.nombreApellido}`,
+                headerTitle: user
+                    ? (selectedPatient
+                        ? `Paciente: ${selectedPatient.nombreApellido}`
+                        : `Usuario: ${user.nombreApellido}`)
+                    : 'Inicio',
                 tabBarIcon: ({ color, size }) => (
                     <HomeIcon color={color} size={size} />
                 ),
@@ -47,14 +51,18 @@ function MyTabs() {
                 <React.Fragment>
                     <Tab.Screen name="Estadísticas" component={StatisticsStackScreen} options={{
                         tabBarLabel: 'Estadísticas',
-                        headerTitle: selectedPatient ? `Paciente: ${selectedPatient.nombreApellido}` : 'Estadísticas',
+                        headerTitle: selectedPatient
+                            ? `Paciente: ${selectedPatient.nombreApellido}`
+                            : 'Estadísticas',
                         tabBarIcon: ({ color, size }) => (
                             <ChartBarIcon color={color} size={size} />
                         ),
                     }} />
                     <Tab.Screen name="Recompensas" component={RewardsStackScreen} options={{
                         tabBarLabel: 'Recompensas',
-                        headerTitle: selectedPatient ? `Paciente: ${selectedPatient.nombreApellido}` : 'Recompensas',
+                        headerTitle: selectedPatient
+                            ? `Paciente: ${selectedPatient.nombreApellido}`
+                            : 'Recompensas',
                         tabBarIcon: ({ color, size }) => (
                             <GiftIcon color={color} size={size} />
                         ),
@@ -63,8 +71,7 @@ function MyTabs() {
             )}
             <Tab.Screen name="Perfil" component={ProfileStackScreen} options={{
                 tabBarLabel: 'Perfil',
-                headerTitle: `Usuario: ${user.nombreApellido}`
-                ,
+                headerTitle: user ? `Usuario: ${user.nombreApellido}` : 'Perfil',
                 tabBarIcon: ({ color, size }) => (
                     <AccountIcon color={color} size={size} />
                 ),

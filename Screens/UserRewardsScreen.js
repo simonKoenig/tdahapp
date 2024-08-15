@@ -19,6 +19,8 @@ const UserRewardsScreen = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [refreshing, setRefreshing] = useState(false); // Estado para controlar la actualización
 
+
+
     const handleFetchUserRewards = async () => {
         try {
             if (email) {

@@ -1,25 +1,39 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, Button } from 'react-native';
-import { AuthContext } from '../Context/AuthProvider';
 import { useNavigation } from '@react-navigation/native';
+import { AuthContext } from '../Context/AuthProvider';
+import LoadingScreen from '../Components/LoadingScreen'; // Asegúrate de que la ruta sea correcta
 
 function ProfileScreen() {
-    const { logout } = useContext(AuthContext);
+    const { logout, isAuthenticated } = useContext(AuthContext);
     const navigation = useNavigation();
+    const [loading, setLoading] = useState(false);
 
     const handleLogout = async () => {
+        setLoading(true);
         await logout();
-        // navigation.navigate('Login'); // Navega a la pantalla de inicio de sesión
-        navigation.navigate('Login');
+        setLoading(false);
     };
+
+    useEffect(() => {
+        if (!isAuthenticated && !loading) {
+            navigation.replace('Login'); // Utiliza replace en lugar de reset
+        }
+    }, [isAuthenticated, loading, navigation]);
 
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text>ProfileScreen</Text>
-            <Button
-                title="Cerrar Sesión"
-                onPress={handleLogout}
-            />
+            {loading ? (
+                <LoadingScreen />
+            ) : (
+                <>
+                    <Text>ProfileScreen</Text>
+                    <Button
+                        title="Cerrar Sesión"
+                        onPress={handleLogout} s
+                    />
+                </>
+            )}
         </View>
     );
 }
