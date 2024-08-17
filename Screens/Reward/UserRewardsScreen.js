@@ -52,16 +52,7 @@ const UserRewardsScreen = () => {
                     />
                 }
             >
-                {patients.length > 0 && (
-                    // <FlatList
-                    //     data={patients}
-                    //     keyExtractor={(item) => item.id}
-                    //     renderItem={({ item }) => (
-                    //         <TouchableOpacity onPress={() => handleSelectPatient(item.id)}>
-                    //             <Text style={styles.patientItem}>{item.nombreApellido}</Text>
-                    //         </TouchableOpacity>
-                    //     )}
-                    // />
+                {patients.length > 0 ? (
                     <DropdownComponent
                         data={transformedPatients}
                         value={selectedPatientId}
@@ -69,6 +60,8 @@ const UserRewardsScreen = () => {
                         placeholder="Seleccione un paciente"
                         onSelect={handleSelectPatient} // Pasar handleSelectPatient como prop
                     />
+                ) : (
+                    <Text style={styles.noPatientsText}>No se encontraron pacientes.</Text>
                 )}
                 {loading && <LoadingScreen />}
                 {typeof errorMessage === 'string' && errorMessage.length > 0 && (
@@ -76,14 +69,6 @@ const UserRewardsScreen = () => {
                         <Text style={styles.errorMessage}>{errorMessage}</Text>
                     </View>
                 )}
-
-
-
-
-
-                {/* {userRewards.length === 0 && (
-                <Text style={styles.noRewardsText}>No se encontraron recompensas para este correo electrónico.</Text>
-            )} */}
             </ScrollView>
         </View>
     );
