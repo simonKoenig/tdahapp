@@ -1,16 +1,16 @@
 
 import React, { useContext, useState, useEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet, Button } from 'react-native';
-import { RewardsContext } from '../Context/RewardsProvider';
+import { RewardsContext } from '../../Context/RewardsProvider';
 import { useNavigation } from '@react-navigation/native';
-import RewardItem from '../Components/RewardItem';
-import SearchBar from '../Components/SearchBar';
-import DropdownComponent from '../Components/Dropdown';  // Importamos DropdownCompone
+import RewardItem from '../../Components/RewardItem';
+import SearchBar from '../../Components/SearchBar';  // Importamos SearchBar
+import DropdownComponent from '../../Components/Dropdown';  // Importamos DropdownCompone
 
-import { filtradoDificultades } from '../Utils/Constant';
+import { filtradoDificultades } from '../../Utils/Constant';  // Importamos las dificultades
 
-import { AuthContext } from '../Context/AuthProvider';
-import { PatientsContext } from '../Context/PatientsProvider';
+import { AuthContext } from '../../Context/AuthProvider';
+import { PatientsContext } from '../../Context/PatientsProvider';
 
 const RewardsListScreen = ({ route }) => {
     const { rewards, fetchRewards } = useContext(RewardsContext);

@@ -1,12 +1,12 @@
 import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import DropdownComponent from '../Components/Dropdown';
-import { dificultades } from '../Utils/Constant';
+import DropdownComponent from '../../Components/Dropdown';
+import { dificultades } from '../../Utils/Constant';
 
 
-import { RewardsContext } from '../Context/RewardsProvider';
+import { RewardsContext } from '../../Context/RewardsProvider';
 import { useNavigation } from '@react-navigation/native';
-import { PatientsContext } from '../Context/PatientsProvider';
+import { PatientsContext } from '../../Context/PatientsProvider';
 
 function AddRewardScreen() {
     const [nombre, setNombre] = useState('');

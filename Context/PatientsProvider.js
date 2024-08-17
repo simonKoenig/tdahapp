@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { collection, getDocs, addDoc, doc, getDoc, setDoc, query, where } from 'firebase/firestore';
+import { collection, getDocs, addDoc, doc, getDoc, setDoc, query, where, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase-config';
 import { AuthContext } from './AuthProvider';
 
@@ -135,9 +135,24 @@ export const PatientsProvider = ({ children }) => {
         }
     };
 
+    const deletePatient = async (patientUid, userUid) => {
+        if (userUid && patientUid) {
+            try {
+                console.log('Deleting patient with UID:', patientUid, 'for user UID:', userUid);
+                const patientRef = doc(db, 'usuarios', userUid, 'pacientes', patientUid);
+                await deleteDoc(patientRef);
+                setPatients(prevPatients => prevPatients.filter(patient => patient.id !== patientUid));
+            } catch (error) {
+                console.error('Error deleting patient:', error);
+            }
+        } else {
+            console.error('No user or patient UID provided');
+        }
+    };
+
 
     return (
-        <PatientsContext.Provider value={{ patients, addPatientByEmail, selectedPatientId, setSelectedPatientId, fetchPatients }}>
+        <PatientsContext.Provider value={{ patients, addPatientByEmail, selectedPatientId, setSelectedPatientId, fetchPatients, deletePatient }}>
             {children}
         </PatientsContext.Provider>
     );

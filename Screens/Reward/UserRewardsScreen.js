@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, RefreshControl } from 'react-native';
-import { RewardsContext } from '../Context/RewardsProvider';
-import { PatientsContext } from '../Context/PatientsProvider';
-import DropdownComponent from '../Components/Dropdown';
-import LoadingScreen from '../Components/LoadingScreen';
+import { RewardsContext } from '../../Context/RewardsProvider';
+import { PatientsContext } from '../../Context/PatientsProvider';
+import DropdownComponent from '../../Components/Dropdown';
+import LoadingScreen from '../../Components/LoadingScreen';
 
 import { useNavigation } from '@react-navigation/native';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -20,30 +20,6 @@ const UserRewardsScreen = () => {
     const [refreshing, setRefreshing] = useState(false); // Estado para controlar la actualización
 
 
-
-    const handleFetchUserRewards = async () => {
-        try {
-            if (email) {
-                setLoading(true);
-                setErrorMessage(''); // Limpiar cualquier mensaje de error previo
-                const patientData = await addPatientByEmail(email);
-
-                if (patientData && patientData.uid) {
-                    console.log('Patient data:', patientData);
-                    handleSelectPatient(patientData.uid); // Llamar a handleSelectPatient con el UID del paciente encontrado
-                }
-                else {
-                    setErrorMessage('No se encontró un usuario con ese email.');
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching user rewards:', error);
-            setErrorMessage(error.message || 'Ocurrió un error al intentar buscar recompensas.');
-
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleSelectPatient = async (patientId) => {
         const rewards = await fetchRewards(patientId);
@@ -76,18 +52,6 @@ const UserRewardsScreen = () => {
                     />
                 }
             >
-                <Text style={styles.label}>Ingrese correo electrónico del usuario</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Correo electrónico del usuario"
-                    value={email}
-                    onChangeText={setEmail}
-                />
-                <TouchableOpacity style={styles.button} onPress={handleFetchUserRewards}>
-                    <Text style={styles.buttonText}>Buscar Recompensas</Text>
-                </TouchableOpacity>
-
-
                 {patients.length > 0 && (
                     // <FlatList
                     //     data={patients}

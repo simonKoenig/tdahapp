@@ -1,11 +1,11 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import DropdownComponent from '../Components/Dropdown';
-import { dificultades } from '../Utils/Constant';
-import { RewardsContext } from '../Context/RewardsProvider';
+import DropdownComponent from '../../Components/Dropdown';
+import { dificultades } from '../../Utils/Constant';
+import { RewardsContext } from '../../Context/RewardsProvider';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import LoadingScreen from '../Components/LoadingScreen'; // Importar LoadingScreen
-import { PatientsContext } from '../Context/PatientsProvider';
+import LoadingScreen from '../../Components/LoadingScreen'; // Importar LoadingScreen
+import { PatientsContext } from '../../Context/PatientsProvider';
 
 function RewardDetailScreen() {
     const route = useRoute();

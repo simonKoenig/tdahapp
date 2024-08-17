@@ -8,12 +8,14 @@ import HomeScreen from "./Screens/HomeScreen";
 import LoginScreen from "./Screens/LoginScreen";
 import ProfileScreen from "./Screens/ProfileScreen";
 import StatisticsScreen from "./Screens/StatisticsScreen";
-import RewardsListScreen from './Screens/RewardsListScreen';
-import AddRewardScreen from './Screens/AddRewardScreen';
-import RewardDetailScreen from './Screens/RewardDetailScreen';
 import SignUpScreen from "./Screens/SingUpScreen";
 
-import UserRewardsScreen from './Screens/UserRewardsScreen';
+//Rewards
+import RewardsListScreen from './Screens/Reward/RewardsListScreen'
+import AddRewardScreen from './Screens/Reward/AddRewardScreen';
+import RewardDetailScreen from './Screens/Reward/RewardDetailScreen';
+import UserRewardsScreen from './Screens/Reward/UserRewardsScreen';
+
 
 import { AuthContext } from './Context/AuthProvider';
 import { AccountIcon, ChartBarIcon, GiftIcon, HomeIcon } from './Components/Icons';
