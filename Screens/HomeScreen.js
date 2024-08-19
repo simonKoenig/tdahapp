@@ -4,11 +4,12 @@ import { AuthContext } from '../Context/AuthProvider';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase-config';
 import LoadingScreen from '../Components/LoadingScreen'; // Asegúrate de ajustar la ruta según tu estructura de proyecto
-
+import { PatientsContext } from '../Context/PatientsProvider';
 function HomeScreen() {
     const { user } = useContext(AuthContext);
     const [role, setRole] = useState('');
     const [loading, setLoading] = useState(true);
+    const { patients, setSelectedPatientId, addPatientByEmail, selectedPatientId, fetchPatients } = useContext(PatientsContext);
 
     useEffect(() => {
         const obtenerRol = async () => {
@@ -27,17 +28,32 @@ function HomeScreen() {
         obtenerRol();
     }, [user]);
 
+
     if (loading) {
         return <LoadingScreen />;
     }
 
+    const selectedPatient = patients.find(patient => patient.id === selectedPatientId);
+
     return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text>Home Screen</Text>
-            {user && <Text>Mail: {user.email}</Text>}
-            {user && <Text>UID: {user.uid}</Text>}
-            {user && <Text>Nombre y Apellido: {user.nombreApellido}</Text>}
-            {user && <Text>Rol: {role}</Text>}
+        <View>
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <Text>Home Screen</Text>
+                {user && <Text>Mail: {user.email}</Text>}
+                {user && <Text>UID: {user.uid}</Text>}
+                {user && <Text>Nombre y Apellido: {user.nombreApellido}</Text>}
+                {user && <Text>Rol: {role}</Text>}
+                {selectedPatient ? (
+                    <View>
+                        <Text>Paciente Seleccionado:</Text>
+                        <Text>Nombre: {selectedPatient.nombreApellido}</Text>
+                        <Text>ID: {selectedPatient.id}</Text>
+                    </View>
+                ) : (
+                    <Text>No hay paciente seleccionado</Text>
+                )}
+            </View>
+
         </View>
     );
 }

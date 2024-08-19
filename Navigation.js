@@ -7,59 +7,93 @@ import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "./Screens/HomeScreen";
 import LoginScreen from "./Screens/LoginScreen";
 import ProfileScreen from "./Screens/ProfileScreen";
-import RewardsScreen from "./Screens/RewardsScreen";
 import StatisticsScreen from "./Screens/StatisticsScreen";
-
 import SignUpScreen from "./Screens/SingUpScreen";
 
+//Rewards
+import RewardsListScreen from './Screens/Reward/RewardsListScreen'
+import AddRewardScreen from './Screens/Reward/AddRewardScreen';
+import RewardDetailScreen from './Screens/Reward/RewardDetailScreen';
+import UserRewardsScreen from './Screens/Reward/UserRewardsScreen';
+
+//Subjects
+
+import SubjectsListScreen from './Screens/Subject/SubjectsListScreen';
+import AddSubjectScreen from './Screens/Subject/AddSubjectScreen';
+import SubjectDetailScreen from './Screens/Subject/SubjectDetailScreen';
+import UserSubjectsScreen from './Screens/Subject/UserSubjectsScreen';
+
+
+
 import { AuthContext } from './Context/AuthProvider';
+import { AccountIcon, ChartBarIcon, GiftIcon, HomeIcon, SubjectIcon } from './Components/Icons';
 
-// Icons
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-
-
+import { PatientsContext } from './Context/PatientsProvider';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const AuthStack = createStackNavigator();
-
 const HomeStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
 const RewardsStack = createStackNavigator();
 const StatisticsStack = createStackNavigator();
-
+const SubjectsStack = createStackNavigator();
 
 function MyTabs() {
-    const { role } = useContext(AuthContext);
+    const { role, user } = useContext(AuthContext);
+    const { patients, selectedPatientId } = useContext(PatientsContext);
+    const selectedPatient = patients.find(patient => patient.id === selectedPatientId)
+
     return (
-        <Tab.Navigator initialRouteName="Home">
+        <Tab.Navigator initialRouteName="Perfil">
             <Tab.Screen name="Inicio" component={HomeStackScreen} options={{
                 tabBarLabel: 'Inicio',
+                headerTitle: user
+                    ? (selectedPatient
+                        ? `Paciente: ${selectedPatient.nombreApellido}`
+                        : `Usuario: ${user.nombreApellido}`)
+                    : 'Inicio',
                 tabBarIcon: ({ color, size }) => (
-                    <MaterialCommunityIcons name="home" color={color} size={size} />
+                    <HomeIcon color={color} size={size} />
                 ),
             }} />
             {role === 'administrador' && (
-                <>
+                <React.Fragment>
                     <Tab.Screen name="Estadísticas" component={StatisticsStackScreen} options={{
                         tabBarLabel: 'Estadísticas',
+                        headerTitle: selectedPatient
+                            ? `Paciente: ${selectedPatient.nombreApellido}`
+                            : 'Estadísticas',
                         tabBarIcon: ({ color, size }) => (
-                            <MaterialCommunityIcons name="chart-bar" color={color} size={size} />
+                            <ChartBarIcon color={color} size={size} />
+                        ),
+                    }} />
+                    <Tab.Screen name="Materias" component={SubjectsStackScreen} options={{
+                        tabBarLabel: 'Materias',
+                        headerTitle: selectedPatient
+                            ? `Paciente: ${selectedPatient.nombreApellido}`
+                            : 'Materias',
+                        tabBarIcon: ({ color, size }) => (
+                            <SubjectIcon color={color} size={size} />
                         ),
                     }} />
                     <Tab.Screen name="Recompensas" component={RewardsStackScreen} options={{
                         tabBarLabel: 'Recompensas',
+                        headerTitle: selectedPatient
+                            ? `Paciente: ${selectedPatient.nombreApellido}`
+                            : 'Recompensas',
                         tabBarIcon: ({ color, size }) => (
-                            <MaterialCommunityIcons name="gift" color={color} size={size} />
+                            <GiftIcon color={color} size={size} />
                         ),
                     }} />
-                </>
+                </React.Fragment>
             )}
             <Tab.Screen name="Perfil" component={ProfileStackScreen} options={{
                 tabBarLabel: 'Perfil',
+                headerTitle: user ? `Usuario: ${user.nombreApellido}` : 'Perfil',
                 tabBarIcon: ({ color, size }) => (
-                    <MaterialCommunityIcons name="account" color={color} size={size} />
+                    <AccountIcon color={color} size={size} />
                 ),
             }} />
         </Tab.Navigator>
@@ -70,10 +104,12 @@ function HomeStackScreen() {
     return (
         <HomeStack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
             <HomeStack.Screen name="Home" component={HomeScreen} />
-            {/* Agrega más pantallas al stack de Home aquí si es necesario */}
+
         </HomeStack.Navigator>
     );
 }
+
+
 
 function StatisticsStackScreen() {
     const { role } = useContext(AuthContext);
@@ -84,21 +120,46 @@ function StatisticsStackScreen() {
     return (
         <StatisticsStack.Navigator initialRouteName="Statistics" screenOptions={{ headerShown: false }}>
             <StatisticsStack.Screen name="Statistics" component={StatisticsScreen} />
-            {/* Agrega más pantallas al stack de Statistics aquí si es necesario */}
+
         </StatisticsStack.Navigator>
     );
 }
 
-function RewardsStackScreen() {
+function SubjectsStackScreen() {
     const { role } = useContext(AuthContext);
     if (role !== 'administrador') {
         return null; // No renderizar si el rol no es admin
     }
 
     return (
-        <RewardsStack.Navigator initialRouteName="Rewards" screenOptions={{ headerShown: false }}>
-            <RewardsStack.Screen name="Rewards" component={RewardsScreen} />
-            {/* Agrega más pantallas al stack de Rewards aquí si es necesario */}
+        <SubjectsStack.Navigator initialRouteName="SubjectsList" screenOptions={{ headerShown: false }}>
+            <SubjectsStack.Screen name="SubjectsList" component={SubjectsListScreen} />
+            <SubjectsStack.Screen name="AddSubject" component={AddSubjectScreen} />
+            <SubjectsStack.Screen name="SubjectDetail" component={SubjectDetailScreen} />
+            <SubjectsStack.Screen name="UserSubjects" component={UserSubjectsScreen} />
+        </SubjectsStack.Navigator>
+    );
+}
+
+
+
+function RewardsStackScreen() {
+    const { role } = useContext(AuthContext);
+
+
+    if (role !== 'administrador') {
+        return null; // No renderizar si el rol no es admin
+    }
+
+    return (
+        <RewardsStack.Navigator initialRouteName="RewardsList" screenOptions={{ headerShown: false }}>
+            <RewardsStack.Screen
+                name="RewardsList"
+                component={RewardsListScreen}
+            />
+            <RewardsStack.Screen name="AddReward" component={AddRewardScreen} />
+            <RewardsStack.Screen name="RewardDetail" component={RewardDetailScreen} />
+            <RewardsStack.Screen name="UserRewards" component={UserRewardsScreen} />
         </RewardsStack.Navigator>
     );
 }
@@ -107,11 +168,11 @@ function ProfileStackScreen() {
     return (
         <ProfileStack.Navigator initialRouteName="Profile" screenOptions={{ headerShown: false }}>
             <ProfileStack.Screen name="Profile" component={ProfileScreen} />
-            {/* Agrega más pantallas al stack de Profile aquí si es necesario */}
+            <ProfileStack.Screen name="Login" component={LoginScreen} />
+
         </ProfileStack.Navigator>
     );
 }
-
 
 function AuthStackScreen() {
     return (
@@ -121,20 +182,6 @@ function AuthStackScreen() {
         </AuthStack.Navigator>
     );
 }
-
-
-
-
-
-// function MyStack() {
-//     return (
-//         <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
-//             <Stack.Screen name="Login" component={LoginScreen} />
-//             <Stack.Screen name="Main" component={MyTabs} />
-//             <Stack.Screen name="SignUp" component={SignUpScreen} />
-//         </Stack.Navigator>
-//     );
-// }
 
 export default function Navigation() {
     const { isAuthenticated } = useContext(AuthContext);
