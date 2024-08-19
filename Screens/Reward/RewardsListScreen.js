@@ -21,7 +21,17 @@ const RewardsListScreen = ({ route }) => {
 
     const { selectedPatientId } = useContext(PatientsContext);
 
+    useEffect(() => {
+        const loadRewards = async () => {
+            if (selectedPatientId) {
+                setRefreshing(true);
+                await fetchRewards(selectedPatientId);
+                setRefreshing(false);
+            }
+        };
 
+        loadRewards();
+    }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
 
     // Filtramos las recompensas en función del término de búsqueda y la dificultad seleccionada
     const filteredRewards = rewards.filter(reward =>

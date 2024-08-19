@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import { SubjectsContext } from '../../Context/SubjectsProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';

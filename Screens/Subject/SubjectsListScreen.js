@@ -1,29 +1,31 @@
-
 import React, { useContext, useState, useEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet, Button } from 'react-native';
 import { SubjectsContext } from '../../Context/SubjectsProvider';
 import { useNavigation } from '@react-navigation/native';
-import RewardItem from '../../Components/RewardItem';
-import SearchBar from '../../Components/SearchBar';  // Importamos SearchBar
-import SubjectItem from '../../Components/SubjectItem';  // Importamos SubjectItem
+import SearchBar from '../../Components/SearchBar';
+import SubjectItem from '../../Components/SubjectItem';
 
-
-
-
-import { AuthContext } from '../../Context/AuthProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';
 
-const SubjectsListScreen = ({ route }) => {
+const SubjectsListScreen = () => {
     const { subjects, fetchSubjects } = useContext(SubjectsContext);
+    const { selectedPatientId } = useContext(PatientsContext);
     const [searchTerm, setSearchTerm] = useState('');
-    const [refreshing, setRefreshing] = useState(false); // Estado para controlar la actualización
+    const [refreshing, setRefreshing] = useState(false);
     const navigation = useNavigation();
 
-    const { selectedPatientId } = useContext(PatientsContext);
+    useEffect(() => {
+        const loadSubjects = async () => {
+            if (selectedPatientId) {
+                setRefreshing(true);
+                await fetchSubjects(selectedPatientId);
+                setRefreshing(false);
+            }
+        };
 
+        loadSubjects();
+    }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
 
-
-    // Filtramos las recompensas en función del término de búsqueda y la dificultad seleccionada
     const filteredSubjects = subjects.filter(subject =>
         subject.nombre.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -62,12 +64,6 @@ const SubjectsListScreen = ({ route }) => {
                 refreshing={refreshing}
                 onRefresh={handleRefresh}
             />
-            <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => navigation.navigate('AddSubject')}
-            >
-                <Text style={styles.addButtonText}>+</Text>
-            </TouchableOpacity>
         </View>
     );
 };
