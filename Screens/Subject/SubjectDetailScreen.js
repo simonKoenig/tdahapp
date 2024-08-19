@@ -1,32 +1,36 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import DropdownComponent from '../../Components/Dropdown';
-import { dificultades } from '../../Utils/Constant';
-import { RewardsContext } from '../../Context/RewardsProvider';
+
+
+
+import { SubjectsContext } from '../../Context/SubjectsProvider';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import LoadingScreen from '../../Components/LoadingScreen'; // Importar LoadingScreen
 import { PatientsContext } from '../../Context/PatientsProvider';
 
-function RewardDetailScreen() {
+function SubjectDetailScreen() {
     const route = useRoute();
-    const { rewardId, uid } = route.params;
+    const { subjectId, uid } = route.params;
     const [nombre, setNombre] = useState('');
-    const [dificultad, setDificultad] = useState('');
+    const [profesor, setProfesor] = useState('');
     const [loading, setLoading] = useState(true); // Estado de carga
-    const { getReward, updateReward, deleteReward } = useContext(RewardsContext);
+    const { getSubject, updateSubject, deleteSubject } = useContext(SubjectsContext);
     const navigation = useNavigation();
     const { selectedPatientId } = useContext(PatientsContext);
 
+    console.log('Subject ID:', subjectId);
+    console.log('UID:', uid);
+    console.log('Selected Patient ID:', selectedPatientId);
 
     useEffect(() => {
-        const fetchReward = async () => {
+        const fetchSubjects = async () => {
             try {
-                console.log('Fetching reward details for ID:', rewardId);
-                const reward = await getReward(rewardId, uid); // Asegúrate de pasar el UID correcto
-                if (reward) {
-                    console.log('Nombre de la materia:', reward.nombre)
-                    setNombre(reward.nombre);
-                    setDificultad(reward.dificultad);
+
+                const subject = await getSubject(subjectId, uid); // Asegúrate de pasar el UID correcto
+
+                if (subject) {
+                    setNombre(subject.nombre);
+                    setProfesor(subject.profesor);
                 } else {
                     console.error('Reward not found');
                 }
@@ -36,12 +40,12 @@ function RewardDetailScreen() {
                 setLoading(false);
             }
         };
-        fetchReward();
-    }, [rewardId, uid]);
+        fetchSubjects();
+    }, [subjectId, uid]);
 
-    const handleUpdateReward = async () => {
+    const handleUpdateSubject = async () => {
         try {
-            await updateReward(rewardId, { nombre, dificultad }, selectedPatientId);
+            await updateSubject(subjectId, { nombre, profesor }, selectedPatientId);
             navigation.goBack();
 
         } catch (error) {
@@ -49,9 +53,9 @@ function RewardDetailScreen() {
         }
     };
 
-    const handleDeleteReward = async () => {
+    const handleDeleteSubject = async () => {
         try {
-            await deleteReward(rewardId, selectedPatientId);
+            await deleteSubject(subjectId, selectedPatientId);
             navigation.goBack();
 
 
@@ -73,19 +77,18 @@ function RewardDetailScreen() {
                 value={nombre}
                 onChangeText={setNombre}
             />
-            <Text style={styles.label}>Dificultad</Text>
-            <DropdownComponent
-                data={dificultades}
-                value={dificultad}
-                setValue={setDificultad}
-                placeholder="Selecciona una dificultad"
+            <Text style={styles.label}>Profesor</Text>
+            <TextInput
+                style={styles.input}
+                placeholder='Nombre del profesor de la materia'
+                value={profesor}
+                onChangeText={setProfesor}
             />
-
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={handleUpdateReward}>
+                <TouchableOpacity style={styles.button} onPress={handleUpdateSubject}>
                     <Text style={styles.buttonText}>Actualizar</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={handleDeleteReward}>
+                <TouchableOpacity style={styles.button} onPress={handleDeleteSubject}>
                     <Text style={styles.buttonText}>Eliminar</Text>
                 </TouchableOpacity>
             </View>
@@ -149,4 +152,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default RewardDetailScreen;
+export default SubjectDetailScreen;

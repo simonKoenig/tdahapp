@@ -16,9 +16,17 @@ import AddRewardScreen from './Screens/Reward/AddRewardScreen';
 import RewardDetailScreen from './Screens/Reward/RewardDetailScreen';
 import UserRewardsScreen from './Screens/Reward/UserRewardsScreen';
 
+//Subjects
+
+import SubjectsListScreen from './Screens/Subject/SubjectsListScreen';
+import AddSubjectScreen from './Screens/Subject/AddSubjectScreen';
+import SubjectDetailScreen from './Screens/Subject/SubjectDetailScreen';
+import UserSubjectsScreen from './Screens/Subject/UserSubjectsScreen';
+
+
 
 import { AuthContext } from './Context/AuthProvider';
-import { AccountIcon, ChartBarIcon, GiftIcon, HomeIcon } from './Components/Icons';
+import { AccountIcon, ChartBarIcon, GiftIcon, HomeIcon, SubjectIcon } from './Components/Icons';
 
 import { PatientsContext } from './Context/PatientsProvider';
 
@@ -30,6 +38,7 @@ const HomeStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
 const RewardsStack = createStackNavigator();
 const StatisticsStack = createStackNavigator();
+const SubjectsStack = createStackNavigator();
 
 function MyTabs() {
     const { role, user } = useContext(AuthContext);
@@ -58,6 +67,15 @@ function MyTabs() {
                             : 'Estadísticas',
                         tabBarIcon: ({ color, size }) => (
                             <ChartBarIcon color={color} size={size} />
+                        ),
+                    }} />
+                    <Tab.Screen name="Materias" component={SubjectsStackScreen} options={{
+                        tabBarLabel: 'Materias',
+                        headerTitle: selectedPatient
+                            ? `Paciente: ${selectedPatient.nombreApellido}`
+                            : 'Materias',
+                        tabBarIcon: ({ color, size }) => (
+                            <SubjectIcon color={color} size={size} />
                         ),
                     }} />
                     <Tab.Screen name="Recompensas" component={RewardsStackScreen} options={{
@@ -91,6 +109,8 @@ function HomeStackScreen() {
     );
 }
 
+
+
 function StatisticsStackScreen() {
     const { role } = useContext(AuthContext);
     if (role !== 'administrador') {
@@ -104,6 +124,24 @@ function StatisticsStackScreen() {
         </StatisticsStack.Navigator>
     );
 }
+
+function SubjectsStackScreen() {
+    const { role } = useContext(AuthContext);
+    if (role !== 'administrador') {
+        return null; // No renderizar si el rol no es admin
+    }
+
+    return (
+        <SubjectsStack.Navigator initialRouteName="SubjectsList" screenOptions={{ headerShown: false }}>
+            <SubjectsStack.Screen name="SubjectsList" component={SubjectsListScreen} />
+            <SubjectsStack.Screen name="AddSubject" component={AddSubjectScreen} />
+            <SubjectsStack.Screen name="SubjectDetail" component={SubjectDetailScreen} />
+            <SubjectsStack.Screen name="UserSubjects" component={UserSubjectsScreen} />
+        </SubjectsStack.Navigator>
+    );
+}
+
+
 
 function RewardsStackScreen() {
     const { role } = useContext(AuthContext);

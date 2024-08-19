@@ -14,6 +14,6 @@ export const SearchIcon = ({ color, size }) => <MaterialCommunityIcons name="mag
 
 export const AccountIcon = ({ color, size }) => <MaterialCommunityIcons name="account" color={color} size={size} />;
 
-
+export const SubjectIcon = ({ color, size }) => <MaterialCommunityIcons name="book" color={color} size={size} />;
 
 export const DeleteIcon = ({ color, size }) => <MaterialCommunityIcons name="delete" color={color} size={size} />;
