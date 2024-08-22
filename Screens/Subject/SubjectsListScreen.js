@@ -14,17 +14,17 @@ const SubjectsListScreen = () => {
     const [refreshing, setRefreshing] = useState(false);
     const navigation = useNavigation();
 
-    useEffect(() => {
-        const loadSubjects = async () => {
-            if (selectedPatientId) {
-                setRefreshing(true);
-                await fetchSubjects(selectedPatientId);
-                setRefreshing(false);
-            }
-        };
+    // useEffect(() => {
+    //     const loadSubjects = async () => {
+    //         if (selectedPatientId) {
+    //             setRefreshing(true);
+    //             await fetchSubjects(selectedPatientId);
+    //             setRefreshing(false);
+    //         }
+    //     };
 
-        loadSubjects();
-    }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
+    //     loadSubjects();
+    // }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
 
     const filteredSubjects = subjects.filter(subject =>
         subject.nombre.toLowerCase().includes(searchTerm.toLowerCase())
