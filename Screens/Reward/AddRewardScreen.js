@@ -25,12 +25,6 @@ function AddRewardScreen() {
         }
     };
 
-    // const dificultades = [
-    //     { label: 'Baja', value: 'Baja' },
-    //     { label: 'Media', value: 'Media' },
-    //     { label: 'Alta', value: 'Alta' },
-    // ];
-
     return (
         <View style={styles.form}>
             <Text style={styles.label}>Nombre</Text>

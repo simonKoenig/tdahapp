@@ -9,6 +9,7 @@ export const RewardsContext = createContext();
 export const RewardsProvider = ({ children }) => {
     const { user } = useContext(AuthContext);
     const [rewards, setRewards] = useState([]);
+    const [selectedRewardId, setSelectedRewardId] = useState(null);
 
 
     const fetchRewards = async (uid) => {
@@ -92,7 +93,7 @@ export const RewardsProvider = ({ children }) => {
     };
 
     return (
-        <RewardsContext.Provider value={{ rewards, setRewards, fetchRewards, addReward, updateReward, deleteReward, getReward }}>
+        <RewardsContext.Provider value={{ rewards, setRewards, fetchRewards, addReward, updateReward, deleteReward, getReward, selectedRewardId, setSelectedRewardId }}>
             {children}
         </RewardsContext.Provider>
     );
