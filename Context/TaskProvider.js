@@ -8,23 +8,41 @@ import { AuthContext } from './AuthProvider';
 export const TasksContext = createContext();
 
 export const TasksProvider = ({ children }) => {
-    const { user } = useContext(AuthContext);
     const [tasks, setTasks] = useState([]);
+
+    // const fetchTasks = async (uid) => {
+    //     if (typeof uid === 'string' && uid.trim() !== '') {
+    //         try {
+    //             console.log('Fetching tasks for UID:', uid);
+    //             const tasksRef = collection(db, 'usuarios', uid, 'tareas');
+    //             console.log('Tasks collection reference:', tasksRef);
+    //             const tasksSnapshot = await getDocs(tasksRef);
+    //             const tasksList = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    //             setTasks(tasksList);
+    //             return tasksList;
+    //         } catch (error) {
+    //             console.error('Error fetching tasks:', error);
+    //         }
+    //     } else {
+    //         console.error('Invalid UID provided');
+    //     }
+    // };
 
     const fetchTasks = async (uid) => {
         if (uid) {
             try {
-                console.log('Fetching tasks for UID:', uid);
+                console.log('Fetching rewards for UID:', uid);
                 const tasksRef = collection(db, 'usuarios', uid, 'tareas');
                 const tasksSnapshot = await getDocs(tasksRef);
                 const tasksList = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 setTasks(tasksList);
                 return tasksList;
+                // setCurrentPatientId(patientId);
             } catch (error) {
-                console.error('Error fetching tasks:', error);
+                console.error('Error fetching rewards:', error);
             }
         }
-    }
+    };
 
     const addTask = async (task, uid) => {
         if (uid) {
@@ -89,20 +107,8 @@ export const TasksProvider = ({ children }) => {
         }
     }
 
-    const patientGetTasks = async (id) => {
-        if (user) {
-            const rewardRef = doc(db, 'usuarios', user.uid, 'tareas', id);
-            const rewardDoc = await getDoc(rewardRef);
-            if (rewardDoc.exists()) {
-                return { id: rewardDoc.id, ...rewardDoc.data() };
-            } else {
-                throw new Error('Task not found');
-            }
-        }
-    }
-
     return (
-        <TasksContext.Provider value={{ tasks, setTasks, fetchTasks, addTask, updateTask, deleteTask, getTask, patientGetTasks }}>
+        <TasksContext.Provider value={{ tasks, setTasks, fetchTasks, addTask, updateTask, deleteTask, getTask }}>
             {children}
         </TasksContext.Provider>
     );

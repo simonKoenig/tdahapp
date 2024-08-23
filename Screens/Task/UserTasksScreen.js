@@ -23,7 +23,7 @@ const UserTasksScreen = () => {
 
     const handleSelectPatient = async (patientId) => {
         const tasks = await fetchTasks(patientId);
-        fetchTasks(fetchTasks);
+        setTasks(tasks);
         console.log('User tasks:', tasks); // Imprimir recompensas por consola
         navigation.navigate('TasksList');
     };

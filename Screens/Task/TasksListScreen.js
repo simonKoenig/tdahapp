@@ -46,7 +46,7 @@ const TaskListScreen = ({ route }) => {
         tasks.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (selectedDifficulty === '' || tasks.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
     );
-
+    console.log('Paciente seleccionado:', selectedPatientId);
     const handleRefresh = async () => {
         setRefreshing(true);
         await fetchTasks(selectedPatientId);
@@ -76,7 +76,7 @@ const TaskListScreen = ({ route }) => {
                 renderItem={({ item }) => (
                     <SubjectItem
                         item={item}
-                        onPress={() => navigation.navigate('RewardDetail', { rewardId: item.id, uid: selectedPatientId })}
+                        onPress={() => navigation.navigate('TaskDetail', { taskId: item.id, uid: selectedPatientId })}
                     />
                 )}
                 refreshing={refreshing}
