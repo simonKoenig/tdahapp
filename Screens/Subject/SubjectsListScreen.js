@@ -14,17 +14,17 @@ const SubjectsListScreen = () => {
     const [refreshing, setRefreshing] = useState(false);
     const navigation = useNavigation();
 
-    // useEffect(() => {
-    //     const loadSubjects = async () => {
-    //         if (selectedPatientId) {
-    //             setRefreshing(true);
-    //             await fetchSubjects(selectedPatientId);
-    //             setRefreshing(false);
-    //         }
-    //     };
+    useEffect(() => {
+        const loadSubjects = async () => {
+            if (selectedPatientId) {
+                setRefreshing(true);
+                await fetchSubjects(selectedPatientId);
+                setRefreshing(false);
+            }
+        };
 
-    //     loadSubjects();
-    // }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
+        loadSubjects();
+    }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
 
     const filteredSubjects = subjects.filter(subject =>
         subject.nombre.toLowerCase().includes(searchTerm.toLowerCase())
@@ -42,12 +42,7 @@ const SubjectsListScreen = () => {
                 title="Ver Recompensas de Otro Usuario"
                 onPress={() => navigation.navigate('UserSubjects')}
             />
-            <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => navigation.navigate('AddSubject')}
-            >
-                <Text style={styles.addButtonText}>+</Text>
-            </TouchableOpacity>
+
             <SearchBar
                 searchTerm={searchTerm}
                 onSearch={setSearchTerm}
@@ -64,6 +59,12 @@ const SubjectsListScreen = () => {
                 refreshing={refreshing}
                 onRefresh={handleRefresh}
             />
+            <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => navigation.navigate('AddSubject')}
+            >
+                <Text style={styles.addButtonText}>+</Text>
+            </TouchableOpacity>
         </View>
     );
 };

@@ -89,8 +89,20 @@ export const TasksProvider = ({ children }) => {
         }
     }
 
+    const patientGetTasks = async (id) => {
+        if (user) {
+            const rewardRef = doc(db, 'usuarios', user.uid, 'tareas', id);
+            const rewardDoc = await getDoc(rewardRef);
+            if (rewardDoc.exists()) {
+                return { id: rewardDoc.id, ...rewardDoc.data() };
+            } else {
+                throw new Error('Task not found');
+            }
+        }
+    }
+
     return (
-        <TasksContext.Provider value={{ tasks, setTasks, fetchTasks, addTask, updateTask, deleteTask, getTask }}>
+        <TasksContext.Provider value={{ tasks, setTasks, fetchTasks, addTask, updateTask, deleteTask, getTask, patientGetTasks }}>
             {children}
         </TasksContext.Provider>
     );

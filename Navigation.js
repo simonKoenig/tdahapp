@@ -24,10 +24,10 @@ import SubjectDetailScreen from './Screens/Subject/SubjectDetailScreen';
 import UserSubjectsScreen from './Screens/Subject/UserSubjectsScreen';
 
 // Tasks
-// import TasksListScreen from './Screens/Task/TasksListScreen';
+import TasksListScreen from './Screens/Task/TasksListScreen';
 import AddTaskScreen from './Screens/Task/AddTaskScreen';
 // import TaskDetailScreen from './Screens/Task/TaskDetailScreen';
-// import UserTasksScreen from './Screens/Task/UserTasksScreen';
+import UserTasksScreen from './Screens/Task/UserTasksScreen';
 
 
 
@@ -117,11 +117,11 @@ function MyTabs() {
 
 function HomeStackScreen() {
     return (
-        <HomeStack.Navigator initialRouteName="AddTask" screenOptions={{ headerShown: false }}>
-            {/* <HomeStack.Screen name="TasksList" component={TasksListScreen} /> */}
+        <HomeStack.Navigator initialRouteName="TasksList" screenOptions={{ headerShown: false }}>
+            <HomeStack.Screen name="TasksList" component={TasksListScreen} />
             <HomeStack.Screen name="AddTask" component={AddTaskScreen} />
-            {/* <HomeStack.Screen name="TaskDetail" component={TaskDetailScreen} />
-            <HomeStack.Screen name="UserTasks" component={UserTasksScreen} /> */}
+            {/* <HomeStack.Screen name="TaskDetail" component={TaskDetailScreen} /> */}
+            <HomeStack.Screen name="UserTasks" component={UserTasksScreen} />
         </HomeStack.Navigator>
     );
 }
