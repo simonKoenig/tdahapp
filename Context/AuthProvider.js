@@ -73,8 +73,12 @@ export const AuthProvider = ({ children }) => {
         return <LoadingScreen />; // Renderiza la pantalla de carga mientras se obtiene el estado de autenticación
     }
 
+    const isPaciente = () => {
+        return role === 'paciente';
+    };
+
     return (
-        <AuthContext.Provider value={{ user, role, isAuthenticated, login, logout }}>
+        <AuthContext.Provider value={{ user, role, isAuthenticated, login, logout, isPaciente }}>
             {children}
         </AuthContext.Provider>
     );

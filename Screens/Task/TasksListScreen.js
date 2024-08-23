@@ -26,8 +26,21 @@ const TaskListScreen = ({ route }) => {
     const [selectedDifficulty, setSelectedDifficulty] = useState('');
     const [refreshing, setRefreshing] = useState(false); // Estado para controlar la actualización
     const navigation = useNavigation();
+    const { user, isPaciente, isLoading } = useContext(AuthContext);
 
     const { selectedPatientId } = useContext(PatientsContext);
+
+
+    if (isPaciente()) {
+        return (
+            <View style={styles.container}>
+                <Text>Hola</Text>
+            </View>
+        );
+    }
+
+
+
 
     // useEffect(() => {
     //     const loadRewards = async () => {
