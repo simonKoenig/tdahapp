@@ -14,7 +14,6 @@ export const filtradoDificultades = [
 
 export const roles = [
     { label: 'Usuario', value: 'paciente' },
-    { label: 'Administrador', value: 'administrador' },
     { label: 'Profesional de la salud', value: 'administrador' },
     { label: 'Profesional de la educación', value: 'administrador' },
     { label: 'Acompañante terapéutico', value: 'administrador' },
