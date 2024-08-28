@@ -11,6 +11,8 @@ const DropdownComponent = ({ data, value, setValue, placeholder, onSelect }) => 
             valueField="value"
             placeholder={placeholder}
             value={value}
+            search
+            searchPlaceholder="Buscar..."
             onChange={item => {
                 setValue(item.value);
                 if (onSelect) {

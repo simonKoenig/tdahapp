@@ -9,6 +9,8 @@ export const SubjectsContext = createContext();
 export const SubjectsProvider = ({ children }) => {
     const { user } = useContext(AuthContext);
     const [subjects, setSubjects] = useState([]);
+    const [selectedSubjectId, setSelectedSubjectId] = useState(null);
+
 
 
     const fetchSubjects = async (uid) => {
@@ -92,7 +94,7 @@ export const SubjectsProvider = ({ children }) => {
     };
 
     return (
-        <SubjectsContext.Provider value={{ subjects, setSubjects, fetchSubjects, addSubject, updateSubject, deleteSubject, getSubject }}>
+        <SubjectsContext.Provider value={{ subjects, setSubjects, fetchSubjects, addSubject, updateSubject, deleteSubject, getSubject, selectedSubjectId, setSelectedSubjectId }}>
             {children}
         </SubjectsContext.Provider>
     );

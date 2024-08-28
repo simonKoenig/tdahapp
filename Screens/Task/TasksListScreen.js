@@ -1,6 +1,11 @@
 
 import React, { useContext, useState, useEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet, Button } from 'react-native';
+
+import { TasksContext } from '../../Context/TaskProvider';
+import SubjectItem from '../../Components/SubjectItem';
+
+
 import { RewardsContext } from '../../Context/RewardsProvider';
 import { useNavigation } from '@react-navigation/native';
 import RewardItem from '../../Components/RewardItem';
@@ -12,15 +17,59 @@ import { filtradoDificultades } from '../../Utils/Constant';  // Importamos las 
 import { AuthContext } from '../../Context/AuthProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';
 
-const RewardsListScreen = ({ route }) => {
+const TaskListScreen = ({ route }) => {
+
+    const { tasks, fetchTasks } = useContext(TasksContext);
+
     const { rewards, fetchRewards } = useContext(RewardsContext);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedDifficulty, setSelectedDifficulty] = useState('');
     const [refreshing, setRefreshing] = useState(false); // Estado para controlar la actualización
     const navigation = useNavigation();
-    const [rewardsCache, setRewardsCache] = useState({});
+    const { user, isPaciente, isLoading } = useContext(AuthContext);
 
     const { selectedPatientId } = useContext(PatientsContext);
+
+    const handleRefresh = async () => {
+        setRefreshing(true);
+        await fetchTasks(selectedPatientId || null);  // Llama a fetchTasks con selectedPatientId o sin parámetros
+        console.log('Updated tasks after fetch:', tasks); // Esto aún podría mostrar la versión anterior de tasks
+        setRefreshing(false);
+    };
+
+
+    if (isPaciente()) {
+        console.log('Paciente seleccionado:', selectedPatientId);
+        console.log('user:', user);
+        console.log('isPaciente:', isPaciente());
+        console.log('tasks:', tasks);
+        return (
+            <View style={styles.container}>
+                <FlatList
+                    data={tasks}
+                    keyExtractor={item => item.id}
+                    renderItem={({ item }) => (
+                        <SubjectItem
+                            item={item}
+                            onPress={() => {
+                                const params = { taskId: item.id };
+                                if (selectedPatientId) {
+                                    params.uid = selectedPatientId;
+                                }
+                                navigation.navigate('TaskDetail', params);
+                            }}
+                        />
+                    )}
+                    refreshing={refreshing}
+                    onRefresh={handleRefresh}
+                />
+            </View>
+
+        );
+    }
+
+
+
 
     useEffect(() => {
         const loadRewards = async () => {
@@ -35,29 +84,24 @@ const RewardsListScreen = ({ route }) => {
     }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
 
     // Filtramos las recompensas en función del término de búsqueda y la dificultad seleccionada
-    const filteredRewards = rewards.filter(reward =>
-        reward.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (selectedDifficulty === '' || reward.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
+    const filteredTasks = tasks.filter(tasks =>
+        tasks.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (selectedDifficulty === '' || tasks.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
     );
-
-    const handleRefresh = async () => {
-        setRefreshing(true);
-        await fetchRewards(selectedPatientId);
-        setRefreshing(false);
-    };
+    console.log('Paciente seleccionado:', selectedPatientId);
+    // const handleRefresh = async () => {
+    //     setRefreshing(true);
+    //     await fetchTasks(selectedPatientId);
+    //     setRefreshing(false);
+    // };
 
     return (
         <View style={styles.container}>
             <Button
-                title="Ver Recompensas de Otro Usuario"
-                onPress={() => navigation.navigate('UserRewards')}
+                title="Ver tareas de Otro Usuario"
+                onPress={() => navigation.navigate('UserTasks')}
             />
-            <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => navigation.navigate('AddReward')}
-            >
-                <Text style={styles.addButtonText}>+</Text>
-            </TouchableOpacity>
+
             <SearchBar
                 searchTerm={searchTerm}
                 onSearch={setSearchTerm}
@@ -69,12 +113,12 @@ const RewardsListScreen = ({ route }) => {
                 placeholder="Selecciona una dificultad"
             />
             <FlatList
-                data={filteredRewards}
+                data={filteredTasks}
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => (
-                    <RewardItem
+                    <SubjectItem
                         item={item}
-                        onPress={() => navigation.navigate('RewardDetail', { rewardId: item.id, uid: selectedPatientId })}
+                        onPress={() => navigation.navigate('TaskDetail', { taskId: item.id, uid: selectedPatientId })}
                     />
                 )}
                 refreshing={refreshing}
@@ -82,7 +126,7 @@ const RewardsListScreen = ({ route }) => {
             />
             <TouchableOpacity
                 style={styles.addButton}
-                onPress={() => navigation.navigate('AddReward')}
+                onPress={() => navigation.navigate('AddTask')}
             >
                 <Text style={styles.addButtonText}>+</Text>
             </TouchableOpacity>
@@ -115,4 +159,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default RewardsListScreen;
+export default TaskListScreen;

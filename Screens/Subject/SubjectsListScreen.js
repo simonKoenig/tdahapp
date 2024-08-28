@@ -42,12 +42,7 @@ const SubjectsListScreen = () => {
                 title="Ver Recompensas de Otro Usuario"
                 onPress={() => navigation.navigate('UserSubjects')}
             />
-            <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => navigation.navigate('AddSubject')}
-            >
-                <Text style={styles.addButtonText}>+</Text>
-            </TouchableOpacity>
+
             <SearchBar
                 searchTerm={searchTerm}
                 onSearch={setSearchTerm}
@@ -64,6 +59,12 @@ const SubjectsListScreen = () => {
                 refreshing={refreshing}
                 onRefresh={handleRefresh}
             />
+            <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => navigation.navigate('AddSubject')}
+            >
+                <Text style={styles.addButtonText}>+</Text>
+            </TouchableOpacity>
         </View>
     );
 };
