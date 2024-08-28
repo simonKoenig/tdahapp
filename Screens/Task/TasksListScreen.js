@@ -102,6 +102,7 @@ const TaskListScreen = ({ route }) => {
                 title="Ver tareas de Otro Usuario"
                 onPress={() => navigation.navigate('UserTasks')}
             /> */}
+            <PatientSelector />
 
             <SearchBar
                 searchTerm={searchTerm}
