@@ -15,13 +15,17 @@ const PatientSelector = () => {
     const { fetchTasks } = useContext(TasksContext);
     const [loading, setLoading] = useState(true);
 
+    // Si no hay pacientes cargados, se cargan
     useEffect(() => {
         const loadPatients = async () => {
-            await fetchPatients();
+            if (!patients.length) {
+                console.log("CARGANDO PACIENTESSSSSSS")
+                await fetchPatients();
+            }
             setLoading(false);
         };
         loadPatients();
-    }, []);
+    }, [patients, fetchPatients]);
 
     const handleSelectPatient = async (patientId) => {
         setSelectedPatientId(patientId);
