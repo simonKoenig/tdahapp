@@ -8,41 +8,39 @@ import { AuthContext } from './AuthProvider';
 export const TasksContext = createContext();
 
 export const TasksProvider = ({ children }) => {
+    const { user } = useContext(AuthContext);
     const [tasks, setTasks] = useState([]);
 
-    // const fetchTasks = async (uid) => {
-    //     if (typeof uid === 'string' && uid.trim() !== '') {
-    //         try {
-    //             console.log('Fetching tasks for UID:', uid);
-    //             const tasksRef = collection(db, 'usuarios', uid, 'tareas');
-    //             console.log('Tasks collection reference:', tasksRef);
-    //             const tasksSnapshot = await getDocs(tasksRef);
-    //             const tasksList = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    //             setTasks(tasksList);
-    //             return tasksList;
-    //         } catch (error) {
-    //             console.error('Error fetching tasks:', error);
-    //         }
-    //     } else {
-    //         console.error('Invalid UID provided');
-    //     }
-    // };
 
-    const fetchTasks = async (uid) => {
-        if (uid) {
+    //Se usa la misma función para el paciente, donde si no se le pasa el uid, se toma el uid del paciente logueado
+    const fetchTasks = async (uid = null) => {
+        // Usa el uid pasado como parámetro o el uid del usuario actual
+        const userId = uid || user?.uid;
+        if (userId) {
             try {
-                console.log('Fetching rewards for UID:', uid);
-                const tasksRef = collection(db, 'usuarios', uid, 'tareas');
+                console.log('Fetching tasks for UID:', userId);
+                const tasksRef = collection(db, 'usuarios', userId, 'tareas');
                 const tasksSnapshot = await getDocs(tasksRef);
                 const tasksList = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
                 setTasks(tasksList);
                 return tasksList;
-                // setCurrentPatientId(patientId);
             } catch (error) {
-                console.error('Error fetching rewards:', error);
+                console.error('Error fetching tasks:', error);
             }
+        } else {
+            console.error('UID or user is not defined');
         }
     };
+
+
+    useEffect(() => { //solo llama a fetchTasks si el usuario está autenticado (if (user))
+        if (user) {
+            fetchTasks();
+        }
+    }, [user]);
+
+
 
     const addTask = async (task, uid) => {
         if (uid) {
@@ -87,13 +85,31 @@ export const TasksProvider = ({ children }) => {
         }
     }
 
-    const getTask = async (id, uid) => {
-        console.log('UID:', uid);
-        console.log('ID:', id);
-        if (uid) {
+
+    // const getTask = async (id, uid) => {
+    //     console.log('UID:', uid);
+    //     console.log('ID:', id);
+    //     if (uid) {
+    //         try {
+    //             console.log('Getting task with ID:', id);
+    //             const taskRef = doc(db, 'usuarios', uid, 'tareas', id);
+    //             const taskDoc = await getDoc(taskRef);
+    //             if (taskDoc.exists()) {
+    //                 return { id: taskDoc.id, ...taskDoc.data() };
+    //             } else {
+    //                 throw new Error('task not found');
+    //             }
+    //         } catch (error) {
+    //             console.error('Error getting task:', error);
+    //             throw error;
+    //         }
+    //     }
+    // }
+    const getTask = async (id, uid = null) => {
+        const userId = uid || user?.uid; // Usa el UID proporcionado o el UID del usuario autenticado
+        if (userId) {
             try {
-                console.log('Getting task with ID:', id);
-                const taskRef = doc(db, 'usuarios', uid, 'tareas', id);
+                const taskRef = doc(db, 'usuarios', userId, 'tareas', id);
                 const taskDoc = await getDoc(taskRef);
                 if (taskDoc.exists()) {
                     return { id: taskDoc.id, ...taskDoc.data() };
@@ -106,6 +122,9 @@ export const TasksProvider = ({ children }) => {
             }
         }
     }
+
+
+
 
     return (
         <TasksContext.Provider value={{ tasks, setTasks, fetchTasks, addTask, updateTask, deleteTask, getTask }}>

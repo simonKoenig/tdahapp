@@ -30,29 +30,58 @@ const TaskListScreen = ({ route }) => {
 
     const { selectedPatientId } = useContext(PatientsContext);
 
+    const handleRefresh = async () => {
+        setRefreshing(true);
+        await fetchTasks(selectedPatientId || null);  // Llama a fetchTasks con selectedPatientId o sin parámetros
+        console.log('Updated tasks after fetch:', tasks); // Esto aún podría mostrar la versión anterior de tasks
+        setRefreshing(false);
+    };
+
 
     if (isPaciente()) {
+        console.log('Paciente seleccionado:', selectedPatientId);
+        console.log('user:', user);
+        console.log('isPaciente:', isPaciente());
+        console.log('tasks:', tasks);
         return (
             <View style={styles.container}>
-                <Text>Hola</Text>
+                <FlatList
+                    data={tasks}
+                    keyExtractor={item => item.id}
+                    renderItem={({ item }) => (
+                        <SubjectItem
+                            item={item}
+                            onPress={() => {
+                                const params = { taskId: item.id };
+                                if (selectedPatientId) {
+                                    params.uid = selectedPatientId;
+                                }
+                                navigation.navigate('TaskDetail', params);
+                            }}
+                        />
+                    )}
+                    refreshing={refreshing}
+                    onRefresh={handleRefresh}
+                />
             </View>
+
         );
     }
 
 
 
 
-    // useEffect(() => {
-    //     const loadRewards = async () => {
-    //         if (selectedPatientId) {
-    //             setRefreshing(true);
-    //             await fetchRewards(selectedPatientId);
-    //             setRefreshing(false);
-    //         }
-    //     };
+    useEffect(() => {
+        const loadRewards = async () => {
+            if (selectedPatientId) {
+                setRefreshing(true);
+                await fetchRewards(selectedPatientId);
+                setRefreshing(false);
+            }
+        };
 
-    //     loadRewards();
-    // }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
+        loadRewards();
+    }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
 
     // Filtramos las recompensas en función del término de búsqueda y la dificultad seleccionada
     const filteredTasks = tasks.filter(tasks =>
@@ -60,11 +89,11 @@ const TaskListScreen = ({ route }) => {
         (selectedDifficulty === '' || tasks.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
     );
     console.log('Paciente seleccionado:', selectedPatientId);
-    const handleRefresh = async () => {
-        setRefreshing(true);
-        await fetchTasks(selectedPatientId);
-        setRefreshing(false);
-    };
+    // const handleRefresh = async () => {
+    //     setRefreshing(true);
+    //     await fetchTasks(selectedPatientId);
+    //     setRefreshing(false);
+    // };
 
     return (
         <View style={styles.container}>

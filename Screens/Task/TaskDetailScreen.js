@@ -11,6 +11,8 @@ import { TasksContext } from '../../Context/TaskProvider';
 import { RewardsContext } from '../../Context/RewardsProvider';
 import { SubjectsContext } from '../../Context/SubjectsProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';
+import { AuthContext } from '../../Context/AuthProvider';
+
 import moment from 'moment'; // Importar moment
 import 'moment/locale/es'; // Importar el idioma español para moment
 
@@ -26,6 +28,9 @@ function TaskDetailScreen() {
     const [loading, setLoading] = useState(true); // Estado de carga
     const [show, setShow] = useState(false); // Estado para controlar la visibilidad del DateTimePicker
     const [mode, setMode] = useState('date'); // Estado para controlar el modo del DateTimePicker
+    const { user, isPaciente, isLoading } = useContext(AuthContext);
+    const [selectedSubjectName, setSelectedSubjectName] = useState('');
+
 
     const { getTask, updateTask, deleteTask } = useContext(TasksContext);
     const navigation = useNavigation();
@@ -33,13 +38,16 @@ function TaskDetailScreen() {
     const { subjects, setSelectedSubjectId, selectedSubjectId, fetchSubjects } = useContext(SubjectsContext);
     const { rewards, fetchRewards } = useContext(RewardsContext);
 
+
+
     useEffect(() => {
         const fetchData = async () => {
             try {
+                const currentPatientId = selectedPatientId || user.uid;
                 // Primero, cargamos las recompensas y materias
-                await fetchRewards(selectedPatientId);
-                await fetchSubjects(selectedPatientId);
-                await fetchPatients(selectedPatientId);
+                await fetchRewards(currentPatientId);
+                await fetchSubjects(currentPatientId);
+                await fetchPatients(currentPatientId);
 
                 // Luego, cargamos la tarea
                 console.log('Fetching task details for ID:', taskId);
@@ -51,7 +59,6 @@ function TaskDetailScreen() {
                     setDificultad(task.dificultad);
                     setSelectedRewardId(task.selectedRewardId);
                     setSelectedSubjectId(task.selectedSubjectId);
-                    console.log('materia seleccionada:', task.selectedSubjectId);
                     setSelectedPatientId(uid); // Establecemos el paciente seleccionado
                     console.log('Fecha:', task.date.toDate());
 
@@ -115,6 +122,35 @@ function TaskDetailScreen() {
 
     if (loading) {
         return <LoadingScreen />; // Mostrar pantalla de carga
+    }
+
+    if (isPaciente()) {
+
+        return (
+            <View style={styles.form}>
+                <Text style={styles.label}>Descripción</Text>
+                <Text style={styles.input}>{descripcion}</Text>
+
+
+                <Text style={styles.label}>Fecha</Text>
+                <Text style={styles.input}>{moment(date).format('DD/MM/YYYY')}</Text>
+
+
+
+                <Text style={styles.label}>Dificultad</Text>
+                <Text style={styles.input}>{dificultad}</Text>
+
+                <Text style={styles.label}>Materia</Text>
+                <Text style={styles.input}>{subjects.find(subject => subject.id === selectedSubjectId)?.nombre}</Text>
+
+
+
+                <Text style={styles.label}>Nombre</Text>
+                <Text style={styles.input}>{nombre}</Text>
+
+            </View>
+
+        );
     }
 
     return (

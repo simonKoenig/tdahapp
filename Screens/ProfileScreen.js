@@ -22,7 +22,7 @@ function ProfileScreen() {
     };
     console.log('Patients:', patients);
     console.log('Selected patient ID:', selectedPatientId);
-    console.log('UserUid:', user.uid);
+
 
     useEffect(() => {
         if (!isAuthenticated && !loading) {
@@ -52,6 +52,14 @@ function ProfileScreen() {
             setLoading(false);
         }
     };
+
+    // if (!user) {
+    //     return (
+    //         <View style={styles.container}>
+    //             <Text style={styles.errorMessage}>Usuario no está logueado</Text>
+    //         </View>
+    //     );
+    // }
 
     const renderPatientItem = ({ item }) => (
         <View style={styles.row}>

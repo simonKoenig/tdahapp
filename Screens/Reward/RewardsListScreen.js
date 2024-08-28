@@ -18,20 +18,21 @@ const RewardsListScreen = ({ route }) => {
     const [selectedDifficulty, setSelectedDifficulty] = useState('');
     const [refreshing, setRefreshing] = useState(false); // Estado para controlar la actualización
     const navigation = useNavigation();
+    const [rewardsCache, setRewardsCache] = useState({});
 
     const { selectedPatientId } = useContext(PatientsContext);
 
-    // useEffect(() => {
-    //     const loadRewards = async () => {
-    //         if (selectedPatientId) {
-    //             setRefreshing(true);
-    //             await fetchRewards(selectedPatientId);
-    //             setRefreshing(false);
-    //         }
-    //     };
+    useEffect(() => {
+        const loadRewards = async () => {
+            if (selectedPatientId) {
+                setRefreshing(true);
+                await fetchRewards(selectedPatientId);
+                setRefreshing(false);
+            }
+        };
 
-    //     loadRewards();
-    // }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
+        loadRewards();
+    }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
 
     // Filtramos las recompensas en función del término de búsqueda y la dificultad seleccionada
     const filteredRewards = rewards.filter(reward =>
