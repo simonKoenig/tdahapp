@@ -5,7 +5,10 @@ import { RewardsContext } from '../../Context/RewardsProvider';
 import { useNavigation } from '@react-navigation/native';
 import RewardItem from '../../Components/RewardItem';
 import SearchBar from '../../Components/SearchBar';  // Importamos SearchBar
-import DropdownComponent from '../../Components/Dropdown';  // Importamos DropdownCompone
+import DropdownComponent from '../../Components/Dropdown';  // Importamos DropdownComponent
+
+import PatientSelector from '../../Components/PatientSelector';
+
 
 import { filtradoDificultades } from '../../Utils/Constant';  // Importamos las dificultades
 
@@ -22,17 +25,17 @@ const RewardsListScreen = ({ route }) => {
 
     const { selectedPatientId } = useContext(PatientsContext);
 
-    useEffect(() => {
-        const loadRewards = async () => {
-            if (selectedPatientId) {
-                setRefreshing(true);
-                await fetchRewards(selectedPatientId);
-                setRefreshing(false);
-            }
-        };
+    // useEffect(() => {
+    //     const loadRewards = async () => {
+    //         if (selectedPatientId) {
+    //             setRefreshing(true);
+    //             await fetchRewards(selectedPatientId);
+    //             setRefreshing(false);
+    //         }
+    //     };
 
-        loadRewards();
-    }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
+    //     loadRewards();
+    // }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
 
     // Filtramos las recompensas en función del término de búsqueda y la dificultad seleccionada
     const filteredRewards = rewards.filter(reward =>
@@ -48,10 +51,12 @@ const RewardsListScreen = ({ route }) => {
 
     return (
         <View style={styles.container}>
-            <Button
+            {/* <Button
                 title="Ver Recompensas de Otro Usuario"
                 onPress={() => navigation.navigate('UserRewards')}
-            />
+            /> */}
+            <PatientSelector />
+            
             <TouchableOpacity
                 style={styles.addButton}
                 onPress={() => navigation.navigate('AddReward')}

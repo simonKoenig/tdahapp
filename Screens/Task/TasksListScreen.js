@@ -1,4 +1,3 @@
-
 import React, { useContext, useState, useEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet, Button } from 'react-native';
 
@@ -10,7 +9,8 @@ import { RewardsContext } from '../../Context/RewardsProvider';
 import { useNavigation } from '@react-navigation/native';
 import RewardItem from '../../Components/RewardItem';
 import SearchBar from '../../Components/SearchBar';  // Importamos SearchBar
-import DropdownComponent from '../../Components/Dropdown';  // Importamos DropdownCompone
+import DropdownComponent from '../../Components/Dropdown';  // Importamos DropdownComponent
+import PatientSelector from '../../Components/PatientSelector';
 
 import { filtradoDificultades } from '../../Utils/Constant';  // Importamos las dificultades
 
@@ -45,6 +45,7 @@ const TaskListScreen = ({ route }) => {
         console.log('tasks:', tasks);
         return (
             <View style={styles.container}>
+                <PatientSelector />
                 <FlatList
                     data={tasks}
                     keyExtractor={item => item.id}
@@ -71,17 +72,17 @@ const TaskListScreen = ({ route }) => {
 
 
 
-    useEffect(() => {
-        const loadRewards = async () => {
-            if (selectedPatientId) {
-                setRefreshing(true);
-                await fetchRewards(selectedPatientId);
-                setRefreshing(false);
-            }
-        };
+    // useEffect(() => {
+    //     const loadRewards = async () => {
+    //         if (selectedPatientId) {
+    //             setRefreshing(true);
+    //             await fetchRewards(selectedPatientId);
+    //             setRefreshing(false);
+    //         }
+    //     };
 
-        loadRewards();
-    }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
+    //     loadRewards();
+    // }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
 
     // Filtramos las recompensas en función del término de búsqueda y la dificultad seleccionada
     const filteredTasks = tasks.filter(tasks =>
@@ -97,10 +98,10 @@ const TaskListScreen = ({ route }) => {
 
     return (
         <View style={styles.container}>
-            <Button
+            {/* <Button
                 title="Ver tareas de Otro Usuario"
                 onPress={() => navigation.navigate('UserTasks')}
-            />
+            /> */}
 
             <SearchBar
                 searchTerm={searchTerm}

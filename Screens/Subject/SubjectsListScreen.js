@@ -4,6 +4,7 @@ import { SubjectsContext } from '../../Context/SubjectsProvider';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from '../../Components/SearchBar';
 import SubjectItem from '../../Components/SubjectItem';
+import PatientSelector from '../../Components/PatientSelector';
 
 import { PatientsContext } from '../../Context/PatientsProvider';
 
@@ -14,17 +15,17 @@ const SubjectsListScreen = () => {
     const [refreshing, setRefreshing] = useState(false);
     const navigation = useNavigation();
 
-    useEffect(() => {
-        const loadSubjects = async () => {
-            if (selectedPatientId) {
-                setRefreshing(true);
-                await fetchSubjects(selectedPatientId);
-                setRefreshing(false);
-            }
-        };
+    // useEffect(() => {
+    //     const loadSubjects = async () => {
+    //         if (selectedPatientId) {
+    //             setRefreshing(true);
+    //             await fetchSubjects(selectedPatientId);
+    //             setRefreshing(false);
+    //         }
+    //     };
 
-        loadSubjects();
-    }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
+    //     loadSubjects();
+    // }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
 
     const filteredSubjects = subjects.filter(subject =>
         subject.nombre.toLowerCase().includes(searchTerm.toLowerCase())
@@ -38,10 +39,12 @@ const SubjectsListScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Button
+            {/* <Button
                 title="Ver Recompensas de Otro Usuario"
                 onPress={() => navigation.navigate('UserSubjects')}
-            />
+            /> */}
+            <PatientSelector />
+
 
             <SearchBar
                 searchTerm={searchTerm}
