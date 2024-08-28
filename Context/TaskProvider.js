@@ -33,14 +33,12 @@ export const TasksProvider = ({ children }) => {
         }
     };
 
-
-    useEffect(() => { //solo llama a fetchTasks si el usuario está autenticado (if (user))
-        if (user) {
-            fetchTasks();
-        }
-    }, [user]);
-
-
+    //DESCOMENTAR
+    // useEffect(() => { //solo llama a fetchTasks si el usuario está autenticado (if (user))
+    //     if (user) {
+    //         fetchTasks();
+    //     }
+    // }, [user]);
 
     const addTask = async (task, uid) => {
         if (uid) {
