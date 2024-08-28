@@ -101,7 +101,7 @@ function AddTaskScreen() {
             };
 
             await addTask(newTask, selectedPatientId); // Pasa el UID del paciente seleccionado
-            //navigation.goBack();
+            navigation.goBack();
         } else {
             console.error('No patient selected');
         }
