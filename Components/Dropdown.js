@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
-const DropdownComponent = ({ data, value, setValue, placeholder, onSelect }) => {
+const DropdownComponent = ({ data, value, setValue, placeholder, onSelect, searchActivo = true }) => {
     return (
         <Dropdown
             style={styles.dropdown}
@@ -11,7 +11,7 @@ const DropdownComponent = ({ data, value, setValue, placeholder, onSelect }) => 
             valueField="value"
             placeholder={placeholder}
             value={value}
-            search
+            search={searchActivo}
             searchPlaceholder="Buscar..."
             onChange={item => {
                 setValue(item.value);

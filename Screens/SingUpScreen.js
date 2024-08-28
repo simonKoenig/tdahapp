@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase-config';
 import { useNavigation } from '@react-navigation/native';
+import { roles } from '../Utils/Constant';
+import DropdownComponent from '../Components/Dropdown';
 
 function SignUpScreen() {
 
@@ -13,11 +14,18 @@ function SignUpScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [nombreApellido, setNombreApellido] = useState('');
-    const [role, setRole] = useState('paciente'); // Valor predeterminado
+    const [role, setRole] = useState(''); // Valor predeterminado
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleSignUp = async () => {
+        if (!email || !password || !nombreApellido || !role) {
+            setErrorMessage('Por favor, complete todos los campos y seleccione un rol.');
+            return;
+        }
+
         const auth = getAuth();
         try {
+            setErrorMessage(''); // Limpiar cualquier mensaje de error previo
             const userCredential = await createUserWithEmailAndPassword(auth, email, password); // Crear usuario con correo y contraseña
             const user = userCredential.user;
 
@@ -32,6 +40,7 @@ function SignUpScreen() {
             await signInWithEmailAndPassword(auth, email, password);
         } catch (error) {
             console.error('Error al registrar el usuario:', error);
+            setErrorMessage(error.message || 'Error al registrar el usuario:');
         }
     };
 
@@ -68,14 +77,14 @@ function SignUpScreen() {
                 secureTextEntry
             />
             <Text style={styles.label}>Seleccione el rol</Text>
-            <Picker
-                selectedValue={role}
-                style={styles.picker}
-                onValueChange={(itemValue) => setRole(itemValue)}
-            >
-                <Picker.Item label="Administrador" value="administrador" />
-                <Picker.Item label="Paciente" value="paciente" />
-            </Picker>
+            <DropdownComponent
+                data={roles}
+                value={role}
+                setValue={setRole}
+                placeholder="Seleccione un role"
+                onSelect={(value) => console.log('Selected:', value)}
+                searchActivo={false}
+            />
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleSignUp}>
                     <Text style={styles.buttonText}>Registrar</Text>
@@ -84,6 +93,11 @@ function SignUpScreen() {
                     <Text style={styles.buttonText}>Cancelar</Text>
                 </TouchableOpacity>
             </View>
+            {typeof errorMessage === 'string' && errorMessage.length > 0 && (
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorMessage}>{errorMessage}</Text>
+                </View>
+            )}
         </View>
     );
 }
@@ -142,6 +156,20 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 18,
     },
+    errorContainer: {
+        marginVertical: 8,
+        padding: 10,
+        backgroundColor: '#fee',
+        borderRadius: 5,
+
+    },
+
+    errorMessage: {
+        color: 'red',
+        fontSize: 16,
+        marginTop: 16,
+        textAlign: 'center'
+    }
 });
 
 export default SignUpScreen;

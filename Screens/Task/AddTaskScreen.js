@@ -31,8 +31,8 @@ function AddTaskScreen() {
 
     // Transforma los pacientes para el Dropdown
     const transformedPatients = patients.map(patient => ({
-         label: patient.nombreApellido,
-         value: patient.id,
+        label: patient.nombreApellido,
+        value: patient.id,
     }));
 
     // Transforma las materias para el Dropdown
@@ -40,16 +40,16 @@ function AddTaskScreen() {
         label: subject.nombre,
         value: subject.id,
     }));
-    
+
     // Transforma las recompensas y las filtra según la dificultad elegida para el Dropdown
     const transformedRewards = rewards
-    .filter(reward => reward.dificultad === dificultad)
-    .map(reward => ({
-        label: reward.nombre,
-        value: reward.id,
-        dificultad: reward.dificultad
-    }));
-    
+        .filter(reward => reward.dificultad === dificultad)
+        .map(reward => ({
+            label: reward.nombre,
+            value: reward.id,
+            dificultad: reward.dificultad
+        }));
+
     // Función para seleccionar una materia
     const handleSelectSubject = async (subjectId) => {
         setSelectedSubjectId(subjectId);
@@ -87,7 +87,7 @@ function AddTaskScreen() {
     const showTimepicker = () => {
         showMode('time');
     };
-    
+
     // Función para agregar una tarea
     const handleAddTask = async () => {
         if (selectedPatientId) {
@@ -99,7 +99,7 @@ function AddTaskScreen() {
                 selectedRewardId,
                 selectedSubjectId,
             };
-            
+
             await addTask(newTask, selectedPatientId); // Pasa el UID del paciente seleccionado
             //navigation.goBack();
         } else {
@@ -131,25 +131,25 @@ function AddTaskScreen() {
             <Text>Fecha seleccionada: {date.toLocaleString()}</Text>
             {show && (
                 <DateTimePicker
-                minimumDate={new Date()}
-                value={date}
-                mode={mode}
-                is24Hour={true}
-                onChange={onChange}
+                    minimumDate={new Date()}
+                    value={date}
+                    mode={mode}
+                    is24Hour={true}
+                    onChange={onChange}
                 />
             )}
 
             <Text style={styles.label}>Paciente</Text>
             {patients.length > 0 ? (
-                    <DropdownComponent
-                        data={transformedPatients}
-                        value={selectedPatientId}
-                        setValue={setSelectedPatientId}
-                        placeholder="Seleccione un paciente"
-                        onSelect={handleSelectPatient}
-                    />
-                ) : (
-                    <Text style={styles.noPatientsText}>No se encontraron pacientes.</Text>
+                <DropdownComponent
+                    data={transformedPatients}
+                    value={selectedPatientId}
+                    setValue={setSelectedPatientId}
+                    placeholder="Seleccione un paciente"
+                    onSelect={handleSelectPatient}
+                />
+            ) : (
+                <Text style={styles.noPatientsText}>No se encontraron pacientes.</Text>
             )}
 
             <Text style={styles.label}>Dificultad</Text>
@@ -158,6 +158,7 @@ function AddTaskScreen() {
                 value={dificultad}
                 setValue={setDificultad}
                 placeholder="Selecciona una dificultad"
+                searchActivo={false}
             />
 
 

@@ -40,6 +40,7 @@ function AddRewardScreen() {
                 value={dificultad}
                 setValue={setDificultad}
                 placeholder="Selecciona una dificultad"
+                searchActivo={false}
             />
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleAddReward}>
