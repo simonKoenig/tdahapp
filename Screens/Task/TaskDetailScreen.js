@@ -44,10 +44,6 @@ function TaskDetailScreen() {
         const fetchData = async () => {
             try {
                 const currentPatientId = selectedPatientId || user.uid;
-                // Primero, cargamos las recompensas y materias
-                // await fetchRewards(currentPatientId);
-                // await fetchSubjects(currentPatientId);
-                // await fetchPatients(currentPatientId);
 
                 // Luego, cargamos la tarea
                 console.log('Fetching task details for ID:', taskId);
