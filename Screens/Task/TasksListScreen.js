@@ -4,6 +4,7 @@ import { View, FlatList, TouchableOpacity, Text, StyleSheet, Button } from 'reac
 
 import { TasksContext } from '../../Context/TaskProvider';
 import SubjectItem from '../../Components/SubjectItem';
+import TaskItem from '../../Components/TaskItem';
 
 
 import { RewardsContext } from '../../Context/RewardsProvider';
@@ -49,7 +50,7 @@ const TaskListScreen = ({ route }) => {
                     data={tasks}
                     keyExtractor={item => item.id}
                     renderItem={({ item }) => (
-                        <SubjectItem
+                        <TaskItem
                             item={item}
                             onPress={() => {
                                 const params = { taskId: item.id };
@@ -94,7 +95,7 @@ const TaskListScreen = ({ route }) => {
     //     await fetchTasks(selectedPatientId);
     //     setRefreshing(false);
     // };
-
+    console.log('tasks:', tasks);
     return (
         <View style={styles.container}>
             <Button
@@ -116,7 +117,7 @@ const TaskListScreen = ({ route }) => {
                 data={filteredTasks}
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => (
-                    <SubjectItem
+                    <TaskItem
                         item={item}
                         onPress={() => navigation.navigate('TaskDetail', { taskId: item.id, uid: selectedPatientId })}
                     />

@@ -1,22 +1,39 @@
+// PriorityBadge.js
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const PriorityBadge = ({ dificultad }) => {
-    const getBackgroundColor = (dificultad) => {
-        if (dificultad.toLowerCase() === 'baja') {
-            return '#81c784'; // Verde claro
-        } else if (dificultad.toLowerCase() === 'media') {
-            return '#ffb74d'; // Naranja claro
-        } else if (dificultad.toLowerCase() === 'alta') {
-            return '#e57373'; // Rojo claro
-        } else {
-            return '#e0e0e0'; // Gris por defecto
+const PriorityBadge = ({ tipo, valor }) => {
+    const getBackgroundColor = (tipo, valor) => {
+        if (tipo === 'dificultad') {
+            switch (valor.toLowerCase()) {
+                case 'baja':
+                    return '#81c784'; // Verde claro
+                case 'media':
+                    return '#ffb74d'; // Naranja claro
+                case 'alta':
+                    return '#e57373'; // Rojo claro
+                default:
+                    return '#e0e0e0'; // Gris por defecto
+            }
+        } else if (tipo === 'estado') {
+            switch (valor.toLowerCase()) {
+                case 'en progreso':
+                    return '#ffb74d'; // Naranja claro
+                case 'finalizada':
+                    return '#81c784'; // Verde
+                case 'pendiente':
+                    return '#64b5f6'; // Azul claro
+                case 'vencida':
+                    return '#e57373'; // Rojo claro
+                default:
+                    return '#e0e0e0'; // Gris por defecto
+            }
         }
     };
 
     return (
-        <View style={[styles.priorityContainer, { backgroundColor: getBackgroundColor(dificultad) }]}>
-            <Text style={styles.priorityText}>{dificultad}</Text>
+        <View style={[styles.priorityContainer, { backgroundColor: getBackgroundColor(tipo, valor) }]}>
+            <Text style={styles.priorityText}>{valor}</Text>
         </View>
     );
 };
