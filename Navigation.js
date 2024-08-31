@@ -15,6 +15,7 @@ import RewardsListScreen from './Screens/Reward/RewardsListScreen'
 import AddRewardScreen from './Screens/Reward/AddRewardScreen';
 import RewardDetailScreen from './Screens/Reward/RewardDetailScreen';
 import UserRewardsScreen from './Screens/Reward/UserRewardsScreen';
+import ObtainTaskScreen from './Screens/Reward/ObtainTaskScreen';
 
 //Subjects
 
@@ -122,6 +123,7 @@ function HomeStackScreen() {
             <HomeStack.Screen name="AddTask" component={AddTaskScreen} />
             <HomeStack.Screen name="TaskDetail" component={TaskDetailScreen} />
             <HomeStack.Screen name="UserTasks" component={UserTasksScreen} />
+            <HomeStack.Screen name="ObtainTask" component={ObtainTaskScreen} />
         </HomeStack.Navigator>
     );
 }
