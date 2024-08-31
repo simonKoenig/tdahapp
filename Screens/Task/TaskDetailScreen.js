@@ -29,6 +29,7 @@ function TaskDetailScreen() {
     const [show, setShow] = useState(false); // Estado para controlar la visibilidad del DateTimePicker
     const [mode, setMode] = useState('date'); // Estado para controlar el modo del DateTimePicker
     const { user, isPaciente, isLoading } = useContext(AuthContext);
+    const [estado, setEstado] = useState(''); // Corrección: useState retorna un array con estado y función de actualización
     const [selectedSubjectName, setSelectedSubjectName] = useState('');
 
 
@@ -60,6 +61,7 @@ function TaskDetailScreen() {
                     setSelectedRewardId(task.selectedRewardId);
                     setSelectedSubjectId(task.selectedSubjectId);
                     setSelectedPatientId(uid); // Establecemos el paciente seleccionado
+                    setEstado(task.estado);
                     console.log('Fecha:', task.date.toDate());
 
                 } else {
@@ -104,13 +106,21 @@ function TaskDetailScreen() {
 
     const handleUpdateTask = async () => {
         try {
-            await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId }, selectedPatientId);
+            await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado }, selectedPatientId);
             navigation.goBack();
         } catch (error) {
             console.error('Error updating task:', error);
         }
     };
 
+    const handleMarkTask = async (nuevoEstado) => {
+        try {
+            await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado: nuevoEstado }, selectedPatientId);
+            navigation.goBack();
+        } catch (error) {
+            console.error('Error updating task:', error);
+        }
+    };
     const handleDeleteTask = async () => {
         try {
             await deleteTask(taskId, selectedPatientId);
@@ -119,6 +129,8 @@ function TaskDetailScreen() {
             console.error('Error deleting task:', error);
         }
     };
+
+
 
     if (loading) {
         return <LoadingScreen />; // Mostrar pantalla de carga
@@ -147,6 +159,32 @@ function TaskDetailScreen() {
 
                 <Text style={styles.label}>Nombre</Text>
                 <Text style={styles.input}>{nombre}</Text>
+
+                {estado === 'En progreso' && (
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => handleMarkTask('Pendiente')}
+                        >
+                            <Text style={styles.buttonText}>Tarea terminada</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+
+                {estado === 'Finalizada' && (
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity
+                            style={styles.button}
+                        >
+                            <Text style={styles.buttonText}>Obtener recompensa</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+
+
+
+
+
 
             </View>
 
@@ -218,6 +256,14 @@ function TaskDetailScreen() {
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={handleDeleteTask}>
                     <Text style={styles.buttonText}>Eliminar</Text>
+                </TouchableOpacity>
+            </View>
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => handleMarkTask('Finalizada')}
+                >
+                    <Text style={styles.buttonText}>Tarea correcta</Text>
                 </TouchableOpacity>
             </View>
         </View>

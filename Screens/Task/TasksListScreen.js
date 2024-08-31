@@ -89,6 +89,7 @@ const TaskListScreen = ({ route }) => {
         tasks.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (selectedDifficulty === '' || tasks.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
     );
+
     console.log('Paciente seleccionado:', selectedPatientId);
     // const handleRefresh = async () => {
     //     setRefreshing(true);
@@ -132,6 +133,7 @@ const TaskListScreen = ({ route }) => {
                 <Text style={styles.addButtonText}>+</Text>
             </TouchableOpacity>
         </View>
+
     );
 };
 

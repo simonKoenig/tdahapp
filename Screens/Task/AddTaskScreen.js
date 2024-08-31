@@ -98,7 +98,7 @@ function AddTaskScreen() {
                 dificultad,
                 selectedRewardId,
                 selectedSubjectId,
-                estado: 'en progreso', // Estado por defecto
+                estado: 'En progreso', // Estado por defecto
             };
 
             await addTask(newTask, selectedPatientId); // Pasa el UID del paciente seleccionado
