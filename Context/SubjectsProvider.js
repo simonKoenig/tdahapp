@@ -2,17 +2,49 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { collection, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase-config';
+import { onSnapshot } from 'firebase/firestore';
 import { AuthContext } from './AuthProvider';
+import { PatientsContext } from './PatientsProvider'; // Importa el contexto de PatientsProvider
 
 export const SubjectsContext = createContext();
 
 export const SubjectsProvider = ({ children }) => {
-    const { user } = useContext(AuthContext);
+    const { user, isPaciente } = useContext(AuthContext);
+    const { selectedPatientId } = useContext(PatientsContext);
     const [subjects, setSubjects] = useState([]);
     const [selectedSubjectId, setSelectedSubjectId] = useState(null);
+    const [unsubscribe, setUnsubscribe] = useState(null);
 
 
+    useEffect(() => {
+        if (isPaciente()) {
+            setSelectedSubjectId(user.uid);
+        }
+        if (user && selectedPatientId) {
+            // Cancel the previous subscription if it exists
+            if (unsubscribe) {
+                unsubscribe();
+            }
 
+            const cachedSubjects = localStorage.getItem(`subjects_${selectedPatientId}`);
+            if (cachedSubjects) {
+                console.log('Setting subjects from cache');
+                setSubjects(JSON.parse(cachedSubjects));
+            }
+
+            const subjectsRef = collection(db, 'usuarios', selectedPatientId, 'materias');
+            const newUnsubscribe = onSnapshot(subjectsRef, (snapshot) => {
+                const subjectsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                setSubjects(subjectsList);
+                console.log('Setting subjects from snapshot');
+                localStorage.setItem(`subjects_${selectedPatientId}`, JSON.stringify(subjectsList));
+            });
+
+            // Save the new unsubscribe function
+            setUnsubscribe(() => newUnsubscribe);
+        }
+    }, [user, selectedPatientId]);
+    
     const fetchSubjects = async (uid) => {
         if (uid) {
             try {
@@ -21,6 +53,7 @@ export const SubjectsProvider = ({ children }) => {
                 const subjectsSnapshot = await getDocs(subjectsRef); // Se obtiene un snapshot de la colección de materias
                 const subjectsList = subjectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Se crea una lista de materias a partir del snapshot
                 setSubjects(subjectsList); // Se actualiza el estado de materias con la lista obtenida
+                localStorage.setItem(`subjects_${uid}`, JSON.stringify(subjectsList));
                 return subjectsList; // Se retorna la lista de materias
                 // setCurrentPatientId(patientId);
             } catch (error) {

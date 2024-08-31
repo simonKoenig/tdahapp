@@ -1,16 +1,47 @@
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { collection, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase-config';
 import { AuthContext } from './AuthProvider';
+import { PatientsContext } from './PatientsProvider';
 
 export const RewardsContext = createContext();
 
 export const RewardsProvider = ({ children }) => {
-    const { user } = useContext(AuthContext);
+    const { user, isPaciente } = useContext(AuthContext);
     const [rewards, setRewards] = useState([]);
     const [selectedRewardId, setSelectedRewardId] = useState(null);
+    const { selectedPatientId } = useContext(PatientsContext);
+    const [unsubscribe, setUnsubscribe] = useState(null);
 
+    useEffect(() => {
+        if (isPaciente()) {
+            setSelectedSubjectId(user.uid);
+        }
+        if (user && selectedPatientId) {
+            // Cancel the previous subscription if it exists
+            if (unsubscribe) {
+                unsubscribe();
+            }
+
+            const cachedRewards = localStorage.getItem(`rewards_${selectedPatientId}`);
+            if (cachedRewards) {
+                console.log('Setting Rewards from cache');
+                setRewards(JSON.parse(cachedRewards));
+            }
+
+            const rewardsRef = collection(db, 'usuarios', selectedPatientId, 'recompensas');
+            const newUnsubscribe = onSnapshot(rewardsRef, (snapshot) => {
+                const rewardsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                setRewards(rewardsList);
+                console.log('Setting rewards from snapshot');
+                localStorage.setItem(`rewards_${selectedPatientId}`, JSON.stringify(rewardsList));
+            });
+
+            // Save the new unsubscribe function
+            setUnsubscribe(() => newUnsubscribe);
+        }
+    }, [user, selectedPatientId]);
 
     const fetchRewards = async (uid) => {
         if (uid) {

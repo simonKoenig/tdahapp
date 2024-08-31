@@ -30,9 +30,9 @@ const PatientSelector = () => {
     const handleSelectPatient = async (patientId) => {
         setSelectedPatientId(patientId);
         await Promise.all([
-            fetchSubjects(patientId),
-            fetchRewards(patientId),
-            fetchTasks(patientId),
+            //fetchSubjects(patientId),
+            // fetchRewards(patientId),
+            // fetchTasks(patientId),
         ]);
     };
 

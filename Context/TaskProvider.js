@@ -1,15 +1,46 @@
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { collection, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase-config';
 import { AuthContext } from './AuthProvider';
-
+import { PatientsContext } from './PatientsProvider';
 
 export const TasksContext = createContext();
 
 export const TasksProvider = ({ children }) => {
-    const { user } = useContext(AuthContext);
+    const { user, isPaciente } = useContext(AuthContext);
     const [tasks, setTasks] = useState([]);
+    const { selectedPatientId } = useContext(PatientsContext);
+    const [unsubscribe, setUnsubscribe] = useState(null);
+
+    useEffect(() => {
+        if (isPaciente()) {
+            setSelectedSubjectId(user.uid);
+        }
+        if (user && selectedPatientId) {
+            // Cancel the previous subscription if it exists
+            if (unsubscribe) {
+                unsubscribe();
+            }
+
+            const cachedTasks = localStorage.getItem(`tasks_${selectedPatientId}`);
+            if (cachedTasks) {
+                console.log('Setting Tasks from cache');
+                setTasks(JSON.parse(cachedTasks));
+            }
+
+            const tasksRef = collection(db, 'usuarios', selectedPatientId, 'tareas');
+            const newUnsubscribe = onSnapshot(tasksRef, (snapshot) => {
+                const tasksList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                setTasks(tasksList);
+                console.log('Setting tasks from snapshot');
+                localStorage.setItem(`tasks_${selectedPatientId}`, JSON.stringify(tasksList));
+            });
+
+            // Save the new unsubscribe function
+            setUnsubscribe(() => newUnsubscribe);
+        }
+    }, [user, selectedPatientId]);
 
 
     //Se usa la misma función para el paciente, donde si no se le pasa el uid, se toma el uid del paciente logueado
