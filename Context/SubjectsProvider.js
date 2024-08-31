@@ -15,24 +15,29 @@ export const SubjectsProvider = ({ children }) => {
     const [selectedSubjectId, setSelectedSubjectId] = useState(null);
     const [unsubscribe, setUnsubscribe] = useState(null);
 
-
     useEffect(() => {
-        if (isPaciente()) {
-            setSelectedSubjectId(user.uid);
+        // Si el usuario no está autenticado, no hace nada
+        if (!user){
+            return;
         }
-        if (user && selectedPatientId) {
-            // Cancel the previous subscription if it exists
+        // Si el usuario es un paciente, se suscribe a sus propias recompensas en tiempo real
+        if (isPaciente()) {
+            
+            // Cancela la suscripción anterior si existe
             if (unsubscribe) {
                 unsubscribe();
             }
-
+            
+            // Usa las recompensas en caché si existen
             const cachedSubjects = localStorage.getItem(`subjects_${selectedPatientId}`);
             if (cachedSubjects) {
                 console.log('Setting subjects from cache');
                 setSubjects(JSON.parse(cachedSubjects));
             }
 
+            // Crea una referencia a la colección de recompensas del usuario
             const subjectsRef = collection(db, 'usuarios', selectedPatientId, 'materias');
+            // Se suscribe a los cambios en la colección de recompensas
             const newUnsubscribe = onSnapshot(subjectsRef, (snapshot) => {
                 const subjectsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 setSubjects(subjectsList);
@@ -40,11 +45,37 @@ export const SubjectsProvider = ({ children }) => {
                 localStorage.setItem(`subjects_${selectedPatientId}`, JSON.stringify(subjectsList));
             });
 
-            // Save the new unsubscribe function
+            // Guarda la nueva función de desuscripción
             setUnsubscribe(() => newUnsubscribe);
         }
-    }, [user, selectedPatientId]);
-    
+        // Si el usuario tiene rol de administrador, utiliza el caché y el fetch
+        else {
+            // Cancela la suscripción anterior si existe
+            if (unsubscribe) {
+                unsubscribe();
+            }
+            
+            // Usa las recompensas en caché si existen, sino las obtiene con el fetch
+            const cachedSubjects = localStorage.getItem(`subjects_${selectedPatientId}`);
+            if (cachedSubjects) {
+                console.log('Setting subjects from cache');
+                setSubjects(JSON.parse(cachedSubjects));
+            }
+            else {
+                console.log('Fetching subjects');
+                fetchSubjects(selectedPatientId);
+            }
+        }
+
+        // Cancela la suscripción al desmontar el componente
+        return () => {
+            if (unsubscribe) {
+                unsubscribe();
+            }
+        };
+
+    }, [selectedPatientId]);
+
     const fetchSubjects = async (uid) => {
         if (uid) {
             try {

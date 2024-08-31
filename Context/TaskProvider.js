@@ -14,22 +14,28 @@ export const TasksProvider = ({ children }) => {
     const [unsubscribe, setUnsubscribe] = useState(null);
 
     useEffect(() => {
-        if (isPaciente()) {
-            setSelectedSubjectId(user.uid);
+        // Si el usuario no está autenticado, no hace nada
+        if (!user){
+            return;
         }
-        if (user && selectedPatientId) {
-            // Cancel the previous subscription if it exists
+        // Si el usuario es un paciente, se suscribe a sus propias recompensas en tiempo real
+        if (isPaciente()) {
+            
+            // Cancela la suscripción anterior si existe
             if (unsubscribe) {
                 unsubscribe();
             }
-
+            
+            // Usa las recompensas en caché si existen
             const cachedTasks = localStorage.getItem(`tasks_${selectedPatientId}`);
             if (cachedTasks) {
                 console.log('Setting Tasks from cache');
                 setTasks(JSON.parse(cachedTasks));
             }
 
+            // Crea una referencia a la colección de recompensas del usuario
             const tasksRef = collection(db, 'usuarios', selectedPatientId, 'tareas');
+            // Se suscribe a los cambios en la colección de recompensas
             const newUnsubscribe = onSnapshot(tasksRef, (snapshot) => {
                 const tasksList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 setTasks(tasksList);
@@ -37,11 +43,36 @@ export const TasksProvider = ({ children }) => {
                 localStorage.setItem(`tasks_${selectedPatientId}`, JSON.stringify(tasksList));
             });
 
-            // Save the new unsubscribe function
+            // Guarda la nueva función de desuscripción
             setUnsubscribe(() => newUnsubscribe);
         }
-    }, [user, selectedPatientId]);
+        // Si el usuario tiene rol de administrador, utiliza el caché y el fetch
+        else {
+            // Cancela la suscripción anterior si existe
+            if (unsubscribe) {
+                unsubscribe();
+            }
+            
+            // Usa las recompensas en caché si existen, sino las obtiene con el fetch
+            const cachedTasks = localStorage.getItem(`tasks_${selectedPatientId}`);
+            if (cachedTasks) {
+                console.log('Setting Tasks from cache');
+                setTasks(JSON.parse(cachedTasks));
+            }
+            else {
+                console.log('Fetching tasks');
+                fetchTasks(selectedPatientId);
+            }
+        }
 
+        // Cancela la suscripción al desmontar el componente
+        return () => {
+            if (unsubscribe) {
+                unsubscribe();
+            }
+        };
+
+    }, [selectedPatientId]);
 
     //Se usa la misma función para el paciente, donde si no se le pasa el uid, se toma el uid del paciente logueado
     const fetchTasks = async (uid = null) => {
@@ -53,8 +84,8 @@ export const TasksProvider = ({ children }) => {
                 const tasksRef = collection(db, 'usuarios', userId, 'tareas');
                 const tasksSnapshot = await getDocs(tasksRef);
                 const tasksList = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
                 setTasks(tasksList);
+                localStorage.setItem(`tasks_${userId}`, JSON.stringify(tasksList));
                 return tasksList;
             } catch (error) {
                 console.error('Error fetching tasks:', error);
@@ -63,13 +94,6 @@ export const TasksProvider = ({ children }) => {
             console.error('UID or user is not defined');
         }
     };
-
-    //DESCOMENTAR
-    // useEffect(() => { //solo llama a fetchTasks si el usuario está autenticado (if (user))
-    //     if (user) {
-    //         fetchTasks();
-    //     }
-    // }, [user]);
 
     const addTask = async (task, uid) => {
         if (uid) {
@@ -114,26 +138,6 @@ export const TasksProvider = ({ children }) => {
         }
     }
 
-
-    // const getTask = async (id, uid) => {
-    //     console.log('UID:', uid);
-    //     console.log('ID:', id);
-    //     if (uid) {
-    //         try {
-    //             console.log('Getting task with ID:', id);
-    //             const taskRef = doc(db, 'usuarios', uid, 'tareas', id);
-    //             const taskDoc = await getDoc(taskRef);
-    //             if (taskDoc.exists()) {
-    //                 return { id: taskDoc.id, ...taskDoc.data() };
-    //             } else {
-    //                 throw new Error('task not found');
-    //             }
-    //         } catch (error) {
-    //             console.error('Error getting task:', error);
-    //             throw error;
-    //         }
-    //     }
-    // }
     const getTask = async (id, uid = null) => {
         const userId = uid || user?.uid; // Usa el UID proporcionado o el UID del usuario autenticado
         if (userId) {
@@ -151,9 +155,6 @@ export const TasksProvider = ({ children }) => {
             }
         }
     }
-
-
-
 
     return (
         <TasksContext.Provider value={{ tasks, setTasks, fetchTasks, addTask, updateTask, deleteTask, getTask }}>

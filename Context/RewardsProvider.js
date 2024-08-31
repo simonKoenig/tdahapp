@@ -15,33 +15,64 @@ export const RewardsProvider = ({ children }) => {
     const [unsubscribe, setUnsubscribe] = useState(null);
 
     useEffect(() => {
-        if (isPaciente()) {
-            setSelectedSubjectId(user.uid);
+        // Si el usuario no está autenticado, no hace nada
+        if (!user){
+            return;
         }
-        if (user && selectedPatientId) {
-            // Cancel the previous subscription if it exists
+        // Si el usuario es un paciente, se suscribe a sus propias recompensas en tiempo real
+        if (isPaciente()) {
+            
+            // Cancela la suscripción anterior si existe
             if (unsubscribe) {
                 unsubscribe();
             }
-
-            const cachedRewards = localStorage.getItem(`rewards_${selectedPatientId}`);
+            
+            // Usa las recompensas en caché si existen
+            const cachedRewards = localStorage.getItem(`rewards_${user.uid}`);
             if (cachedRewards) {
                 console.log('Setting Rewards from cache');
                 setRewards(JSON.parse(cachedRewards));
             }
 
-            const rewardsRef = collection(db, 'usuarios', selectedPatientId, 'recompensas');
+            // Crea una referencia a la colección de recompensas del usuario
+            const rewardsRef = collection(db, 'usuarios', user.uid, 'recompensas');
+            // Se suscribe a los cambios en la colección de recompensas
             const newUnsubscribe = onSnapshot(rewardsRef, (snapshot) => {
                 const rewardsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 setRewards(rewardsList);
                 console.log('Setting rewards from snapshot');
-                localStorage.setItem(`rewards_${selectedPatientId}`, JSON.stringify(rewardsList));
+                localStorage.setItem(`rewards_${user.uid}`, JSON.stringify(rewardsList));
             });
 
-            // Save the new unsubscribe function
+            // Guarda la nueva función de desuscripción
             setUnsubscribe(() => newUnsubscribe);
         }
-    }, [user, selectedPatientId]);
+        // Si el usuario tiene rol de administrador, utiliza el caché y el fetch
+        else {
+            // Cancela la suscripción anterior si existe
+            if (unsubscribe) {
+                unsubscribe();
+            }
+            
+            // Usa las recompensas en caché si existen, sino las obtiene con el fetch
+            const cachedRewards = localStorage.getItem(`rewards_${selectedPatientId}`);
+            if (cachedRewards) {
+                console.log('Setting rewards from cache');
+                setRewards(JSON.parse(cachedRewards));
+            } else {
+                console.log('Fetching rewards');
+                fetchRewards(selectedPatientId);
+            }
+        }
+
+        // Cancela la suscripción al desmontar el componente
+        return () => {
+            if (unsubscribe) {
+                unsubscribe();
+            }
+        };
+
+    }, [selectedPatientId]);
 
     const fetchRewards = async (uid) => {
         if (uid) {
@@ -51,8 +82,8 @@ export const RewardsProvider = ({ children }) => {
                 const rewardsSnapshot = await getDocs(rewardsRef);
                 const rewardsList = rewardsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 setRewards(rewardsList);
+                localStorage.setItem(`rewards_${selectedPatientId}`, JSON.stringify(rewardsList)); // Guarda las recompensas en caché
                 return rewardsList;
-                // setCurrentPatientId(patientId);
             } catch (error) {
                 console.error('Error fetching rewards:', error);
             }
