@@ -7,13 +7,19 @@ import { PatientsContext } from '../Context/PatientsProvider';
 import { SubjectsContext } from '../Context/SubjectsProvider';
 import { RewardsContext } from '../Context/RewardsProvider';
 import { TasksContext } from '../Context/TaskProvider';
+import { AuthContext } from '../Context/AuthProvider';
 
 const PatientSelector = () => {
     const { patients, selectedPatientId, setSelectedPatientId, fetchPatients } = useContext(PatientsContext);
     const { fetchSubjects } = useContext(SubjectsContext);
     const { fetchRewards } = useContext(RewardsContext);
     const { fetchTasks } = useContext(TasksContext);
+    const { isPaciente } = useContext(AuthContext);
     const [loading, setLoading] = useState(true);
+
+    if (isPaciente()) {
+        return null;
+    }
 
     // Si no hay pacientes cargados, se cargan
     useEffect(() => {
