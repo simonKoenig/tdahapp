@@ -4,6 +4,7 @@ import { collection, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc, onSnaps
 import { db } from '../firebase-config';
 import { AuthContext } from './AuthProvider';
 import { PatientsContext } from './PatientsProvider';
+import { setAsyncStorage, getAsyncStorage, updateAsyncStorage, addAsyncStorage, deleteAsyncStorage } from '../Utils/AsyncStorage';
 
 export const TasksContext = createContext();
 
@@ -14,63 +15,70 @@ export const TasksProvider = ({ children }) => {
     const [unsubscribe, setUnsubscribe] = useState(null);
 
     useEffect(() => {
-        // Si el usuario no está autenticado, no hace nada
-        if (!user){
-            return;
-        }
-        // Si el usuario es un paciente, se suscribe a sus propias recompensas en tiempo real
-        if (isPaciente()) {
-            
-            // Cancela la suscripción anterior si existe
-            if (unsubscribe) {
-                unsubscribe();
+        const loadTasks = async () => {
+            // Si el usuario no está autenticado, no hace nada
+            if (!user){
+                return;
             }
-            
-            // Usa las recompensas en caché si existen
-            const cachedTasks = localStorage.getItem(`tasks_${selectedPatientId}`);
-            if (cachedTasks) {
-                console.log('Setting Tasks from cache');
-                setTasks(JSON.parse(cachedTasks));
-            }
+            // Si el usuario es un paciente, se suscribe a sus propias recompensas en tiempo real
+            if (isPaciente()) {
+                
+                // Cancela la suscripción anterior si existe
+                if (unsubscribe) {
+                    unsubscribe();
+                }
+                
+                // Usa las recompensas en caché si existen
+                const cachedTasks = await getAsyncStorage(`tasks_${user.uid}`);
+                if (cachedTasks) {
+                    console.log('Setting Tasks from cache');
+                    setTasks(JSON.parse(cachedTasks));
+                }
+                else {
+                    console.log('Fetching tasks');
+                    fetchTasks(user.uid);
+                }
 
-            // Crea una referencia a la colección de recompensas del usuario
-            const tasksRef = collection(db, 'usuarios', selectedPatientId, 'tareas');
-            // Se suscribe a los cambios en la colección de recompensas
-            const newUnsubscribe = onSnapshot(tasksRef, (snapshot) => {
-                const tasksList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                setTasks(tasksList);
-                console.log('Setting tasks from snapshot');
-                localStorage.setItem(`tasks_${selectedPatientId}`, JSON.stringify(tasksList));
-            });
+                // Crea una referencia a la colección de recompensas del usuario
+                const tasksRef = collection(db, 'usuarios', user.uid, 'tareas');
+                // Se suscribe a los cambios en la colección de recompensas
+                const newUnsubscribe = onSnapshot(tasksRef, async (snapshot) => {
+                    const tasksList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    setTasks(tasksList);
+                    console.log('Setting tasks from snapshot');
+                    await setAsyncStorage(`tasks_${user.uid}`, tasksList);
+                });
 
-            // Guarda la nueva función de desuscripción
-            setUnsubscribe(() => newUnsubscribe);
-        }
-        // Si el usuario tiene rol de administrador, utiliza el caché y el fetch
-        else {
-            // Cancela la suscripción anterior si existe
-            if (unsubscribe) {
-                unsubscribe();
+                // Guarda la nueva función de desuscripción
+                setUnsubscribe(() => newUnsubscribe);
             }
-            
-            // Usa las recompensas en caché si existen, sino las obtiene con el fetch
-            const cachedTasks = localStorage.getItem(`tasks_${selectedPatientId}`);
-            if (cachedTasks) {
-                console.log('Setting Tasks from cache');
-                setTasks(JSON.parse(cachedTasks));
-            }
+            // Si el usuario tiene rol de administrador, utiliza el caché y el fetch
             else {
-                console.log('Fetching tasks');
-                fetchTasks(selectedPatientId);
+                // Cancela la suscripción anterior si existe
+                if (unsubscribe) {
+                    unsubscribe();
+                }
+                
+                // Usa las recompensas en caché si existen, sino las obtiene con el fetch
+                const cachedTasks = await getAsyncStorage(`tasks_${selectedPatientId}`);
+                if (cachedTasks) {
+                    console.log('Setting Tasks from cache');
+                    setTasks(cachedTasks);
+                }
+                else {
+                    console.log('Fetching tasks');
+                    fetchTasks(selectedPatientId);
+                }
             }
-        }
 
-        // Cancela la suscripción al desmontar el componente
-        return () => {
-            if (unsubscribe) {
-                unsubscribe();
-            }
+            // Cancela la suscripción al desmontar el componente
+            return () => {
+                if (unsubscribe) {
+                    unsubscribe();
+                }
+            };
         };
+        loadTasks();
 
     }, [selectedPatientId]);
 
@@ -85,7 +93,7 @@ export const TasksProvider = ({ children }) => {
                 const tasksSnapshot = await getDocs(tasksRef);
                 const tasksList = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 setTasks(tasksList);
-                localStorage.setItem(`tasks_${userId}`, JSON.stringify(tasksList));
+                await setAsyncStorage(`tasks_${userId}`, tasksList);
                 return tasksList;
             } catch (error) {
                 console.error('Error fetching tasks:', error);
@@ -101,7 +109,9 @@ export const TasksProvider = ({ children }) => {
                 console.log('Adding task for UID:', uid);
                 const tasksRef = collection(db, 'usuarios', uid, 'tareas');
                 const docRef = await addDoc(tasksRef, task);
-                setTasks(prevTasks => [...prevTasks, { id: docRef.id, ...task }]);
+                const newTask = { id: docRef.id, ...task };
+                setTasks(prevTasks => [...prevTasks, newTask]);
+                await addAsyncStorage(`tasks_${uid}`, newTask);
             } catch (error) {
                 console.error('Error adding task:', error);
             }
@@ -114,9 +124,12 @@ export const TasksProvider = ({ children }) => {
         if (uid) {
             try {
                 console.log('Updating task with ID:', id);
+                console.log('Updated task:', updatedTask);
                 const taskRef = doc(db, 'usuarios', uid, 'tareas', id);
                 await updateDoc(taskRef, updatedTask);
                 setTasks(tasks.map(task => (task.id === id ? { id, ...updatedTask } : task)));
+                const updatedTaskWithId = { id, ...updatedTask };
+                await updateAsyncStorage(`tasks_${uid}`, updatedTaskWithId);
             } catch (error) {
                 console.error('Error updating task:', error);
             }
@@ -130,6 +143,7 @@ export const TasksProvider = ({ children }) => {
                 const taskRef = doc(db, 'usuarios', uid, 'tareas', id);
                 await deleteDoc(taskRef);
                 setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
+                await deleteAsyncStorage(`tasks_${uid}`, id);
             } catch (error) {
                 console.error('Error deleting task:', error);
             }

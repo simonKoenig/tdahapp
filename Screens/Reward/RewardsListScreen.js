@@ -38,7 +38,8 @@ const RewardsListScreen = ({ route }) => {
     // }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
 
     // Filtramos las recompensas en función del término de búsqueda y la dificultad seleccionada
-    const filteredRewards = rewards.filter(reward =>
+    const auxRewards = rewards;
+    const filteredRewards = auxRewards.filter(reward =>
         reward.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (selectedDifficulty === '' || reward.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
     );

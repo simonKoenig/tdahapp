@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import SearchBar from '../../Components/SearchBar';
 import SubjectItem from '../../Components/SubjectItem';
 import PatientSelector from '../../Components/PatientSelector';
-
+import { getAsyncStorage } from '../../Utils/AsyncStorage';
 import { PatientsContext } from '../../Context/PatientsProvider';
 
 
@@ -16,8 +16,10 @@ const SubjectsListScreen = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [refreshing, setRefreshing] = useState(false);
     const navigation = useNavigation();
-
-    const filteredSubjects = subjects.filter(subject =>
+    
+    // guardo subjects en una variable intermedia para que su valor se capture correctamente
+    const auxSubjects = subjects;
+    const filteredSubjects = auxSubjects.filter(subject =>
         subject.nombre.toLowerCase().includes(searchTerm.toLowerCase())
     );
 

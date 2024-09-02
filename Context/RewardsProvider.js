@@ -4,6 +4,7 @@ import { collection, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc, onSnaps
 import { db } from '../firebase-config';
 import { AuthContext } from './AuthProvider';
 import { PatientsContext } from './PatientsProvider';
+import { setAsyncStorage, getAsyncStorage, updateAsyncStorage, addAsyncStorage, deleteAsyncStorage } from '../Utils/AsyncStorage';
 
 export const RewardsContext = createContext();
 
@@ -15,63 +16,70 @@ export const RewardsProvider = ({ children }) => {
     const [unsubscribe, setUnsubscribe] = useState(null);
 
     useEffect(() => {
-        // Si el usuario no está autenticado, no hace nada
-        if (!user){
-            return;
+        const loadRewards = async () => {
+            // Si el usuario no está autenticado, no hace nada
+            if (!user){
+                return;
+            }
+            // Si el usuario es un paciente, se suscribe a sus propias recompensas en tiempo real
+            if (isPaciente()) {
+                console.log('User is a patient');
+                // Cancela la suscripción anterior si existe
+                if (unsubscribe) {
+                    unsubscribe();
+                }
+                
+                // Usa las recompensas en caché si existen
+                const cachedRewards = await getAsyncStorage(`rewards_${user.uid}`);
+                if (cachedRewards) {
+                    console.log('Setting Rewards from cache');
+                    setRewards(JSON.parse(cachedRewards));
+                }
+                else {
+                    console.log('Fetching rewards');
+                    fetchRewards(user.uid);
+                }
+
+                // Crea una referencia a la colección de recompensas del usuario
+                const rewardsRef = collection(db, 'usuarios', user.uid, 'recompensas');
+                // Se suscribe a los cambios en la colección de recompensas
+                const newUnsubscribe = onSnapshot(rewardsRef, async (snapshot) => {
+                    const rewardsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    setRewards(rewardsList);
+                    console.log('Setting rewards from snapshot');
+                    await setAsyncStorage(`rewards_${user.uid}`, JSON.stringify(rewardsList));
+                });
+
+                // Guarda la nueva función de desuscripción
+                setUnsubscribe(() => newUnsubscribe);
+            }
+            // Si el usuario tiene rol de administrador, utiliza el caché y el fetch
+            else {
+                // Cancela la suscripción anterior si existe
+                if (unsubscribe) {
+                    unsubscribe();
+                }
+                
+                // Usa las recompensas en caché si existen, sino las obtiene con el fetch
+                const cachedRewards = await getAsyncStorage(`rewards_${selectedPatientId}`);
+                console.log('Cached rewards:', cachedRewards); 
+                if (cachedRewards) {
+                    console.log('Setting rewards from cache');
+                    setRewards(cachedRewards);
+                } else {
+                    console.log('Fetching rewards');
+                    fetchRewards(selectedPatientId);
+                }
+            }
+
+            // Cancela la suscripción al desmontar el componente
+            return () => {
+                if (unsubscribe) {
+                    unsubscribe();
+                }
+            };
         }
-        // Si el usuario es un paciente, se suscribe a sus propias recompensas en tiempo real
-        if (isPaciente()) {
-            
-            // Cancela la suscripción anterior si existe
-            if (unsubscribe) {
-                unsubscribe();
-            }
-            
-            // Usa las recompensas en caché si existen
-            const cachedRewards = localStorage.getItem(`rewards_${user.uid}`);
-            if (cachedRewards) {
-                console.log('Setting Rewards from cache');
-                setRewards(JSON.parse(cachedRewards));
-            }
-
-            // Crea una referencia a la colección de recompensas del usuario
-            const rewardsRef = collection(db, 'usuarios', user.uid, 'recompensas');
-            // Se suscribe a los cambios en la colección de recompensas
-            const newUnsubscribe = onSnapshot(rewardsRef, (snapshot) => {
-                const rewardsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                setRewards(rewardsList);
-                console.log('Setting rewards from snapshot');
-                localStorage.setItem(`rewards_${user.uid}`, JSON.stringify(rewardsList));
-            });
-
-            // Guarda la nueva función de desuscripción
-            setUnsubscribe(() => newUnsubscribe);
-        }
-        // Si el usuario tiene rol de administrador, utiliza el caché y el fetch
-        else {
-            // Cancela la suscripción anterior si existe
-            if (unsubscribe) {
-                unsubscribe();
-            }
-            
-            // Usa las recompensas en caché si existen, sino las obtiene con el fetch
-            const cachedRewards = localStorage.getItem(`rewards_${selectedPatientId}`);
-            if (cachedRewards) {
-                console.log('Setting rewards from cache');
-                setRewards(JSON.parse(cachedRewards));
-            } else {
-                console.log('Fetching rewards');
-                fetchRewards(selectedPatientId);
-            }
-        }
-
-        // Cancela la suscripción al desmontar el componente
-        return () => {
-            if (unsubscribe) {
-                unsubscribe();
-            }
-        };
-
+        loadRewards();
     }, [selectedPatientId]);
 
     const fetchRewards = async (uid) => {
@@ -82,7 +90,7 @@ export const RewardsProvider = ({ children }) => {
                 const rewardsSnapshot = await getDocs(rewardsRef);
                 const rewardsList = rewardsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 setRewards(rewardsList);
-                localStorage.setItem(`rewards_${selectedPatientId}`, JSON.stringify(rewardsList)); // Guarda las recompensas en caché
+                await setAsyncStorage(`rewards_${selectedPatientId}`, rewardsList); // Guarda las recompensas en caché
                 return rewardsList;
             } catch (error) {
                 console.error('Error fetching rewards:', error);
@@ -96,7 +104,9 @@ export const RewardsProvider = ({ children }) => {
                 console.log('Adding reward for UID:', uid);
                 const rewardsRef = collection(db, 'usuarios', uid, 'recompensas');
                 const docRef = await addDoc(rewardsRef, reward);
-                setRewards(prevRewards => [...prevRewards, { id: docRef.id, ...reward }]);
+                const newReward = { id: docRef.id, ...reward };
+                setRewards(prevRewards => [...prevRewards, newReward]);
+                await addAsyncStorage(`rewards_${uid}`, newReward);
             } catch (error) {
                 console.error('Error adding reward:', error);
             }
@@ -113,6 +123,8 @@ export const RewardsProvider = ({ children }) => {
                 const rewardRef = doc(db, 'usuarios', uid, 'recompensas', id);
                 await updateDoc(rewardRef, updatedReward);
                 setRewards(rewards.map(reward => (reward.id === id ? { id, ...updatedReward } : reward)));
+                const updatedRewardWithId = { id, ...updatedReward };
+                await updateAsyncStorage(`rewards_${uid}`, updatedRewardWithId);
             } catch (error) {
                 console.error('Error updating reward:', error);
             }
@@ -126,6 +138,7 @@ export const RewardsProvider = ({ children }) => {
                 const rewardRef = doc(db, 'usuarios', uid, 'recompensas', id);
                 await deleteDoc(rewardRef);
                 setRewards(prevRewards => prevRewards.filter(reward => reward.id !== id));
+                await deleteAsyncStorage(`rewards_${uid}`, id);
             } catch (error) {
                 console.error('Error deleting reward:', error);
             }

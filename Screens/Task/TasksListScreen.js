@@ -85,7 +85,8 @@ const TaskListScreen = ({ route }) => {
     // }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
 
     // Filtramos las recompensas en función del término de búsqueda y la dificultad seleccionada
-    const filteredTasks = tasks.filter(tasks =>
+    const auxTasks = tasks;
+    const filteredTasks = auxTasks.filter(tasks =>
         tasks.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (selectedDifficulty === '' || tasks.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
     );
