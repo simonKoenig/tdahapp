@@ -10,6 +10,7 @@ export const PatientsProvider = ({ children }) => {
     const { user } = useContext(AuthContext);
     const [patients, setPatients] = useState([]);
     const [selectedPatientId, setSelectedPatientId] = useState(null);
+    const { isPaciente } = useContext(AuthContext);
     const [selectedPatient, setSelectedPatient] = useState(null);
 
 
@@ -38,7 +39,7 @@ export const PatientsProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        if (user) {
+        if (user && isPaciente() === false) {
             fetchPatients();
         }
     }, [user]);

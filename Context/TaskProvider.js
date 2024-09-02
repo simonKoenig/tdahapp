@@ -32,7 +32,7 @@ export const TasksProvider = ({ children }) => {
                 const cachedTasks = await getAsyncStorage(`tasks_${user.uid}`);
                 if (cachedTasks) {
                     console.log('Setting Tasks from cache');
-                    setTasks(JSON.parse(cachedTasks));
+                    setTasks(cachedTasks);
                 }
                 else {
                     console.log('Fetching tasks');
@@ -54,10 +54,17 @@ export const TasksProvider = ({ children }) => {
             }
             // Si el usuario tiene rol de administrador, utiliza el caché y el fetch
             else {
+                // Si no hay un paciente seleccionado, sale de la función
+                if (!selectedPatientId) {
+                    console.error('No selected patient ID');
+                    return;
+                }
+
                 // Cancela la suscripción anterior si existe
                 if (unsubscribe) {
                     unsubscribe();
                 }
+
                 
                 // Usa las recompensas en caché si existen, sino las obtiene con el fetch
                 const cachedTasks = await getAsyncStorage(`tasks_${selectedPatientId}`);

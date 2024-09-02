@@ -33,7 +33,7 @@ export const RewardsProvider = ({ children }) => {
                 const cachedRewards = await getAsyncStorage(`rewards_${user.uid}`);
                 if (cachedRewards) {
                     console.log('Setting Rewards from cache');
-                    setRewards(JSON.parse(cachedRewards));
+                    setRewards(cachedRewards);
                 }
                 else {
                     console.log('Fetching rewards');
@@ -47,7 +47,7 @@ export const RewardsProvider = ({ children }) => {
                     const rewardsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     setRewards(rewardsList);
                     console.log('Setting rewards from snapshot');
-                    await setAsyncStorage(`rewards_${user.uid}`, JSON.stringify(rewardsList));
+                    await setAsyncStorage(`rewards_${user.uid}`, rewardsList);
                 });
 
                 // Guarda la nueva función de desuscripción

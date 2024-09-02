@@ -33,7 +33,7 @@ export const SubjectsProvider = ({ children }) => {
                 const cachedSubjects = await getAsyncStorage(`subjects_${user.uid}`);
                 if (cachedSubjects) {
                     console.log('Setting subjects from cache');
-                    setSubjects(JSON.parse(cachedSubjects));
+                    setSubjects(cachedSubjects);
                 }
                 else {
                     console.log('Fetching subjects');
@@ -47,7 +47,7 @@ export const SubjectsProvider = ({ children }) => {
                     const subjectsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     setSubjects(subjectsList);
                     console.log('Setting subjects from snapshot');
-                    await setAsyncStorage(`subjects_${user.uid}`, JSON.stringify(subjectsList));
+                    await setAsyncStorage(`subjects_${user.uid}`, subjectsList);
                 });
 
                 // Guarda la nueva función de desuscripción
