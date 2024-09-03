@@ -3,6 +3,7 @@ import { View, FlatList, TouchableOpacity, Text, StyleSheet, Button } from 'reac
 
 import { TasksContext } from '../../Context/TaskProvider';
 import SubjectItem from '../../Components/SubjectItem';
+import TaskItem from '../../Components/TaskItem';
 
 
 import { RewardsContext } from '../../Context/RewardsProvider';
@@ -18,31 +19,35 @@ import { AuthContext } from '../../Context/AuthProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';
 
 const TaskListScreen = ({ route }) => {
-
     const { tasks, fetchTasks } = useContext(TasksContext);
-
     const { rewards, fetchRewards } = useContext(RewardsContext);
+    const { user, isPaciente, isLoading } = useContext(AuthContext);
+    const { selectedPatientId } = useContext(PatientsContext);
+
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedDifficulty, setSelectedDifficulty] = useState('');
-    const [refreshing, setRefreshing] = useState(false); // Estado para controlar la actualización
+    const [refreshing, setRefreshing] = useState(false);
     const navigation = useNavigation();
-    const { user, isPaciente, isLoading } = useContext(AuthContext);
 
-    const { selectedPatientId } = useContext(PatientsContext);
+    // Unified effect for loading tasks and rewards
+
+
+    // Filtramos las recompensas en función del término de búsqueda y la dificultad seleccionada
+    const auxTasks = tasks;
+    const filteredTasks = auxTasks.filter(tasks =>
+        tasks.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (selectedDifficulty === '' || tasks.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
+    );
 
     const handleRefresh = async () => {
         setRefreshing(true);
-        await fetchTasks(selectedPatientId || null);  // Llama a fetchTasks con selectedPatientId o sin parámetros
-        console.log('Updated tasks after fetch:', tasks); // Esto aún podría mostrar la versión anterior de tasks
+        if (isPaciente() && selectedPatientId) {
+            await fetchTasks(selectedPatientId);
+        }
         setRefreshing(false);
     };
 
-
     if (isPaciente()) {
-        console.log('Paciente seleccionado:', selectedPatientId);
-        console.log('user:', user);
-        console.log('isPaciente:', isPaciente());
-        console.log('tasks:', tasks);
         return (
             <View style={styles.container}>
                 <PatientSelector />
@@ -50,7 +55,7 @@ const TaskListScreen = ({ route }) => {
                     data={tasks}
                     keyExtractor={item => item.id}
                     renderItem={({ item }) => (
-                        <SubjectItem
+                        <TaskItem
                             item={item}
                             onPress={() => {
                                 const params = { taskId: item.id };
@@ -64,38 +69,15 @@ const TaskListScreen = ({ route }) => {
                     refreshing={refreshing}
                     onRefresh={handleRefresh}
                 />
+                <TouchableOpacity
+                    style={styles.addButton}
+                    onPress={() => navigation.navigate('AddTask')}
+                >
+                    <Text style={styles.addButtonText}>+</Text>
+                </TouchableOpacity>
             </View>
-
         );
     }
-
-
-
-
-    // useEffect(() => {
-    //     const loadRewards = async () => {
-    //         if (selectedPatientId) {
-    //             setRefreshing(true);
-    //             await fetchRewards(selectedPatientId);
-    //             setRefreshing(false);
-    //         }
-    //     };
-
-    //     loadRewards();
-    // }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
-
-    // Filtramos las recompensas en función del término de búsqueda y la dificultad seleccionada
-    const auxTasks = tasks;
-    const filteredTasks = auxTasks.filter(tasks =>
-        tasks.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (selectedDifficulty === '' || tasks.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
-    );
-    console.log('Paciente seleccionado:', selectedPatientId);
-    // const handleRefresh = async () => {
-    //     setRefreshing(true);
-    //     await fetchTasks(selectedPatientId);
-    //     setRefreshing(false);
-    // };
 
     return (
         <View style={styles.container}>
@@ -119,7 +101,7 @@ const TaskListScreen = ({ route }) => {
                 data={filteredTasks}
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => (
-                    <SubjectItem
+                    <TaskItem
                         item={item}
                         onPress={() => navigation.navigate('TaskDetail', { taskId: item.id, uid: selectedPatientId })}
                     />

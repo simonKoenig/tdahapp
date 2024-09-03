@@ -127,21 +127,26 @@ export const TasksProvider = ({ children }) => {
         }
     }
 
-    const updateTask = async (id, updatedTask, uid) => {
-        if (uid) {
+    const updateTask = async (id, updatedTask, uid = null) => {
+        // Usa el uid pasado como parámetro o el uid del usuario actual
+        const userId = uid || user?.uid;
+        if (userId) {
             try {
                 console.log('Updating task with ID:', id);
-                console.log('Updated task:', updatedTask);
-                const taskRef = doc(db, 'usuarios', uid, 'tareas', id);
+                const taskRef = doc(db, 'usuarios', userId, 'tareas', id);
                 await updateDoc(taskRef, updatedTask);
-                setTasks(tasks.map(task => (task.id === id ? { id, ...updatedTask } : task)));
+
+                // Actualiza la lista de tareas en el estado
+                setTasks(prevTasks => prevTasks.map(task => (task.id === id ? { id, ...updatedTask } : task)));
                 const updatedTaskWithId = { id, ...updatedTask };
                 await updateAsyncStorage(`tasks_${uid}`, updatedTaskWithId);
             } catch (error) {
                 console.error('Error updating task:', error);
             }
+        } else {
+            console.error('UID or user is not defined');
         }
-    }
+    };
 
     const deleteTask = async (id, uid) => {
         if (uid && id) {
