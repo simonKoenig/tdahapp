@@ -1,4 +1,3 @@
-
 import React, { useContext, useState, useEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet, Button } from 'react-native';
 
@@ -19,31 +18,34 @@ import { AuthContext } from '../../Context/AuthProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';
 
 const TaskListScreen = ({ route }) => {
-
     const { tasks, fetchTasks } = useContext(TasksContext);
-
     const { rewards, fetchRewards } = useContext(RewardsContext);
+    const { user, isPaciente, isLoading } = useContext(AuthContext);
+    const { selectedPatientId } = useContext(PatientsContext);
+
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedDifficulty, setSelectedDifficulty] = useState('');
-    const [refreshing, setRefreshing] = useState(false); // Estado para controlar la actualización
+    const [refreshing, setRefreshing] = useState(false);
     const navigation = useNavigation();
-    const { user, isPaciente, isLoading } = useContext(AuthContext);
 
-    const { selectedPatientId } = useContext(PatientsContext);
+    // Unified effect for loading tasks and rewards
+
+
+    // Filter tasks based on search term and selected difficulty
+    const filteredTasks = tasks.filter(task =>
+        task.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (selectedDifficulty === '' || task.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
+    );
 
     const handleRefresh = async () => {
         setRefreshing(true);
-        await fetchTasks(selectedPatientId || null);  // Llama a fetchTasks con selectedPatientId o sin parámetros
-        console.log('Updated tasks after fetch:', tasks); // Esto aún podría mostrar la versión anterior de tasks
+        if (isPaciente() && selectedPatientId) {
+            await fetchTasks(selectedPatientId);
+        }
         setRefreshing(false);
     };
 
-
     if (isPaciente()) {
-        console.log('Paciente seleccionado:', selectedPatientId);
-        console.log('user:', user);
-        console.log('isPaciente:', isPaciente());
-        console.log('tasks:', tasks);
         return (
             <View style={styles.container}>
                 <FlatList
@@ -64,46 +66,22 @@ const TaskListScreen = ({ route }) => {
                     refreshing={refreshing}
                     onRefresh={handleRefresh}
                 />
+                <TouchableOpacity
+                    style={styles.addButton}
+                    onPress={() => navigation.navigate('AddTask')}
+                >
+                    <Text style={styles.addButtonText}>+</Text>
+                </TouchableOpacity>
             </View>
-
         );
     }
 
-
-
-
-    useEffect(() => {
-        const loadRewards = async () => {
-            if (selectedPatientId) {
-                setRefreshing(true);
-                await fetchRewards(selectedPatientId);
-                setRefreshing(false);
-            }
-        };
-
-        loadRewards();
-    }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
-
-    // Filtramos las recompensas en función del término de búsqueda y la dificultad seleccionada
-    const filteredTasks = tasks.filter(tasks =>
-        tasks.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (selectedDifficulty === '' || tasks.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
-    );
-
-    console.log('Paciente seleccionado:', selectedPatientId);
-    // const handleRefresh = async () => {
-    //     setRefreshing(true);
-    //     await fetchTasks(selectedPatientId);
-    //     setRefreshing(false);
-    // };
-    console.log('tasks:', tasks);
     return (
         <View style={styles.container}>
             <Button
                 title="Ver tareas de Otro Usuario"
                 onPress={() => navigation.navigate('UserTasks')}
             />
-
             <SearchBar
                 searchTerm={searchTerm}
                 onSearch={setSearchTerm}
@@ -133,7 +111,6 @@ const TaskListScreen = ({ route }) => {
                 <Text style={styles.addButtonText}>+</Text>
             </TouchableOpacity>
         </View>
-
     );
 };
 
