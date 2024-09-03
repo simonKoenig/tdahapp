@@ -47,3 +47,15 @@ export const deleteAsyncStorage = async (key, id) => {
         console.error(`Error deleting AsyncStorage for key ${key}:`, error);
     }
 };
+
+export const clearStorage = async () => {
+    try {
+        // Limpio el almacenamiento local
+        const keys = await AsyncStorage.getAllKeys();
+        const keysToClear = keys.filter(key => key.startsWith('rewards_') || key.startsWith('tasks_') || key.startsWith('subjects_'));
+        await AsyncStorage.multiRemove(keysToClear);
+        console.log('Specific storage keys cleared');
+    } catch (error) {
+        console.error('Error clearing storage:', error);
+    }
+  };

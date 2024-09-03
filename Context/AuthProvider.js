@@ -3,6 +3,7 @@ import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase-config'; // Asegúrate de que la configuración de Firebase esté correctamente importada
 import LoadingScreen from '../Components/LoadingScreen'; // Asegúrate de que la pantalla de carga esté correctamente importada
+import { clearStorage } from '../Utils/AsyncStorage';
 
 export const AuthContext = createContext();
 
@@ -64,6 +65,7 @@ export const AuthProvider = ({ children }) => {
             setUser(null);
             setRole(null);
             setIsAuthenticated(false);
+            clearStorage(); // Limpia el almacenamiento al cerrar sesión
         } catch (error) {
             console.error("Error al cerrar sesión:", error);
         }
