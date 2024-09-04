@@ -4,27 +4,18 @@ import { View, Text, StyleSheet } from 'react-native';
 import DropdownComponent from './Dropdown';
 import LoadingScreen from './LoadingScreen';
 import { PatientsContext } from '../Context/PatientsProvider';
-import { SubjectsContext } from '../Context/SubjectsProvider';
-import { RewardsContext } from '../Context/RewardsProvider';
-import { TasksContext } from '../Context/TaskProvider';
 import { AuthContext } from '../Context/AuthProvider';
 
 const PatientSelector = () => {
-    const { patients, selectedPatientId, setSelectedPatientId, fetchPatients } = useContext(PatientsContext);
-    const { fetchSubjects } = useContext(SubjectsContext);
-    const { fetchRewards } = useContext(RewardsContext);
-    const { fetchTasks } = useContext(TasksContext);
     const { isPaciente } = useContext(AuthContext);
+    const { patients, selectedPatientId, setSelectedPatientId, fetchPatients } = useContext(PatientsContext);
     const [loading, setLoading] = useState(true);
 
-    if (isPaciente()) {
-        return null;
-    }
-
+    
     // Si no hay pacientes cargados, se cargan
     useEffect(() => {
         const loadPatients = async () => {
-            if (!patients.length) {
+            if (!patients.length && !isPaciente()) {
                 console.log("CARGANDO PACIENTESSSSSSS")
                 await fetchPatients();
             }
@@ -32,7 +23,12 @@ const PatientSelector = () => {
         };
         loadPatients();
     }, [patients, fetchPatients]);
-
+    
+    // Si el usuario es un paciente, no renderizar el componente
+    if (isPaciente()) {
+        return null;
+    }
+    
     const handleSelectPatient = async (patientId) => {
         setSelectedPatientId(patientId);
         await Promise.all([
