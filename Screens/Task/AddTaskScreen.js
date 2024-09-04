@@ -4,8 +4,10 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Button } from 'rea
 import { useNavigation } from '@react-navigation/native';
 // Componentes y constantes
 import DropdownComponent from '../../Components/Dropdown';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { dificultades } from '../../Utils/Constant';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment';
+import 'moment/locale/es';
 // Contextos
 import { TasksContext } from '../../Context/TaskProvider';
 import { RewardsContext } from '../../Context/RewardsProvider';
@@ -14,11 +16,9 @@ import { PatientsContext } from '../../Context/PatientsProvider';
 import { ScrollView } from 'react-native-gesture-handler';
 
 function AddTaskScreen() {
-    const { patients, setSelectedPatientId, selectedPatientId, fetchPatients } = useContext(PatientsContext);
+    const { patients, setSelectedPatientId, selectedPatientId } = useContext(PatientsContext);
     const { addTask } = useContext(TasksContext);
     const { subjects, setSelectedSubjectId, selectedSubjectId, fetchSubjects } = useContext(SubjectsContext);
-
-
     const { rewards, setSelectedRewardId, selectedRewardId, fetchRewards } = useContext(RewardsContext);
     const navigation = useNavigation();
 
@@ -126,10 +126,15 @@ function AddTaskScreen() {
                 onChangeText={setDescripcion}
             />
 
-            <Text style={styles.label}>Fecha de vencimiento</Text>
-            <Button onPress={showDatepicker} title="Show date picker!" />
-            <Button onPress={showTimepicker} title="Show time picker!" />
-            <Text>Fecha seleccionada: {date.toLocaleString()}</Text>
+            <Text style={styles.label}>Fecha y hora de vencimiento</Text>
+            <View style={styles.datetimeView}>
+                <TouchableOpacity style={styles.datetimeElement} onPress={showDatepicker}>
+                    <Text style={styles.dateText}>{moment(date).format('DD/MM/YYYY')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.datetimeElement} onPress={showTimepicker}>
+                    <Text style={styles.dateText}>{moment(date).format('HH:mm')}</Text>
+                </TouchableOpacity>
+            </View>
             {show && (
                 <DateTimePicker
                     minimumDate={new Date()}
@@ -139,6 +144,7 @@ function AddTaskScreen() {
                     onChange={onChange}
                 />
             )}
+
 
             <Text style={styles.label}>Paciente</Text>
             {patients.length > 0 ? (
@@ -244,6 +250,26 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 18,
     },
+    datetimeView: {
+        width: '80%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    datetimeElement: {
+        width: '45%',
+        height: 40,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 20,
+        padding: 10,
+        marginVertical: 10,
+        backgroundColor: '#D9D9D9',
+        justifyContent: 'center',
+    },
+    dateText: {
+        textAlign: 'center',
+    },
+        
 });
 
 export default AddTaskScreen;
