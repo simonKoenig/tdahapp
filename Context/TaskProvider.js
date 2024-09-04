@@ -87,7 +87,7 @@ export const TasksProvider = ({ children }) => {
         };
         loadTasks();
 
-    }, [selectedPatientId]);
+    }, [selectedPatientId, user]);
 
     //Se usa la misma función para el paciente, donde si no se le pasa el uid, se toma el uid del paciente logueado
     const fetchTasks = async (uid = null) => {

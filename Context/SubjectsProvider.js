@@ -81,7 +81,7 @@ export const SubjectsProvider = ({ children }) => {
             };
         };
         loadSubjects();
-    }, [selectedPatientId]);
+    }, [selectedPatientId, user]);
 
     const fetchSubjects = async (uid) => {
         if (uid) {

@@ -80,7 +80,7 @@ export const RewardsProvider = ({ children }) => {
             };
         }
         loadRewards();
-    }, [selectedPatientId]);
+    }, [selectedPatientId, user]);
 
     const fetchRewards = async (uid) => {
         if (uid) {
