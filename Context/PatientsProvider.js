@@ -153,7 +153,7 @@ export const PatientsProvider = ({ children }) => {
 
 
     return (
-        <PatientsContext.Provider value={{ patients, addPatientByEmail, selectedPatientId, setSelectedPatientId, fetchPatients, deletePatient }}>
+        <PatientsContext.Provider value={{ patients, setPatients, addPatientByEmail, selectedPatientId, setSelectedPatientId, fetchPatients, deletePatient }}>
             {children}
         </PatientsContext.Provider>
     );

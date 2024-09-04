@@ -65,7 +65,6 @@ export const AuthProvider = ({ children }) => {
             setUser(null);
             setRole(null);
             setIsAuthenticated(false);
-            clearStorage(); // Limpia el almacenamiento al cerrar sesión
         } catch (error) {
             console.error("Error al cerrar sesión:", error);
         }

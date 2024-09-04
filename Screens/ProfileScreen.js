@@ -2,28 +2,51 @@ import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, RefreshControl, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../Context/AuthProvider';
-import LoadingScreen from '../Components/LoadingScreen'; // Asegúrate de que la ruta sea correcta
 import { PatientsContext } from '../Context/PatientsProvider';
+import { RewardsContext } from '../Context/RewardsProvider';
+import { TasksContext } from '../Context/TaskProvider';
+import { SubjectsContext } from '../Context/SubjectsProvider';
+import LoadingScreen from '../Components/LoadingScreen';
+import { clearStorage } from '../Utils/AsyncStorage';
 
 function ProfileScreen() {
     const { logout, isAuthenticated, user } = useContext(AuthContext);
+    const { patients, setPatients, setSelectedPatientId, addPatientByEmail, deletePatient } = useContext(PatientsContext);
     const navigation = useNavigation();
     const [loading, setLoading] = useState(false);
-
-
     const [errorMessage, setErrorMessage] = useState('');
     const [email, setEmail] = useState('');
-    const { patients, setSelectedPatientId, addPatientByEmail, selectedPatientId, fetchPatients, deletePatient } = useContext(PatientsContext);
+    const { setRewards } = useContext(RewardsContext);
+    const { setTasks } = useContext(TasksContext);
+    const { setSubjects } = useContext(SubjectsContext);
 
+    // Logout
     const handleLogout = async () => {
         setLoading(true);
         await logout();
+        await clearStorageLogOut();
         setLoading(false);
     };
-    console.log('Patients:', patients);
-    console.log('Selected patient ID:', selectedPatientId);
 
+    // Limpia el almacenamiento al cerrar sesión
+    const clearStorageLogOut = async () => {
+            try {
+                // Limpia la caché de almacenamiento local
+                await clearStorage();
+                // Limpia los estados de recompensas, tareas, materias y pacientes
+                setRewards([]);
+                setTasks([]);
+                setSubjects([]);
+                setPatients([]);
+                setSelectedPatientId(null);
+            } catch (error) {
+                console.error('Error clearing storage:', error);
+            };
+        
+        return null;
+    };
 
+    // Redirige a la pantalla de inicio de sesión si el usuario no está autenticado
     useEffect(() => {
         if (!isAuthenticated && !loading) {
             navigation.replace('Login'); // Utiliza replace en lugar de reset
@@ -75,7 +98,6 @@ function ProfileScreen() {
 
     return (
 
-
         <View style={styles.container}>
             {loading && <LoadingScreen />}
             {!loading && (
@@ -110,6 +132,7 @@ function ProfileScreen() {
         </View>
     );
 }
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
