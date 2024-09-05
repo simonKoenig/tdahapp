@@ -1,17 +1,16 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import DropdownComponent from '../../Components/Dropdown';
-import { dificultades } from '../../Utils/Constant';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import DropdownComponent from '../../Components/Dropdown';
+import DateTimePickerComponent from '../../Components/DateTimePicker';
 import LoadingScreen from '../../Components/LoadingScreen';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { dificultades } from '../../Utils/Constant';
 import { TasksContext } from '../../Context/TaskProvider';
 import { RewardsContext } from '../../Context/RewardsProvider';
 import { SubjectsContext } from '../../Context/SubjectsProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';
 import { AuthContext } from '../../Context/AuthProvider';
-import moment from 'moment';
-import 'moment/locale/es';
+
 
 function TaskDetailScreen() {
     const route = useRoute();
@@ -26,14 +25,13 @@ function TaskDetailScreen() {
     const [show, setShow] = useState(false);
     const [mode, setMode] = useState('date');
     const [estado, setEstado] = useState('');
-    const [selectedSubjectName, setSelectedSubjectName] = useState('');
 
     const { user, isPaciente } = useContext(AuthContext);
     const { getTask, updateTask, deleteTask } = useContext(TasksContext);
     const navigation = useNavigation();
-    const { patients, setSelectedPatientId, selectedPatientId, fetchPatients } = useContext(PatientsContext);
-    const { subjects, setSelectedSubjectId, selectedSubjectId, fetchSubjects } = useContext(SubjectsContext);
-    const { rewards, fetchRewards } = useContext(RewardsContext);
+    const { setSelectedPatientId, selectedPatientId } = useContext(PatientsContext);
+    const { subjects, setSelectedSubjectId, selectedSubjectId } = useContext(SubjectsContext);
+    const { rewards } = useContext(RewardsContext);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -71,20 +69,6 @@ function TaskDetailScreen() {
         label: reward.nombre,
         value: reward.id,
     }));
-
-    const onChange = (event, selectedDate) => {
-        setShow(false);
-        setDate(selectedDate);
-    };
-
-    const showMode = (currentMode) => {
-        setShow(true);
-        setMode(currentMode);
-    };
-
-    const showDatepicker = () => {
-        showMode('date');
-    };
 
     const handleUpdateTask = async () => {
         try {
@@ -124,8 +108,16 @@ function TaskDetailScreen() {
             <View style={styles.form}>
                 <Text style={styles.label}>Descripción</Text>
                 <Text style={styles.input}>{descripcion}</Text>
-                <Text style={styles.label}>Fecha</Text>
-                <Text style={styles.input}>{moment(date).format('DD/MM/YYYY')}</Text>
+                <Text style={styles.label}>Fecha y hora de vencimiento</Text>
+                <DateTimePickerComponent
+                    date={date}
+                    setDate={setDate}
+                    mode={mode}
+                    setMode={setMode}
+                    show={show}
+                    setShow={setShow}
+                    editable={false}
+                />
                 <Text style={styles.label}>Dificultad</Text>
                 <Text style={styles.input}>{dificultad}</Text>
                 <Text style={styles.label}>Materia</Text>
@@ -159,20 +151,18 @@ function TaskDetailScreen() {
                 value={descripcion}
                 onChangeText={setDescripcion}
             />
-            <Text style={styles.label}>Fecha</Text>
-            <TouchableOpacity style={[styles.input, styles.fullWidth]} onPress={showDatepicker}>
-                <Text style={styles.dateText}>{moment(date).format('DD/MM/YYYY')}</Text>
-            </TouchableOpacity>
-            {show && (
-                <DateTimePicker
-                    testID="dateTimePicker"
-                    value={date}
-                    mode={mode}
-                    is24Hour={true}
-                    display="default"
-                    onChange={onChange}
-                />
-            )}
+            
+            <Text style={styles.label}>Fecha y hora de vencimiento</Text>
+            <DateTimePickerComponent
+                date={date}
+                setDate={setDate}
+                mode={mode}
+                setMode={setMode}
+                show={show}
+                setShow={setShow}
+                editable={true}
+            />
+
             <Text style={styles.label}>Dificultad</Text>
             <DropdownComponent
                 data={dificultades}
@@ -245,9 +235,6 @@ const styles = StyleSheet.create({
     },
     fullWidth: {
         width: '80%',
-    },
-    dateText: {
-        textAlign: 'left',
     },
     dropdown: {
         width: '80%',
