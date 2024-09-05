@@ -5,9 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 // Componentes y constantes
 import DropdownComponent from '../../Components/Dropdown';
 import { dificultades } from '../../Utils/Constant';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import moment from 'moment';
-import 'moment/locale/es';
+import DateTimePickerComponent from '../../Components/DateTimePicker';
 // Contextos
 import { TasksContext } from '../../Context/TaskProvider';
 import { RewardsContext } from '../../Context/RewardsProvider';
@@ -68,26 +66,6 @@ function AddTaskScreen() {
         setSelectedPatientId(patientId);
     };
 
-    // Date time picker
-    const onChange = (event, selectedDate) => {
-        const currentDate = selectedDate;
-        setShow(false);
-        setDate(currentDate);
-    };
-
-    const showMode = (currentMode) => {
-        setShow(true);
-        setMode(currentMode);
-    };
-
-    const showDatepicker = () => {
-        showMode('date');
-    };
-
-    const showTimepicker = () => {
-        showMode('time');
-    };
-
     // Función para agregar una tarea
     const handleAddTask = async () => {
         if (selectedPatientId) {
@@ -127,24 +105,14 @@ function AddTaskScreen() {
             />
 
             <Text style={styles.label}>Fecha y hora de vencimiento</Text>
-            <View style={styles.datetimeView}>
-                <TouchableOpacity style={styles.datetimeElement} onPress={showDatepicker}>
-                    <Text style={styles.dateText}>{moment(date).format('DD/MM/YYYY')}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.datetimeElement} onPress={showTimepicker}>
-                    <Text style={styles.dateText}>{moment(date).format('HH:mm')}</Text>
-                </TouchableOpacity>
-            </View>
-            {show && (
-                <DateTimePicker
-                    minimumDate={new Date()}
-                    value={date}
-                    mode={mode}
-                    is24Hour={true}
-                    onChange={onChange}
-                />
-            )}
-
+            <DateTimePickerComponent
+                date={date}
+                setDate={setDate}
+                mode={mode}
+                setMode={setMode}
+                show={show}
+                setShow={setShow}
+            />
 
             <Text style={styles.label}>Paciente</Text>
             {patients.length > 0 ? (
@@ -249,25 +217,6 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontSize: 18,
-    },
-    datetimeView: {
-        width: '80%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    datetimeElement: {
-        width: '45%',
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 20,
-        padding: 10,
-        marginVertical: 10,
-        backgroundColor: '#D9D9D9',
-        justifyContent: 'center',
-    },
-    dateText: {
-        textAlign: 'center',
     },
         
 });
