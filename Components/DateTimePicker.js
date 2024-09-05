@@ -4,7 +4,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import 'moment/locale/es';
 
-const DateTimePickerComponent = ({ date, setDate, mode, setMode, show, setShow }) => {
+const DateTimePickerComponent = ({ date, setDate, mode, setMode, show, setShow, editable }) => {
 
     const onChange = (event, selectedDate) => {
         const currentDate = selectedDate;
@@ -27,10 +27,18 @@ const DateTimePickerComponent = ({ date, setDate, mode, setMode, show, setShow }
 
     return (
         <View style={styles.datetimeView}>
-                <TouchableOpacity style={styles.datetimeElement} onPress={showDatepicker}>
+                <TouchableOpacity 
+                    style={styles.datetimeElement} 
+                    onPress={editable ? showDatepicker : null}
+                    disabled={!editable}
+                >
                     <Text style={styles.dateText}>{moment(date).format('DD/MM/YYYY')}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.datetimeElement} onPress={showTimepicker}>
+                <TouchableOpacity 
+                    style={styles.datetimeElement} 
+                    onPress={editable ? showTimepicker : null}
+                    disabled={!editable}
+                >
                     <Text style={styles.dateText}>{moment(date).format('HH:mm')}</Text>
                 </TouchableOpacity>
             {show && (
