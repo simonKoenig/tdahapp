@@ -112,6 +112,7 @@ function AddTaskScreen() {
                 setMode={setMode}
                 show={show}
                 setShow={setShow}
+                editable={true}
             />
 
             <Text style={styles.label}>Paciente</Text>
@@ -122,6 +123,7 @@ function AddTaskScreen() {
                     setValue={setSelectedPatientId}
                     placeholder="Seleccione un paciente"
                     onSelect={handleSelectPatient}
+                    editable={true}
                 />
             ) : (
                 <Text style={styles.noPatientsText}>No se encontraron pacientes.</Text>
