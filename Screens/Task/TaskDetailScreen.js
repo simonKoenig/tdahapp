@@ -26,7 +26,7 @@ function TaskDetailScreen() {
     const [mode, setMode] = useState('date');
     const [estado, setEstado] = useState('');
 
-    const { user, isPaciente } = useContext(AuthContext);
+    const { isPaciente } = useContext(AuthContext);
     const { getTask, updateTask, deleteTask } = useContext(TasksContext);
     const navigation = useNavigation();
     const { setSelectedPatientId, selectedPatientId } = useContext(PatientsContext);
@@ -36,8 +36,6 @@ function TaskDetailScreen() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const currentPatientId = selectedPatientId || user.uid;
-
                 const task = await getTask(taskId, uid);
                 if (task) {
                     setNombre(task.nombre);
