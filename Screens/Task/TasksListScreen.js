@@ -1,78 +1,73 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, FlatList, TouchableOpacity, Text, StyleSheet, Button } from 'react-native';
-
+import { View, SectionList, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { TasksContext } from '../../Context/TaskProvider';
 import TaskItem from '../../Components/TaskItem';
-
 import { useNavigation } from '@react-navigation/native';
-import SearchBar from '../../Components/SearchBar';  // Importamos SearchBar
-import DropdownComponent from '../../Components/Dropdown';  // Importamos DropdownComponent
+import SearchBar from '../../Components/SearchBar';
+import DropdownComponent from '../../Components/Dropdown';
 import PatientSelector from '../../Components/PatientSelector';
-
-import { filtradoDificultades } from '../../Utils/Constant';  // Importamos las dificultades
-
+import { filtradoDificultades } from '../../Utils/Constant';
 import { AuthContext } from '../../Context/AuthProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';
 
+// Import moment para formatear la fecha y mostrarla en español
+import moment from 'moment';
+import 'moment/locale/es';
+moment.locale('es');
+
+// Obtén la fecha de hoy
+const fechaHoy = moment().format('LL'); // Formato de fecha larga
+
 const TaskListScreen = ({ route }) => {
-    const { tasks, fetchTasks } = useContext(TasksContext);
+    const { tasks = [], fetchTasks } = useContext(TasksContext); // Valor predeterminado para tasks
     const { user, isPaciente, isLoading } = useContext(AuthContext);
     const { selectedPatientId } = useContext(PatientsContext);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedDifficulty, setSelectedDifficulty] = useState('');
     const [refreshing, setRefreshing] = useState(false);
+    const [showCompletedTasks, setShowCompletedTasks] = useState(true);
     const navigation = useNavigation();
 
-    // Filtramos las recompensas en función del término de búsqueda y la dificultad seleccionada
-    const auxTasks = tasks;
-    const filteredTasks = auxTasks.filter(tasks =>
-        tasks.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (selectedDifficulty === '' || tasks.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
-    );
+    useEffect(() => {
+        const loadTasks = async () => {
+            await fetchTasks(selectedPatientId);
+        };
+        loadTasks();
+    }, [selectedPatientId]);
 
     const handleRefresh = async () => {
         setRefreshing(true);
-        if (isPaciente()) {
-            console.log('INSIDDDEEE');
-            await fetchTasks(user.uid);
-        } else {
-            if (selectedPatientId) {
-                await fetchTasks(selectedPatientId);
-            }
-        }
+        await fetchTasks(selectedPatientId);
         setRefreshing(false);
     };
 
-    if (isPaciente()) {
-        return (
-            <View style={styles.container}>
-                <FlatList
-                    data={tasks}
-                    keyExtractor={item => item.id}
-                    renderItem={({ item }) => (
-                        <TaskItem
-                            item={item}
-                            onPress={() => {
-                                const params = { taskId: item.id };
-                                if (selectedPatientId) {
-                                    params.uid = selectedPatientId;
-                                }
-                                navigation.navigate('TaskDetail', params);
-                            }}
-                        />
-                    )}
-                    refreshing={refreshing}
-                    onRefresh={handleRefresh}
-                />
-            </View>
-        );
-    }
+    const filteredTasks = tasks.filter(task =>
+        task.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (selectedDifficulty === '' || task.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
+    );
+
+    const sections = [
+        {
+            title: 'LISTA DE ACTIVIDADES',
+            data: filteredTasks.filter(task => task.estado.toLowerCase() !== 'finalizada').length > 0
+                ? filteredTasks.filter(task => task.estado.toLowerCase() !== 'finalizada')
+                : [{ id: 'no-tasks', nombre: 'No se encontraron tareas' }]
+        },
+        {
+            title: 'COMPLETAS',
+            data: showCompletedTasks
+                ? filteredTasks.filter(task => task.estado.toLowerCase() === 'finalizada').length > 0
+                    ? filteredTasks.filter(task => task.estado.toLowerCase() === 'finalizada')
+                    : [{ id: 'no-tasks', nombre: 'No se encontraron tareas finalizadas' }]
+                : []
+        },
+    ];
 
     return (
         <View style={styles.container}>
+            <Text style={styles.fechaText}>{fechaHoy}</Text>
             <PatientSelector />
-
             <SearchBar
                 searchTerm={searchTerm}
                 onSearch={setSearchTerm}
@@ -82,25 +77,42 @@ const TaskListScreen = ({ route }) => {
                 value={selectedDifficulty}
                 setValue={setSelectedDifficulty}
                 placeholder="Selecciona una dificultad"
+                searchActivo={false}
             />
-            <FlatList
-                data={filteredTasks}
-                keyExtractor={item => item.id}
+            <SectionList
+                sections={sections}
+                keyExtractor={(item, index) => item.id + index}
                 renderItem={({ item }) => (
-                    <TaskItem
-                        item={item}
-                        onPress={() => navigation.navigate('TaskDetail', { taskId: item.id, uid: selectedPatientId })}
-                    />
+                    item.id === 'no-tasks' ? (
+                        <Text style={styles.noTasksText}>{item.nombre}</Text>
+                    ) : (
+                        <TaskItem
+                            item={item}
+                            onPress={() => navigation.navigate('TaskDetail', { taskId: item.id, uid: selectedPatientId })}
+                        />
+                    )
+                )}
+                renderSectionHeader={({ section: { title } }) => (
+                    <TouchableOpacity onPress={() => title === 'COMPLETAS' && setShowCompletedTasks(!showCompletedTasks)}>
+                        <View style={styles.sectionHeader}>
+                            <Text style={styles.headerTitle}>{title}</Text>
+                            {title === 'COMPLETAS' && (
+                                <Text style={styles.triangle}>{showCompletedTasks ? '▲' : '▼'}</Text>
+                            )}
+                        </View>
+                    </TouchableOpacity>
                 )}
                 refreshing={refreshing}
                 onRefresh={handleRefresh}
             />
-            <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => navigation.navigate('AddTask')}
-            >
-                <Text style={styles.addButtonText}>+</Text>
-            </TouchableOpacity>
+            {!isPaciente() && (
+                <TouchableOpacity
+                    style={styles.addButton}
+                    onPress={() => navigation.navigate('AddTask')}
+                >
+                    <Text style={styles.addButtonText}>+</Text>
+                </TouchableOpacity>
+            )}
         </View>
     );
 };
@@ -110,6 +122,22 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
         backgroundColor: '#ffffff',
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 10,
+        marginTop: 20,
+    },
+    headerTitle: {
+        paddingVertical: 5,
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    triangle: {
+        fontSize: 28,
+        paddingRight: 10,
     },
     addButton: {
         position: 'absolute',
@@ -127,6 +155,17 @@ const styles = StyleSheet.create({
         color: '#ffffff',
         fontSize: 24,
         fontWeight: 'bold',
+    },
+    noTasksText: {
+        textAlign: 'center',
+        marginTop: 10,
+        fontStyle: 'italic',
+    },
+    fechaText: {
+        fontSize: 18,
+        fontWeight: '800',
+        marginBottom: 10,
+        color: '#666666',
     },
 });
 
