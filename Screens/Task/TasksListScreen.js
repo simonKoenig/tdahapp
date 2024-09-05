@@ -2,13 +2,9 @@ import React, { useContext, useState, useEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet, Button } from 'react-native';
 
 import { TasksContext } from '../../Context/TaskProvider';
-import SubjectItem from '../../Components/SubjectItem';
 import TaskItem from '../../Components/TaskItem';
 
-
-import { RewardsContext } from '../../Context/RewardsProvider';
 import { useNavigation } from '@react-navigation/native';
-import RewardItem from '../../Components/RewardItem';
 import SearchBar from '../../Components/SearchBar';  // Importamos SearchBar
 import DropdownComponent from '../../Components/Dropdown';  // Importamos DropdownComponent
 import PatientSelector from '../../Components/PatientSelector';
@@ -20,7 +16,6 @@ import { PatientsContext } from '../../Context/PatientsProvider';
 
 const TaskListScreen = ({ route }) => {
     const { tasks, fetchTasks } = useContext(TasksContext);
-    const { rewards, fetchRewards } = useContext(RewardsContext);
     const { user, isPaciente, isLoading } = useContext(AuthContext);
     const { selectedPatientId } = useContext(PatientsContext);
 
@@ -28,9 +23,6 @@ const TaskListScreen = ({ route }) => {
     const [selectedDifficulty, setSelectedDifficulty] = useState('');
     const [refreshing, setRefreshing] = useState(false);
     const navigation = useNavigation();
-
-    // Unified effect for loading tasks and rewards
-
 
     // Filtramos las recompensas en función del término de búsqueda y la dificultad seleccionada
     const auxTasks = tasks;
@@ -41,8 +33,13 @@ const TaskListScreen = ({ route }) => {
 
     const handleRefresh = async () => {
         setRefreshing(true);
-        if (isPaciente() && selectedPatientId) {
-            await fetchTasks(selectedPatientId);
+        if (isPaciente()) {
+            console.log('INSIDDDEEE');
+            await fetchTasks(user.uid);
+        } else {
+            if (selectedPatientId) {
+                await fetchTasks(selectedPatientId);
+            }
         }
         setRefreshing(false);
     };
@@ -50,7 +47,6 @@ const TaskListScreen = ({ route }) => {
     if (isPaciente()) {
         return (
             <View style={styles.container}>
-                <PatientSelector />
                 <FlatList
                     data={tasks}
                     keyExtractor={item => item.id}
@@ -69,22 +65,12 @@ const TaskListScreen = ({ route }) => {
                     refreshing={refreshing}
                     onRefresh={handleRefresh}
                 />
-                <TouchableOpacity
-                    style={styles.addButton}
-                    onPress={() => navigation.navigate('AddTask')}
-                >
-                    <Text style={styles.addButtonText}>+</Text>
-                </TouchableOpacity>
             </View>
         );
     }
 
     return (
         <View style={styles.container}>
-            {/* <Button
-                title="Ver tareas de Otro Usuario"
-                onPress={() => navigation.navigate('UserTasks')}
-            /> */}
             <PatientSelector />
 
             <SearchBar
