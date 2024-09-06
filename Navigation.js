@@ -167,8 +167,8 @@ function RewardsStackScreen() {
 
 function ProfileStackScreen() {
     return (
-        <ProfileStack.Navigator initialRouteName="Profile" screenOptions={{ headerShown: false }}>
-            <ProfileStack.Screen name="Profile" component={ProfileScreen} />
+        <ProfileStack.Navigator initialRouteName="Profile">
+            <ProfileStack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: true, title: 'Perfil' }} />
             <ProfileStack.Screen name="Login" component={LoginScreen} />
 
         </ProfileStack.Navigator>
