@@ -19,6 +19,9 @@ function ProfileScreen() {
     const { setRewards } = useContext(RewardsContext);
     const { setTasks } = useContext(TasksContext);
     const { setSubjects } = useContext(SubjectsContext);
+    const { isPaciente } = useContext(AuthContext)
+
+
 
     // Logout
     const handleLogout = async () => {
@@ -30,19 +33,19 @@ function ProfileScreen() {
 
     // Limpia el almacenamiento al cerrar sesión
     const clearStorageLogOut = async () => {
-            try {
-                // Limpia la caché de almacenamiento local
-                await clearStorage();
-                // Limpia los estados de recompensas, tareas, materias y pacientes
-                setRewards([]);
-                setTasks([]);
-                setSubjects([]);
-                setPatients([]);
-                setSelectedPatientId(null);
-            } catch (error) {
-                console.error('Error clearing storage:', error);
-            };
-        
+        try {
+            // Limpia la caché de almacenamiento local
+            await clearStorage();
+            // Limpia los estados de recompensas, tareas, materias y pacientes
+            setRewards([]);
+            setTasks([]);
+            setSubjects([]);
+            setPatients([]);
+            setSelectedPatientId(null);
+        } catch (error) {
+            console.error('Error clearing storage:', error);
+        };
+
         return null;
     };
 
@@ -76,13 +79,7 @@ function ProfileScreen() {
         }
     };
 
-    // if (!user) {
-    //     return (
-    //         <View style={styles.container}>
-    //             <Text style={styles.errorMessage}>Usuario no está logueado</Text>
-    //         </View>
-    //     );
-    // }
+
 
     const renderPatientItem = ({ item }) => (
         <View style={styles.row}>
@@ -102,24 +99,29 @@ function ProfileScreen() {
             {loading && <LoadingScreen />}
             {!loading && (
                 <>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Email del paciente"
-                        value={email}
-                        onChangeText={setEmail}
-                    />
-                    <Button title="Buscar Recompensas" onPress={handleFetchUserRewards} />
-                    {typeof errorMessage === 'string' && errorMessage.length > 0 && (
-                        <View style={styles.errorContainer}>
-                            <Text style={styles.errorMessage}>{errorMessage}</Text>
-                        </View>
+                    {!isPaciente() && (
+                        <>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Email del paciente"
+                                value={email}
+                                onChangeText={setEmail}
+                            />
+                            <Button title="Buscar Recompensas" onPress={handleFetchUserRewards} />
+                            {typeof errorMessage === 'string' && errorMessage.length > 0 && (
+                                <View style={styles.errorContainer}>
+                                    <Text style={styles.errorMessage}>{errorMessage}</Text>
+                                </View>
+                            )}
+                            <FlatList
+                                data={patients}
+                                keyExtractor={(item) => item.id}
+                                renderItem={renderPatientItem}
+                                contentContainerStyle={styles.list}
+                            />
+
+                        </>
                     )}
-                    <FlatList
-                        data={patients}
-                        keyExtractor={(item) => item.id}
-                        renderItem={renderPatientItem}
-                        contentContainerStyle={styles.list}
-                    />
                     <Button
                         title="Cerrar Sesión"
                         onPress={handleLogout} s
