@@ -57,12 +57,7 @@ function MyTabs() {
     return (
         <Tab.Navigator initialRouteName="Perfil">
             <Tab.Screen name="Inicio" component={HomeStackScreen} options={{
-                tabBarLabel: 'Inicio',
-                headerTitle: user
-                    ? (selectedPatient
-                        ? `Paciente: ${selectedPatient.nombreApellido}`
-                        : `Usuario: ${user.nombreApellido}`)
-                    : 'Inicio',
+                headerShown: false,
                 tabBarIcon: ({ color, size }) => (
                     <HomeIcon color={color} size={size} />
                 ),
@@ -71,27 +66,18 @@ function MyTabs() {
                 <React.Fragment>
                     <Tab.Screen name="Estadísticas" component={StatisticsStackScreen} options={{
                         tabBarLabel: 'Estadísticas',
-                        headerTitle: selectedPatient
-                            ? `Paciente: ${selectedPatient.nombreApellido}`
-                            : 'Estadísticas',
                         tabBarIcon: ({ color, size }) => (
                             <ChartBarIcon color={color} size={size} />
                         ),
                     }} />
                     <Tab.Screen name="Materias" component={SubjectsStackScreen} options={{
-                        tabBarLabel: 'Materias',
-                        headerTitle: selectedPatient
-                            ? `Paciente: ${selectedPatient.nombreApellido}`
-                            : 'Materias',
+                        headerShown: false,
                         tabBarIcon: ({ color, size }) => (
                             <SubjectIcon color={color} size={size} />
                         ),
                     }} />
                     <Tab.Screen name="Recompensas" component={RewardsStackScreen} options={{
-                        tabBarLabel: 'Recompensas',
-                        headerTitle: selectedPatient
-                            ? `Paciente: ${selectedPatient.nombreApellido}`
-                            : 'Recompensas',
+                        headerShown: false,
                         tabBarIcon: ({ color, size }) => (
                             <GiftIcon color={color} size={size} />
                         ),
@@ -99,8 +85,7 @@ function MyTabs() {
                 </React.Fragment>
             )}
             <Tab.Screen name="Perfil" component={ProfileStackScreen} options={{
-                tabBarLabel: 'Perfil',
-                headerTitle: user ? `Usuario: ${user.nombreApellido}` : 'Perfil',
+                headerShown: false,
                 tabBarIcon: ({ color, size }) => (
                     <AccountIcon color={color} size={size} />
                 ),
