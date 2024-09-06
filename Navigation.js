@@ -137,9 +137,9 @@ function SubjectsStackScreen() {
 
     return (
         <SubjectsStack.Navigator initialRouteName="SubjectsList">
-            <SubjectsStack.Screen name="SubjectsList" component={SubjectsListScreen} />
-            <SubjectsStack.Screen name="AddSubject" component={AddSubjectScreen} />
-            <SubjectsStack.Screen name="SubjectDetail" component={SubjectDetailScreen} />
+            <SubjectsStack.Screen name="SubjectsList" component={SubjectsListScreen} options={{ headerShown: true, title: 'Lista de materias' }} />
+            <SubjectsStack.Screen name="AddSubject" component={AddSubjectScreen} options={{ headerShown: true, title: 'Agregar nueva materia' }} />
+            <SubjectsStack.Screen name="SubjectDetail" component={SubjectDetailScreen} options={{ headerShown: true, title: 'Detalles de la materia' }} />
             <SubjectsStack.Screen name="UserSubjects" component={UserSubjectsScreen} />
         </SubjectsStack.Navigator>
     );
