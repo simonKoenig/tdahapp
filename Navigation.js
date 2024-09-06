@@ -156,13 +156,10 @@ function RewardsStackScreen() {
     }
 
     return (
-        <RewardsStack.Navigator initialRouteName="RewardsList" screenOptions={{ headerShown: false }}>
-            <RewardsStack.Screen
-                name="RewardsList"
-                component={RewardsListScreen}
-            />
-            <RewardsStack.Screen name="AddReward" component={AddRewardScreen} />
-            <RewardsStack.Screen name="RewardDetail" component={RewardDetailScreen} />
+        <RewardsStack.Navigator initialRouteName="RewardsList">
+            <RewardsStack.Screen name="RewardsList" component={RewardsListScreen} options={{ headerShown: true, title: 'Lista de recompensas' }} />
+            <RewardsStack.Screen name="AddReward" component={AddRewardScreen} options={{ headerShown: true, title: 'Agregar nueva recompensa' }} />
+            <RewardsStack.Screen name="RewardDetail" component={RewardDetailScreen} options={{ headerShown: true, title: 'Detalles de la recompensa' }} />
             <RewardsStack.Screen name="UserRewards" component={UserRewardsScreen} />
         </RewardsStack.Navigator>
     );
