@@ -103,10 +103,10 @@ function MyTabs() {
 
 function HomeStackScreen() {
     return (
-        <HomeStack.Navigator initialRouteName="TasksList" screenOptions={{ headerShown: false }}>
-            <HomeStack.Screen name="TasksList" component={TasksListScreen} />
-            <HomeStack.Screen name="AddTask" component={AddTaskScreen} />
-            <HomeStack.Screen name="TaskDetail" component={TaskDetailScreen} />
+        <HomeStack.Navigator initialRouteName="TasksList">
+            <HomeStack.Screen name="TasksList" component={TasksListScreen} options={{ headerShown: true, title: 'Inicio' }} />
+            <HomeStack.Screen name="AddTask" component={AddTaskScreen} options={{ headerShown: true, title: 'Agregar nueva tarea' }} />
+            <HomeStack.Screen name="TaskDetail" component={TaskDetailScreen} options={{ headerShown: true, title: 'Detalles de la tarea' }} />
             <HomeStack.Screen name="UserTasks" component={UserTasksScreen} />
             <HomeStack.Screen name="ObtainTask" component={ObtainTaskScreen} />
         </HomeStack.Navigator>
@@ -136,7 +136,7 @@ function SubjectsStackScreen() {
     }
 
     return (
-        <SubjectsStack.Navigator initialRouteName="SubjectsList" screenOptions={{ headerShown: false }}>
+        <SubjectsStack.Navigator initialRouteName="SubjectsList">
             <SubjectsStack.Screen name="SubjectsList" component={SubjectsListScreen} />
             <SubjectsStack.Screen name="AddSubject" component={AddSubjectScreen} />
             <SubjectsStack.Screen name="SubjectDetail" component={SubjectDetailScreen} />
