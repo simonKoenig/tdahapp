@@ -149,7 +149,7 @@ function TaskDetailScreen() {
                 value={descripcion}
                 onChangeText={setDescripcion}
             />
-            
+
             <Text style={styles.label}>Fecha y hora de vencimiento</Text>
             <DateTimePickerComponent
                 date={date}
@@ -197,11 +197,13 @@ function TaskDetailScreen() {
                     <Text style={styles.buttonText}>Eliminar</Text>
                 </TouchableOpacity>
             </View>
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={() => handleMarkTask('Finalizada')}>
-                    <Text style={styles.buttonText}>Tarea correcta</Text>
-                </TouchableOpacity>
-            </View>
+            {estado === 'Pendiente' && (
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.button} onPress={() => handleMarkTask('Finalizada')}>
+                        <Text style={styles.buttonText}>Tarea correcta</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
         </View>
     );
 }
