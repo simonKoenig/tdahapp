@@ -44,52 +44,7 @@ export const PatientsProvider = ({ children }) => {
         }
     }, [user]);
 
-    // const addPatientByEmail = async (email) => {
-    //     try {
-    //         if (!user) {
-    //             console.error('No hay un usuario autenticado');
-    //             return null;
-    //         }
 
-    //         const usersRef = collection(db, 'usuarios');
-    //         const q = query(usersRef, where('email', '==', email));
-    //         const querySnapshot = await getDocs(q);
-
-    //         if (querySnapshot.empty) {
-    //             throw new Error('No se encontró un usuario con ese email');
-
-    //         }
-
-    //         const sourceDoc = querySnapshot.docs[0];
-    //         const sourceUserId = sourceDoc.id;
-    //         const sourceUserData = sourceDoc.data();
-
-    //         setSelectedPatientId(sourceUserId);
-
-    //         const patientsRef = doc(db, 'usuarios', user.uid, 'pacientes', sourceUserId);
-    //         const patientDoc = await getDoc(patientsRef);
-
-    //         if (!patientDoc.exists()) {
-    //             const newPatientData = {
-    //                 patientId: sourceUserId,
-    //                 nombreApellido: sourceUserData.nombreApellido || '',
-    //                 email: sourceUserData.email || email,
-    //                 rol: sourceUserData.rol || 'paciente',
-    //             };
-
-    //             await setDoc(patientsRef, newPatientData);
-    //             fetchPatients(); // Refresca la lista de pacientes después de agregar uno nuevo
-    //         }
-
-    //         return {
-    //             uid: sourceUserId,
-    //             ...sourceUserData,
-    //         };
-    //     } catch (error) {
-    //         console.error('Error al buscar o agregar paciente por email:', error);
-    //         return null;
-    //     }
-    // };
 
     const addPatientByEmail = async (email) => {
         try {
@@ -102,34 +57,39 @@ export const PatientsProvider = ({ children }) => {
             const querySnapshot = await getDocs(q);
 
             if (querySnapshot.empty) {
-                return null;
+                return { error: 'No se encontró ningún usuario con el email ingresado.' };
             }
 
             const sourceDoc = querySnapshot.docs[0];
             const sourceUserId = sourceDoc.id;
             const sourceUserData = sourceDoc.data();
 
+            // Verificar si el rol del usuario es "administrador"
+            if (sourceUserData.rol === 'administrador') {
+                return { error: 'No se puede agregar a un administrador como paciente.' };
+            }
+
             setSelectedPatientId(sourceUserId);
 
             const patientsRef = doc(db, 'usuarios', user.uid, 'pacientes', sourceUserId);
             const patientDoc = await getDoc(patientsRef);
 
-            if (!patientDoc.exists()) {
-                const newPatientData = {
-                    patientId: sourceUserId,
-                    nombreApellido: sourceUserData.nombreApellido || '',
-                    email: sourceUserData.email || email,
-                    rol: sourceUserData.rol || 'paciente',
-                };
-
-                await setDoc(patientsRef, newPatientData);
-                fetchPatients(); // Refresca la lista de pacientes después de agregar uno nuevo
+            // Verificar si el paciente ya existe
+            if (patientDoc.exists()) {
+                return { error: 'El usuario ya se encuentra vinculado' };
             }
 
-            return {
-                uid: sourceUserId,
-                ...sourceUserData,
+
+            const newPatientData = {
+                patientId: sourceUserId,
+                nombreApellido: sourceUserData.nombreApellido || '',
+                email: sourceUserData.email || email,
+                rol: sourceUserData.rol || 'paciente',
             };
+
+            await setDoc(patientsRef, newPatientData);
+            setPatients(prevPatients => [...prevPatients, { id: sourceUserId, ...newPatientData }]);
+
         } catch (error) {
             console.error('Error en addPatientByEmail:', error);
             throw error; // Lanzar el error para que sea manejado en un nivel superior
