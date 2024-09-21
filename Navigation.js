@@ -2,6 +2,8 @@ import React, { useContext } from 'react';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import Toast from 'react-native-toast-message';
+import { toastConfig } from './Utils/ToastConfig';
 
 // Screens
 import HomeScreen from "./Screens/HomeScreen";
@@ -190,6 +192,7 @@ export default function Navigation() {
     return (
         <NavigationContainer>
             {isAuthenticated ? <MyTabs /> : <AuthStackScreen />}
+            <Toast autoHide={false} visibilityTime={null} config={toastConfig} />
         </NavigationContainer>
     );
 }

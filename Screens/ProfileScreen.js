@@ -8,19 +8,20 @@ import { TasksContext } from '../Context/TaskProvider';
 import { SubjectsContext } from '../Context/SubjectsProvider';
 import LoadingScreen from '../Components/LoadingScreen';
 import { clearStorage } from '../Utils/AsyncStorage';
+import Toast from 'react-native-toast-message';
+
 
 function ProfileScreen() {
     const { logout, isAuthenticated, user } = useContext(AuthContext);
     const { patients, setPatients, setSelectedPatientId, addPatientByEmail, deletePatient } = useContext(PatientsContext);
     const navigation = useNavigation();
     const [loading, setLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
+    const [loadingPatients, setLoadingPatients] = useState(false);
     const [email, setEmail] = useState('');
     const { setRewards } = useContext(RewardsContext);
     const { setTasks } = useContext(TasksContext);
     const { setSubjects } = useContext(SubjectsContext);
     const { isPaciente } = useContext(AuthContext)
-
 
 
     // Logout
@@ -57,25 +58,41 @@ function ProfileScreen() {
     }, [isAuthenticated, loading, navigation]);
 
     const handleFetchUserRewards = async () => {
+        if (!email) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Por favor, proporciona un mail válido. Toca aquí para cerrar.',
+            });
+            return;
+        }
         try {
-            if (email) {
-                setLoading(true);
-                setErrorMessage(''); // Limpiar cualquier mensaje de error previo
-                const patientData = await addPatientByEmail(email);
+            setLoadingPatients(true);
+            const patientData = await addPatientByEmail(email);
+            if (patientData?.error) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: `${patientData.error} Toca aquí para cerrar.`,
+                });
+                console.log('Error en handleFetchUserRewards:', patientData.error);
+            } else {
+                Toast.show({
+                    type: 'success',
+                    text1: 'Exito',
+                    text2: 'Usuario agregado correctamente. Toca aquí para cerrar.',
 
-                if (patientData && patientData.uid) {
-                    console.log('Patient data:', patientData);
-                }
-                else {
-                    setErrorMessage('No se encontró un usuario con ese email.');
-                }
+                });
             }
         } catch (error) {
-            console.error('Error fetching user rewards:', error);
-            setErrorMessage(error.message || 'Ocurrió un error al intentar buscar recompensas.');
-
+            console.error('Error en handleAddPatientByEmail:', error);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Ocurrió un error al agregar el usuario.',
+            });
         } finally {
-            setLoading(false);
+            setLoadingPatients(false);
         }
     };
 
@@ -108,17 +125,16 @@ function ProfileScreen() {
                                 onChangeText={setEmail}
                             />
                             <Button title="Buscar Recompensas" onPress={handleFetchUserRewards} />
-                            {typeof errorMessage === 'string' && errorMessage.length > 0 && (
-                                <View style={styles.errorContainer}>
-                                    <Text style={styles.errorMessage}>{errorMessage}</Text>
-                                </View>
+                            {loadingPatients ? (
+                                <LoadingScreen />
+                            ) : (
+                                <FlatList
+                                    data={patients}
+                                    keyExtractor={(item) => item.id}
+                                    renderItem={renderPatientItem}
+                                    contentContainerStyle={styles.list}
+                                />
                             )}
-                            <FlatList
-                                data={patients}
-                                keyExtractor={(item) => item.id}
-                                renderItem={renderPatientItem}
-                                contentContainerStyle={styles.list}
-                            />
 
                         </>
                     )}
