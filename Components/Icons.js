@@ -17,3 +17,7 @@ export const AccountIcon = ({ color, size }) => <MaterialCommunityIcons name="ac
 export const SubjectIcon = ({ color, size }) => <MaterialCommunityIcons name="book" color={color} size={size} />;
 
 export const DeleteIcon = ({ color, size }) => <MaterialCommunityIcons name="delete" color={color} size={size} />;
+
+export const QrIcon = ({ color, size }) => <MaterialCommunityIcons name="qrcode" color={color} size={size} />;
+
+export const MessageIcon = ({ color, size }) => <MaterialCommunityIcons name="message" color={color} size={size} />;

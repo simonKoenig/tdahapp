@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, RefreshControl, Button } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../Context/AuthProvider';
 import { PatientsContext } from '../Context/PatientsProvider';
@@ -9,19 +9,25 @@ import { SubjectsContext } from '../Context/SubjectsProvider';
 import LoadingScreen from '../Components/LoadingScreen';
 import { clearStorage } from '../Utils/AsyncStorage';
 import Toast from 'react-native-toast-message';
+import { MessageIcon, QrIcon } from '../Components/Icons';
+import PacienteListItem from '../Components/PacienteListItem';
+import ConfirmDeleteAlert from '../Components/ConfirmDeleteAlert';
 
 
 function ProfileScreen() {
-    const { logout, isAuthenticated, user } = useContext(AuthContext);
-    const { patients, setPatients, setSelectedPatientId, addPatientByEmail, deletePatient } = useContext(PatientsContext);
-    const navigation = useNavigation();
-    const [loading, setLoading] = useState(false);
-    const [loadingPatients, setLoadingPatients] = useState(false);
+    //ESTADOS
+    const navigation = useNavigation(); // Hook de navegación
+    const [loading, setLoading] = useState(false); // Estado de carga del componente general
+    const [loadingPatients, setLoadingPatients] = useState(false); // Estado de carga de los pacientes
     const [email, setEmail] = useState('');
+    const [isQRModalVisible, setQRModalVisible] = useState(false);
+    const [isEmailModalVisible, setEmailModalVisible] = useState(false);
+    //CONTEXT
+    const { logout, isAuthenticated, user, isPaciente } = useContext(AuthContext);
+    const { patients, setPatients, setSelectedPatientId, addPatientByEmail, deletePatient } = useContext(PatientsContext);
     const { setRewards } = useContext(RewardsContext);
     const { setTasks } = useContext(TasksContext);
     const { setSubjects } = useContext(SubjectsContext);
-    const { isPaciente } = useContext(AuthContext)
 
 
     // Logout
@@ -96,28 +102,58 @@ function ProfileScreen() {
         }
     };
 
+    const handleDeletePatient = async (patientId) => {
+        try {
+            setLoadingPatients(true); // Muestra algún indicador de carga si es necesario
 
+            // Lógica de eliminación
+            const result = await deletePatient(patientId, user.uid);
 
-    const renderPatientItem = ({ item }) => (
-        <View style={styles.row}>
-            <Text style={styles.cell}>{item.nombreApellido}</Text>
-
-
-            <TouchableOpacity style={styles.cell} onPress={() => deletePatient(item.id, user.uid)}>
-                <Text style={styles.actionText}>Eliminar</Text>
-            </TouchableOpacity>
-        </View>
-    );
+            // Verificamos si la operación tuvo éxito o si resultó en un error
+            if (result?.error) {
+                // Si hubo un error en la eliminación
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: `${result.error} Toca aquí para cerrar.`,
+                });
+                console.log('Error en handleDeletePatient:', result.error);
+            } else {
+                // Si la eliminación fue exitosa
+                Toast.show({
+                    type: 'success',
+                    text1: 'Éxito',
+                    text2: 'Paciente eliminado correctamente. Toca aquí para cerrar.',
+                });
+            }
+        } catch (error) {
+            // Si algo salió mal en la operación
+            console.error('Error en handleDeletePatient:', error);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Ocurrió un error al eliminar el paciente. Toca aquí para cerrar.',
+            });
+        } finally {
+            setLoadingPatients(false); // Se quita el indicador de carga en cualquier caso (éxito o error)
+        }
+    };
 
 
     return (
-
         <View style={styles.container}>
             {loading && <LoadingScreen />}
             {!loading && (
                 <>
+                    {/* Perfil del usuario */}
+                    <View style={styles.profileSection}>
+                        <Text style={styles.profileName}>{user.nombreApellido}</Text>
+                        <Text style={styles.profileEmail}>{user.email}</Text>
+                    </View>
                     {!isPaciente() && (
                         <>
+                            <Text style={styles.sectionTitle}>Usuarios vinculados</Text>
+
                             <TextInput
                                 style={styles.input}
                                 placeholder="Email del paciente"
@@ -129,22 +165,44 @@ function ProfileScreen() {
                                 <LoadingScreen />
                             ) : (
                                 <FlatList
-                                    data={patients}
-                                    keyExtractor={(item) => item.id}
-                                    renderItem={renderPatientItem}
-                                    contentContainerStyle={styles.list}
+                                    data={patients} // Lista de pacientes
+                                    keyExtractor={(item) => item.id} // Asegúrate de que cada paciente tiene un id
+                                    renderItem={({ item }) => {
+                                        // Configuramos la alerta de confirmación de eliminación para cada paciente
+                                        const showDeletePatientAlert = ConfirmDeleteAlert({
+                                            itemId: item.id,
+                                            itemName: item.nombreApellido,
+                                            onConfirm: handleDeletePatient, // Función que elimina al paciente
+                                        });
+
+                                        return (
+                                            <PacienteListItem
+                                                paciente={item}
+                                                onDelete={showDeletePatientAlert} // La alerta de eliminación se muestra cuando se presiona el botón
+                                            />
+                                        );
+                                    }}
                                 />
                             )}
+                            <Text style={styles.sectionTitle}>Vincular nuevo usuario</Text>
+                            <View style={styles.connectionOptions}>
+                                <TouchableOpacity style={styles.optionContainer} onPress={() => setEmailModalVisible(true)} >
+                                    <Text style={styles.optionText}>Añadir con mail</Text>
+                                    <MessageIcon size={24} color="black" />
+                                </TouchableOpacity>
 
+                                {/* Opción: Agregar por código QR */}
+                                <TouchableOpacity style={styles.optionContainer} onPress={() => setQRModalVisible(true)}>
+                                    <Text style={styles.optionText}>Añadir con codigo QR</Text>
+                                    <QrIcon size={24} color="black" />
+                                </TouchableOpacity>
+                            </View>
                         </>
                     )}
                     <Button
                         title="Cerrar Sesión"
-                        onPress={handleLogout} s
+                        onPress={handleLogout}
                     />
-
-
-
                 </>
             )}
         </View>
@@ -190,18 +248,6 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: '#ccc',
     },
-    errorContainer: {
-        marginVertical: 8,
-        padding: 10,
-        backgroundColor: '#fee',
-        borderRadius: 5,
-    },
-
-    errorMessage: {
-        color: 'red',
-        fontSize: 16,
-        marginTop: 16,
-    },
     item: {
         flex: 1,
         backgroundColor: '#d3d3d3', // Fondo gris
@@ -233,6 +279,67 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
 
+
+    profileSection: {
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    profileName: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    profileEmail: {
+        fontSize: 16,
+        color: '#777',
+    },
+    sectionTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    optionContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between', // Para que el texto esté a la izquierda y el ícono a la derecha
+        alignItems: 'center',
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
+    },
+    optionText: {
+        fontSize: 16,
+        color: '#333',
+    },
+    modalBackground: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo semitransparente para el modal
+    },
+    modalContainer: {
+        width: '80%', // Ajusta el ancho del modal según sea necesario
+        maxHeight: '50%', // Ajusta la altura máxima del modal según sea necesario
+        backgroundColor: '#ffffff',
+        borderRadius: 10,
+        padding: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    buttonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginTop: 16,
+    },
+    input: {
+        height: 40,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        marginBottom: 16,
+        width: '100%',
+    },
 });
 
 
