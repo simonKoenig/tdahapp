@@ -12,6 +12,8 @@ import Toast from 'react-native-toast-message';
 import { MessageIcon, QrIcon } from '../Components/Icons';
 import PacienteListItem from '../Components/PacienteListItem';
 import ConfirmDeleteAlert from '../Components/ConfirmDeleteAlert';
+import AddPatientModal from '../Modals/AddPatientModal';
+
 
 
 function ProfileScreen() {
@@ -63,7 +65,7 @@ function ProfileScreen() {
         }
     }, [isAuthenticated, loading, navigation]);
 
-    const handleFetchUserRewards = async () => {
+    const handleFetchUserRewards = async (email) => {
         if (!email) {
             Toast.show({
                 type: 'error',
@@ -153,14 +155,6 @@ function ProfileScreen() {
                     {!isPaciente() && (
                         <>
                             <Text style={styles.sectionTitle}>Usuarios vinculados</Text>
-
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Email del paciente"
-                                value={email}
-                                onChangeText={setEmail}
-                            />
-                            <Button title="Buscar Recompensas" onPress={handleFetchUserRewards} />
                             {loadingPatients ? (
                                 <LoadingScreen />
                             ) : (
@@ -197,6 +191,11 @@ function ProfileScreen() {
                                     <QrIcon size={24} color="black" />
                                 </TouchableOpacity>
                             </View>
+                            <AddPatientModal
+                                visible={isEmailModalVisible}
+                                onClose={() => setEmailModalVisible(false)}
+                                onSubmit={handleFetchUserRewards}
+                            />
                         </>
                     )}
                     <Button
