@@ -13,6 +13,7 @@ import { MessageIcon, QrIcon } from '../Components/Icons';
 import PacienteListItem from '../Components/PacienteListItem';
 import ConfirmDeleteAlert from '../Components/ConfirmDeleteAlert';
 import AddPatientModal from '../Modals/AddPatientModal';
+import PatientQRCode from '../Components/QR';
 
 
 
@@ -152,7 +153,7 @@ function ProfileScreen() {
                         <Text style={styles.profileName}>{user.nombreApellido}</Text>
                         <Text style={styles.profileEmail}>{user.email}</Text>
                     </View>
-                    {!isPaciente() && (
+                    {!isPaciente() ? (
                         <>
                             <Text style={styles.sectionTitle}>Usuarios vinculados</Text>
                             {loadingPatients ? (
@@ -196,6 +197,10 @@ function ProfileScreen() {
                                 onClose={() => setEmailModalVisible(false)}
                                 onSubmit={handleFetchUserRewards}
                             />
+                        </>
+                    ) : (
+                        <>
+                            <PatientQRCode email={user.email} />
                         </>
                     )}
                     <Button
