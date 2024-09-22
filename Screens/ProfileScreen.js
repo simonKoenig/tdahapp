@@ -14,6 +14,7 @@ import PacienteListItem from '../Components/PacienteListItem';
 import ConfirmDeleteAlert from '../Components/ConfirmDeleteAlert';
 import AddPatientModal from '../Modals/AddPatientModal';
 import PatientQRCode from '../Components/QR';
+import QRScannerModal from '../Modals/QRScannerModal';
 
 
 
@@ -196,6 +197,11 @@ function ProfileScreen() {
                                 visible={isEmailModalVisible}
                                 onClose={() => setEmailModalVisible(false)}
                                 onSubmit={handleFetchUserRewards}
+                            />
+                            <QRScannerModal
+                                visible={isQRModalVisible}
+                                onClose={() => setQRModalVisible(false)}
+                                onScan={handleFetchUserRewards} // Pasar la función handleScan al modal
                             />
                         </>
                     ) : (
