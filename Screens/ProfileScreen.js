@@ -180,8 +180,8 @@ function ProfileScreen() {
                                     }}
                                 />
                             )}
-                            <Text style={styles.sectionTitle}>Vincular nuevo usuario</Text>
                             <View style={styles.connectionOptions}>
+                                <Text style={styles.sectionTitle}>Vincular nuevo usuario</Text>
                                 <TouchableOpacity style={styles.optionContainer} onPress={() => setEmailModalVisible(true)} >
                                     <Text style={styles.optionText}>Añadir con mail</Text>
                                     <MessageIcon size={24} color="black" />
@@ -209,10 +209,11 @@ function ProfileScreen() {
                             <PatientQRCode email={user.email} />
                         </>
                     )}
-                    <Button
-                        title="Cerrar Sesión"
-                        onPress={handleLogout}
-                    />
+                    <View style={[styles.buttonsContainer, isPaciente() && styles.extraStyle]}>
+                        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                            <Text style={styles.logoutButtonText}>CERRAR SESIÓN</Text>
+                        </TouchableOpacity>
+                    </View>
                 </>
             )}
         </View>
@@ -224,72 +225,8 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
         backgroundColor: '#ffffff',
+        flexDirection: 'column',
     },
-    label: {
-        fontSize: 16,
-        marginBottom: 8,
-    },
-    input: {
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 5,
-        paddingHorizontal: 10,
-        marginBottom: 16,
-    },
-    button: {
-        backgroundColor: '#4c669f',
-        padding: 10,
-        borderRadius: 5,
-        alignItems: 'center',
-    },
-    buttonText: {
-        color: '#ffffff',
-        fontSize: 16,
-    },
-    noRewardsText: {
-        marginTop: 16,
-        fontSize: 16,
-        textAlign: 'center',
-    },
-    patientItem: {
-        padding: 10,
-        fontSize: 16,
-        borderBottomWidth: 1,
-        borderColor: '#ccc',
-    },
-    item: {
-        flex: 1,
-        backgroundColor: '#d3d3d3', // Fondo gris
-        padding: 10,
-        margin: 5,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    row: {
-        flexDirection: 'row',
-        backgroundColor: '#d3d3d3', // Fondo gris
-        padding: 10,
-        marginVertical: 2,
-        borderWidth: 1,
-        borderColor: '#ccc',
-    },
-    cell: {
-        flex: 1,
-        textAlign: 'center',
-        borderRightWidth: 1,
-        borderColor: '#ccc',
-        padding: 5,
-    },
-    actionText: {
-        color: '#007bff',
-    },
-    list: {
-        width: '100%',
-        paddingHorizontal: 10,
-    },
-
-
     profileSection: {
         alignItems: 'center',
         marginBottom: 20,
@@ -320,35 +257,21 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#333',
     },
-    modalBackground: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo semitransparente para el modal
-    },
-    modalContainer: {
-        width: '80%', // Ajusta el ancho del modal según sea necesario
-        maxHeight: '50%', // Ajusta la altura máxima del modal según sea necesario
-        backgroundColor: '#ffffff',
-        borderRadius: 10,
-        padding: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
     buttonsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        marginTop: 16,
+        justifyContent: 'flex-end',
     },
-    input: {
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
+    extraStyle: {
+        flexGrow: 1,
+    },
+    logoutButton: {
+        backgroundColor: '#007bff',
+        padding: 15,
         borderRadius: 5,
-        paddingHorizontal: 10,
-        marginBottom: 16,
-        width: '100%',
+    },
+    logoutButtonText: {
+        color: 'white',
+        textAlign: 'center',
+        fontWeight: 'bold',
     },
 });
 
