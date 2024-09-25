@@ -11,7 +11,7 @@ async function updateTareasVencidas() {
   try {
     const tasksSnapshot = await db.collectionGroup('tareas')
       .where('estado', '==', 'En progreso')
-      .where('date', '>=', now)
+      .where('date', '<=', now)
       .get();
 
     if (tasksSnapshot.empty) {
