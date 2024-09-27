@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AppState, Alert } from 'react-native';
+import { AppState, Alert, PermissionsAndroid, Platform } from 'react-native';
 import Navigation from './Navigation';
 import { AuthProvider } from './Context/AuthProvider';
 import { RewardsProvider } from './Context/RewardsProvider';
@@ -28,10 +28,21 @@ const App = () => {
   // Solicita permiso para recibir notificaciones
   const requestUserPermission = async () => {
     try {
-      const authStatus = await messaging().requestPermission();
+      let authStatus = await messaging().requestPermission();
       const enabled =
         authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
         authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+      if (Platform.OS === 'android' && Platform.Version >= 33) {
+        // En Android 13 o superior, también se necesita el permiso de POST_NOTIFICATIONS
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          console.log('Permiso de notificaciones en Android 13 no autorizado');
+          return false;
+        }
+      }
 
       if (enabled) {
         console.log('Permiso de notificaciones autorizado:', authStatus);
