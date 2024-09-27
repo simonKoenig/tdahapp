@@ -15,16 +15,14 @@ export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Solicita permiso para recibir notificaciones
     const requestUserPermission = async () => {
         try {
-            let authStatus = await messaging().requestPermission();
+            const authStatus = await messaging().requestPermission();
             const enabled =
                 authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
                 authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
             if (Platform.OS === 'android' && Platform.Version >= 33) {
-                // En Android 13 o superior, también se necesita el permiso de POST_NOTIFICATIONS
                 const granted = await PermissionsAndroid.request(
                     PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
                 );
@@ -34,17 +32,18 @@ export const AuthProvider = ({ children }) => {
                 }
             }
 
-            if (enabled) {
-                console.log('Permiso de notificaciones autorizado:', authStatus);
-                return true;
-            } else {
-                console.log('Permiso de notificaciones no autorizado:', authStatus);
-                return false;
-            }
+            return enabled; // Devuelve si el permiso fue autorizado
         } catch (error) {
             console.error('Error al solicitar permisos de notificaciones:', error);
             return false;
         }
+    };
+    const checkUserPermission = async () => {
+        const authStatus = await messaging().hasPermission();
+        return (
+            authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+            authStatus === messaging.AuthorizationStatus.PROVISIONAL
+        );
     };
 
     // Función para guardar el token FCM en Firestore
@@ -98,7 +97,7 @@ export const AuthProvider = ({ children }) => {
                     const docSnap = await getDoc(docRef);
                     if (docSnap.exists()) {
                         const userData = docSnap.data();
-                        setRole(userData.rol); // Aquí se usa userData.rol
+                        setRole(userData.rol);
                         setUser({
                             uid: user.uid,
                             email: user.email,
@@ -106,27 +105,35 @@ export const AuthProvider = ({ children }) => {
                         });
                         setIsAuthenticated(true);
 
-                        requestUserPermission(); // Solicita permiso para recibir notificaciones
+                        // Verificar permisos de notificación
+                        const hasPermission = await checkUserPermission();
+                        if (!hasPermission) {
+                            // Solo solicita permisos si no están ya concedidos
+                            const permissionGranted = await requestUserPermission();
+                            if (permissionGranted) {
+                                // Si el usuario concede los permisos, obtenemos el token FCM
+                                const fcmToken = await messaging().getToken();
+                                if (fcmToken) {
+                                    console.log('Token FCM obtenido:', fcmToken);
+                                    await saveTokenToFirestore(user.uid, fcmToken);
+                                }
 
-                        // Si el usuario inicia sesión correctamente, obtenemos el token FCM
-                        const fcmToken = await messaging().getToken();
-                        if (fcmToken) {
-                            console.log('Token FCM obtenido:', fcmToken);
-                            await saveTokenToFirestore(user.uid, fcmToken);
+                                // Listener para detectar cambios en el token FCM
+                                const unsubscribeOnTokenRefresh = messaging().onTokenRefresh(async (newToken) => {
+                                    console.log('Token FCM actualizado:', newToken);
+                                    await saveTokenToFirestore(user.uid, newToken); // Guarda el nuevo token en Firestore
+                                });
+
+                                // Limpia el listener al salir
+                                return () => unsubscribeOnTokenRefresh();
+                            } else {
+                                console.log('Permisos de notificaciones denegados');
+                            }
+                        } else {
+                            console.log('Permisos de notificaciones ya concedidos');
                         }
 
-                        // Listener para detectar cambios en el token FCM
-                        const unsubscribeOnTokenRefresh = messaging().onTokenRefresh(async (newToken) => {
-                            console.log('Token FCM actualizado:', newToken);
-                            await saveTokenToFirestore(user.uid, newToken); // Guarda el nuevo token en Firestore
-                        });
-
                         setIsLoading(false);
-
-                        // Limpia el listener al salir
-                        return () => unsubscribeOnTokenRefresh();
-
-
                     } else {
                         console.log("No such document!");
                     }
