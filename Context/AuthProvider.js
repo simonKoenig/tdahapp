@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, arrayUnion, updateDoc, arrayRemove } from 'firebase/firestore';
 import { db } from '../firebase-config'; // Asegúrate de que la configuración de Firebase esté correctamente importada
 import LoadingScreen from '../Components/LoadingScreen'; // Asegúrate de que la pantalla de carga esté correctamente importada
 
@@ -19,13 +19,41 @@ export const AuthProvider = ({ children }) => {
     // Función para guardar el token FCM en Firestore
     const saveTokenToFirestore = async (userId, token) => {
         try {
+            // Referencia al documento del usuario en Firestore
             const userRef = doc(db, 'usuarios', userId);
-            await updateDoc(userRef, {
-                FCMtokens: token ? [token] : [],  // Actualiza el array de tokens FCM (sólo un token para móvil)
-            });
-            console.log('Token FCM guardado/actualizado en Firestore');
+
+            // Verificamos el documento actual para ver si ya tiene tokens
+            const userDoc = await getDoc(userRef);
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+
+                // Comprobamos si el token ya está en el array de FCMtokens
+                const existingTokens = userData.FCMtokens || [];
+                if (!existingTokens.includes(token)) {
+                    // Si el token no existe, lo agregamos
+                    await updateDoc(userRef, {
+                        FCMtokens: arrayUnion(token),  // arrayUnion agrega el token solo si no está presente
+                    });
+                    console.log('Nuevo token FCM agregado en Firestore');
+                } else {
+                    console.log('El token FCM ya existe en Firestore, no se agregó');
+                }
+            }
         } catch (error) {
             console.error('Error al guardar el token FCM en Firestore:', error);
+        }
+    };
+
+    // Función para eliminar un token FCM específico de Firestore
+    const removeFcmTokenFromFirestore = async (userId, token) => {
+        try {
+            const userRef = doc(db, 'usuarios', userId);
+            await updateDoc(userRef, {
+                FCMtokens: arrayRemove(token)  // Usa arrayRemove para eliminar solo el token específico
+            });
+            console.log('Token FCM eliminado de Firestore');
+        } catch (error) {
+            console.error('Error al eliminar el token FCM de Firestore:', error);
         }
     };
 
@@ -60,8 +88,11 @@ export const AuthProvider = ({ children }) => {
                             await saveTokenToFirestore(user.uid, newToken); // Guarda el nuevo token en Firestore
                         });
 
+                        setIsLoading(false);
+
                         // Limpia el listener al salir
                         return () => unsubscribeOnTokenRefresh();
+
 
                     } else {
                         console.log("No such document!");
@@ -94,21 +125,31 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
+            const fcmToken = await messaging().getToken();
+
             const auth = getAuth();
+
+            // Guarda el UID del usuario actual antes de cerrar sesión
+            const userId = user?.uid;
+
+            // Cierra la sesión de Firebase Auth
             await signOut(auth);
+
+            // Limpia el estado local
             setUser(null);
             setRole(null);
             setIsAuthenticated(false);
 
-            // Opcional: Elimina el token FCM del usuario en Firestore al cerrar sesión
-            const authUser = getAuth().currentUser;
-            if (authUser) {
-                await saveTokenToFirestore(authUser.uid, null);  // Limpia el token FCM del usuario al cerrar sesión
+            // Verifica si el `userId` y el token FCM actual están disponibles para eliminarlos de Firestore
+            if (userId && fcmToken) {
+                await removeFcmTokenFromFirestore(userId, fcmToken);
+                console.log('Token FCM eliminado del usuario en Firestore');
             }
         } catch (error) {
             console.error("Error al cerrar sesión:", error);
         }
     };
+
 
     if (isLoading) {
         return <LoadingScreen />; // Renderiza la pantalla de carga mientras se obtiene el estado de autenticación

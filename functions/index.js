@@ -28,7 +28,7 @@ async function updateTareasVencidas() {
     });
 
     const message = {
-      token: 'dE3nn6Y0TwGdFcLE3dAXR9:APA91bEnRPS6bYWJMwzwwnUF8T5KoYPE97rIarLtAqy1nrclA3YBd9YIXyR_4bQcDyKQVD1E1sC1FHxjfmYVk4bGyytTWHEer7OjDMIdfhSuaE7jZWcHS_JRc3f4pPTL5WF09X0IFO0L',
+      token: 'ecl2swZwSz-U6OrJak4eTL:APA91bGx0q0-aQQWoYoQ9rtJlxp_rcOniIlsbF4EJrahKLudgh1rsWYlXCVBv8IwTtolFmEU2j2ydfT0GJrb8PKCz_Dxj5dlKJj0RZ0Pf6sjRumsFe4vcMNgvpTWMMYE_xe1hpPOj5QB',
       notification: {
         title: 'Tarea vencida',
         body: `La tarea ha vencido.`,
