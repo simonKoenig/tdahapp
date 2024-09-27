@@ -25,38 +25,6 @@ const App = () => {
     };
   }, []);
 
-  // Solicita permiso para recibir notificaciones
-  const requestUserPermission = async () => {
-    try {
-      let authStatus = await messaging().requestPermission();
-      const enabled =
-        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-
-      if (Platform.OS === 'android' && Platform.Version >= 33) {
-        // En Android 13 o superior, también se necesita el permiso de POST_NOTIFICATIONS
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-        );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          console.log('Permiso de notificaciones en Android 13 no autorizado');
-          return false;
-        }
-      }
-
-      if (enabled) {
-        console.log('Permiso de notificaciones autorizado:', authStatus);
-        return true;
-      } else {
-        console.log('Permiso de notificaciones no autorizado:', authStatus);
-        return false;
-      }
-    } catch (error) {
-      console.error('Error al solicitar permisos de notificaciones:', error);
-      return false;
-    }
-  };
-
   React.useEffect(() => {
     const setupNotifications = async () => {
       const hasPermission = await requestUserPermission();

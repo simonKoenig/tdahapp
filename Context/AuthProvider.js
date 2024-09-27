@@ -1,10 +1,9 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { Platform, PermissionsAndroid } from 'react-native';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc, arrayUnion, updateDoc, arrayRemove } from 'firebase/firestore';
 import { db } from '../firebase-config'; // Asegúrate de que la configuración de Firebase esté correctamente importada
 import LoadingScreen from '../Components/LoadingScreen'; // Asegúrate de que la pantalla de carga esté correctamente importada
-
-
 import messaging from '@react-native-firebase/messaging';
 
 
@@ -15,6 +14,38 @@ export const AuthProvider = ({ children }) => {
     const [role, setRole] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+
+    // Solicita permiso para recibir notificaciones
+    const requestUserPermission = async () => {
+        try {
+            let authStatus = await messaging().requestPermission();
+            const enabled =
+                authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+                authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+            if (Platform.OS === 'android' && Platform.Version >= 33) {
+                // En Android 13 o superior, también se necesita el permiso de POST_NOTIFICATIONS
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+                );
+                if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+                    console.log('Permiso de notificaciones en Android 13 no autorizado');
+                    return false;
+                }
+            }
+
+            if (enabled) {
+                console.log('Permiso de notificaciones autorizado:', authStatus);
+                return true;
+            } else {
+                console.log('Permiso de notificaciones no autorizado:', authStatus);
+                return false;
+            }
+        } catch (error) {
+            console.error('Error al solicitar permisos de notificaciones:', error);
+            return false;
+        }
+    };
 
     // Función para guardar el token FCM en Firestore
     const saveTokenToFirestore = async (userId, token) => {
@@ -74,6 +105,8 @@ export const AuthProvider = ({ children }) => {
                             nombreApellido: userData.nombreApellido,
                         });
                         setIsAuthenticated(true);
+
+                        requestUserPermission(); // Solicita permiso para recibir notificaciones
 
                         // Si el usuario inicia sesión correctamente, obtenemos el token FCM
                         const fcmToken = await messaging().getToken();
