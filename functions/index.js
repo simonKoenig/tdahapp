@@ -20,10 +20,23 @@ async function updateTareasVencidas() {
     }
 
     const batch = db.batch();
+    const notificationPromises = [];
+
     tasksSnapshot.forEach((taskDoc) => {
       const taskRef = taskDoc.ref;
       batch.update(taskRef, { estado: 'Vencida' });
     });
+
+    const message = {
+      token: 'dE3nn6Y0TwGdFcLE3dAXR9:APA91bEnRPS6bYWJMwzwwnUF8T5KoYPE97rIarLtAqy1nrclA3YBd9YIXyR_4bQcDyKQVD1E1sC1FHxjfmYVk4bGyytTWHEer7OjDMIdfhSuaE7jZWcHS_JRc3f4pPTL5WF09X0IFO0L',
+      notification: {
+        title: 'Tarea vencida',
+        body: `La tarea ha vencido.`,
+      },
+    };
+
+    notificationPromises.push(admin.messaging().send(message));
+
 
     await batch.commit();
     console.log('Tareas vencidas actualizadas correctamente');

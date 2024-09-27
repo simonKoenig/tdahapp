@@ -33,3 +33,9 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+#Google service account
+google-service.json
+
+#servicios
+tdah-ef69a-firebase-adminsdk-rap2x-efd498c0f4.json
