@@ -11,7 +11,6 @@ import { SubjectsContext } from '../../Context/SubjectsProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';
 import { AuthContext } from '../../Context/AuthProvider';
 
-
 function TaskDetailScreen() {
     const route = useRoute();
     const { taskId, uid } = route.params;
@@ -25,6 +24,7 @@ function TaskDetailScreen() {
     const [show, setShow] = useState(false);
     const [mode, setMode] = useState('date');
     const [estado, setEstado] = useState('');
+    const [fechaCreacion, setFechaCreacion] = useState('');
 
     const { isPaciente } = useContext(AuthContext);
     const { getTask, updateTask, deleteTask } = useContext(TasksContext);
@@ -46,6 +46,7 @@ function TaskDetailScreen() {
                     setSelectedSubjectId(task.selectedSubjectId);
                     setSelectedPatientId(uid);
                     setEstado(task.estado);
+                    setFechaCreacion(task.fechaCreacion.toDate());
                 } else {
                     console.error('Task not found');
                 }
@@ -70,7 +71,7 @@ function TaskDetailScreen() {
 
     const handleUpdateTask = async () => {
         try {
-            await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado }, selectedPatientId);
+            await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado, fechaCreacion }, selectedPatientId);
             navigation.goBack();
         } catch (error) {
             console.error('Error updating task:', error);
@@ -79,7 +80,7 @@ function TaskDetailScreen() {
 
     const handleMarkTask = async (nuevoEstado) => {
         try {
-            await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado: nuevoEstado }, selectedPatientId);
+            await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado: nuevoEstado, fechaCreacion }, selectedPatientId);
             navigation.goBack();
         } catch (error) {
             console.error('Error updating task:', error);
@@ -94,18 +95,30 @@ function TaskDetailScreen() {
             console.error('Error deleting task:', error);
         }
     };
-
+    
     if (loading) {
         return <LoadingScreen />;
     }
-
+    
     const recompensaNombre = rewards.find(reward => reward.id === selectedRewardId)?.nombre;
-
+    
     if (isPaciente()) {
         return (
             <View style={styles.form}>
+                <Text style={styles.label}>Nombre</Text>
+                <Text style={styles.input}>{nombre}</Text>
                 <Text style={styles.label}>Descripción</Text>
                 <Text style={styles.input}>{descripcion}</Text>
+                <Text style={styles.label}>Fecha de creación</Text>
+                <DateTimePickerComponent
+                    date={fechaCreacion}
+                    setDate={setDate}
+                    mode={mode}
+                    setMode={setMode}
+                    show={show}
+                    setShow={setShow}
+                    editable={false}
+                />
                 <Text style={styles.label}>Fecha y hora de vencimiento</Text>
                 <DateTimePickerComponent
                     date={date}
@@ -120,8 +133,6 @@ function TaskDetailScreen() {
                 <Text style={styles.input}>{dificultad}</Text>
                 <Text style={styles.label}>Materia</Text>
                 <Text style={styles.input}>{subjects.find(subject => subject.id === selectedSubjectId)?.nombre}</Text>
-                <Text style={styles.label}>Nombre</Text>
-                <Text style={styles.input}>{nombre}</Text>
                 {estado === 'En progreso' && (
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.button} onPress={() => handleMarkTask('Pendiente')}>
@@ -139,9 +150,17 @@ function TaskDetailScreen() {
             </View>
         );
     }
-
+    
     return (
         <View style={styles.form}>
+            <Text style={styles.label}>Nombre</Text>
+            <TextInput
+                style={styles.input}
+                placeholder='Nombre de la tarea'
+                value={nombre}
+                onChangeText={setNombre}
+            />
+
             <Text style={styles.label}>Descripción</Text>
             <TextInput
                 style={styles.input}
@@ -149,6 +168,18 @@ function TaskDetailScreen() {
                 value={descripcion}
                 onChangeText={setDescripcion}
             />
+
+            <Text style={styles.label}>Fecha de creación</Text>
+            <DateTimePickerComponent
+                    date={fechaCreacion}
+                    setDate={setDate}
+                    mode={mode}
+                    setMode={setMode}
+                    show={show}
+                    setShow={setShow}
+                    editable={false}
+            />
+
 
             <Text style={styles.label}>Fecha y hora de vencimiento</Text>
             <DateTimePickerComponent
@@ -181,13 +212,6 @@ function TaskDetailScreen() {
                 value={selectedSubjectId}
                 setValue={setSelectedSubjectId}
                 placeholder="Selecciona una materia"
-            />
-            <Text style={styles.label}>Nombre</Text>
-            <TextInput
-                style={styles.input}
-                placeholder='Nombre de la tarea'
-                value={nombre}
-                onChangeText={setNombre}
             />
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleUpdateTask}>

@@ -26,6 +26,7 @@ function AddTaskScreen() {
     const [date, setDate] = useState(new Date()); //  Use new Date() para obtener la fecha actual
     const [mode, setMode] = useState('date'); // Date time picker
     const [show, setShow] = useState(false); // Date time picker
+    const [fechaCreacion, setFechaCreacion] = useState(''); // Fecha de creación de la tarea
 
     // Transforma los pacientes para el Dropdown
     const transformedPatients = patients.map(patient => ({
@@ -69,6 +70,7 @@ function AddTaskScreen() {
     // Función para agregar una tarea
     const handleAddTask = async () => {
         if (selectedPatientId) {
+            fechaCreacion = new Date()
             const newTask = {
                 nombre,
                 descripcion,
@@ -77,6 +79,7 @@ function AddTaskScreen() {
                 selectedRewardId,
                 selectedSubjectId,
                 estado: 'En progreso', // Estado por defecto
+                fechaCreacion,
             };
 
             await addTask(newTask, selectedPatientId); // Pasa el UID del paciente seleccionado
