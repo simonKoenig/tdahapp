@@ -47,10 +47,10 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     itemText: {
-        flex: 1,
         fontSize: 16,
     },
     dateText: {
+        flex: 1,
         fontSize: 12,
         color: '#888',
     },
