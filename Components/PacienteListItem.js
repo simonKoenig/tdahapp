@@ -6,28 +6,28 @@ import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 const PacienteListItem = ({ paciente, onDelete }) => {
     const nombreArray = paciente.nombreApellido.split(' ');
 
-    // Obtener las iniciales (primera letra de las dos primeras palabras)
-    const iniciales = nombreArray.length > 1
-        ? `${nombreArray[0][0]}${nombreArray[1][0]}`
-        : nombreArray[0][0]; // Si solo hay una palabra, tomar solo la primera letra
-
+    const iniciales = () => {
+        // Verificar que nombreArray tenga al menos un elemento y que los elementos no sean undefined o null
+        if (nombreArray.length > 0 && nombreArray[0]) {
+            return nombreArray.length > 1 && nombreArray[1]
+                ? `${nombreArray[0][0]}${nombreArray[1][0]}`
+                : nombreArray[0][0]; // Si solo hay una palabra, tomar solo la primera letra
+        } else {
+            return (''); // Manejar el caso donde nombreArray está vacío o tiene elementos inválidos
+        }
+    }
 
     return (
-
-
-
         <View style={styles.pacienteContainer}>
             <View style={styles.circle}>
-                <Text style={styles.circleText}>{iniciales}</Text>
+                <Text style={styles.circleText}>{iniciales()}</Text>
             </View>
             <View>
                 <Text style={styles.pacienteText}>{paciente.nombreApellido}</Text>
                 <Text style={styles.pacienteEmail}>{paciente.email}</Text>
             </View>
-
             <TouchableOpacity style={styles.deleteButton} onPress={() => onDelete(paciente.id)}>
                 <DeleteIcon size={42} color="red" />
-
             </TouchableOpacity>
         </View>
     );
