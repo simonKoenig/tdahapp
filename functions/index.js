@@ -121,48 +121,48 @@ exports.updateTareasVencidas = functions.pubsub.schedule('every 1 minutes').onRu
 });
 
 // Función para enviar notificación al crear una nueva tarea
-// exports.onCreateTarea = functions.firestore
-//   .document('usuarios/{userId}/tareas/{tareaId}')
-//   .onCreate(async (snapshot, context) => {
-//     const tareaData = snapshot.data(); // Datos de la tarea creada
-//     const userId = context.params.userId; // UID del usuario al que pertenece la tarea
-//     const nombreTarea = tareaData.nombre || 'Sin nombre'; // Nombre de la tarea
+exports.onCreateTarea = functions.firestore
+  .document('usuarios/{userId}/tareas/{tareaId}')
+  .onCreate(async (snapshot, context) => {
+    const tareaData = snapshot.data(); // Datos de la tarea creada
+    const userId = context.params.userId; // UID del usuario al que pertenece la tarea
+    const nombreTarea = tareaData.nombre || 'Sin nombre'; // Nombre de la tarea
 
-//     try {
-//       // Obtener el nombre del usuario al que pertenece la tarea
-//       const userDoc = await db.collection('usuarios').doc(userId).get();
-//       const nombreUsuario = userDoc.exists ? userDoc.data().nombreApellido || 'Usuario Desconocido' : 'Usuario Desconocido';
+    try {
+      // Obtener el nombre del usuario al que pertenece la tarea
+      const userDoc = await db.collection('usuarios').doc(userId).get();
+      const nombreUsuario = userDoc.exists ? userDoc.data().nombreApellido || 'Usuario Desconocido' : 'Usuario Desconocido';
 
-//       // Obtener los tokens de notificación del usuario (FCM tokens)
-//       const FCMtokens = userDoc.exists && userDoc.data().FCMtokens ? userDoc.data().FCMtokens : [];
+      // Obtener los tokens de notificación del usuario (FCM tokens)
+      const FCMtokens = userDoc.exists && userDoc.data().FCMtokens ? userDoc.data().FCMtokens : [];
 
-//       // Si no tiene tokens registrados, loguear y salir
-//       if (FCMtokens.length === 0) {
-//         console.log(`El usuario "${nombreUsuario}" (UID: ${userId}) no tiene tokens de notificación registrados.`);
-//         return; // Salir de la función, ya que no se puede enviar la notificación
-//       }
+      // Si no tiene tokens registrados, loguear y salir
+      if (FCMtokens.length === 0) {
+        console.log(`El usuario "${nombreUsuario}" (UID: ${userId}) no tiene tokens de notificación registrados.`);
+        return; // Salir de la función, ya que no se puede enviar la notificación
+      }
 
-//       console.log(`Nueva tarea creada: "${nombreTarea}" para el usuario: "${nombreUsuario}" (UID: ${userId})`);
+      console.log(`Nueva tarea creada: "${nombreTarea}" para el usuario: "${nombreUsuario}" (UID: ${userId})`);
 
-//       // Enviar la notificación a cada token individualmente
-//       for (const token of FCMtokens) {
-//         const notificationMessage = {
-//           notification: {
-//             title: 'Nueva Tarea Asignada',
-//             body: `Se ha asignado una nueva tarea: "${nombreTarea}".`,
-//           },
-//           token: token, // Enviar la notificación al token individualmente
-//         };
+      // Enviar la notificación a cada token individualmente
+      for (const token of FCMtokens) {
+        const notificationMessage = {
+          notification: {
+            title: 'Nueva Tarea Asignada',
+            body: `Se ha asignado una nueva tarea: "${nombreTarea}".`,
+          },
+          token: token, // Enviar la notificación al token individualmente
+        };
 
-//         try {
-//           const response = await admin.messaging().send(notificationMessage);
-//           console.log(`Notificación enviada correctamente al token ${token}:`, response);
-//         } catch (error) {
-//           console.error(`Error enviando notificación al token ${token}:`, error);
-//         }
-//       }
+        try {
+          const response = await admin.messaging().send(notificationMessage);
+          console.log(`Notificación enviada correctamente al token ${token}:`, response);
+        } catch (error) {
+          console.error(`Error enviando notificación al token ${token}:`, error);
+        }
+      }
 
-//     } catch (error) {
-//       console.error('Error al notificar la nueva tarea:', error);
-//     }
-//   });
+    } catch (error) {
+      console.error('Error al notificar la nueva tarea:', error);
+    }
+  });
