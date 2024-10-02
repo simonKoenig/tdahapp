@@ -70,7 +70,7 @@ function AddTaskScreen() {
     // Función para agregar una tarea
     const handleAddTask = async () => {
         if (selectedPatientId) {
-            fechaCreacion = new Date()
+            const fechaCreacion = new Date()
             const newTask = {
                 nombre,
                 descripcion,

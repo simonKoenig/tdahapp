@@ -4,14 +4,28 @@ import PriorityBadge from './PriorityBadge';
 import moment from 'moment';
 
 const Item = ({ item, onPress, tipo, valor, mostrarFecha }) => {
+    const [formattedDate, setFormattedDate] = React.useState('');
+
+    React.useEffect(() => {
+        if (!item.date) {
+            return;
+        }
+        if (item.date && item.date.toDate) {
+            setFormattedDate(moment(item.date.toDate()).calendar());
+        } else {
+            setFormattedDate(moment(item.date).calendar());
+        }
+    }, [item]);
+
     return (
+        console.log(item.formattedDate),
         <TouchableOpacity style={styles.itemContainer} onPress={onPress}>
             <View style={styles.circle}>
                 <Text style={styles.circleText}>{item.nombre[0]}</Text>
             </View>
             <View style={styles.textContainer}>
                 <Text style={styles.itemText}>{item.nombre}</Text>
-                {mostrarFecha && <Text style={styles.dateText}>{moment(item.date.toDate()).calendar()}</Text>}
+                {mostrarFecha && <Text style={styles.dateText}>{formattedDate}</Text>}
             </View>
             <PriorityBadge tipo={tipo} valor={valor} />
         </TouchableOpacity>
