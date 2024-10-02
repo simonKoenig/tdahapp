@@ -1,3 +1,4 @@
+import { Timestamp } from 'firebase/firestore';
 // React 
 import React, { useContext, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Button } from 'react-native';
@@ -74,12 +75,12 @@ function AddTaskScreen() {
             const newTask = {
                 nombre,
                 descripcion,
-                date,
+                date: Timestamp.fromDate(date),
                 dificultad,
                 selectedRewardId,
                 selectedSubjectId,
                 estado: 'En progreso', // Estado por defecto
-                fechaCreacion,
+                fechaCreacion: Timestamp.fromDate(fechaCreacion),
             };
 
             await addTask(newTask, selectedPatientId); // Pasa el UID del paciente seleccionado

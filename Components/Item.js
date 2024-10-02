@@ -10,15 +10,13 @@ const Item = ({ item, onPress, tipo, valor, mostrarFecha }) => {
         if (!item.date) {
             return;
         }
+        
         if (item.date && item.date.toDate) {
             setFormattedDate(moment(item.date.toDate()).calendar());
-        } else {
-            setFormattedDate(moment(item.date).calendar());
         }
     }, [item]);
 
     return (
-        console.log(item.formattedDate),
         <TouchableOpacity style={styles.itemContainer} onPress={onPress}>
             <View style={styles.circle}>
                 <Text style={styles.circleText}>{item.nombre[0]}</Text>
