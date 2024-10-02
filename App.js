@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AppState, Alert } from 'react-native';
+import { AppState, Alert, Platform } from 'react-native';
 import Navigation from './Navigation';
 import { AuthProvider } from './Context/AuthProvider';
 import { RewardsProvider } from './Context/RewardsProvider';
@@ -27,8 +27,12 @@ const App = () => {
     };
   }, []);
 
+
+
   React.useEffect(() => {
-    // Configurar listeners globales de notificaciones
+    // Configurar listeners globales de notificaciones (solo en móviles)
+    if (Platform.OS === 'web') return;
+
     const unsubscribeOnMessage = setupNotificationListeners();
     setupBackgroundHandler(); // Configurar el handler en segundo plano
 
@@ -37,7 +41,6 @@ const App = () => {
       unsubscribeOnMessage();
     };
   }, []);
-
 
   // // Solicita permiso para recibir notificaciones
   // const requestUserPermission = async () => {

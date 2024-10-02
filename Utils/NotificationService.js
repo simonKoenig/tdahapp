@@ -1,5 +1,5 @@
 import messaging from '@react-native-firebase/messaging';
-// import { Alert } from 'react-native';
+import { Vibration } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 
@@ -8,6 +8,7 @@ export const setupNotificationListeners = () => {
 
     // Listener para mensajes en primer plano
     const unsubscribeOnMessage = messaging().onMessage(async (remoteMessage) => {
+        Vibration.vibrate();
         Toast.show({
             type: 'info',
             text1: remoteMessage.notification.title,
