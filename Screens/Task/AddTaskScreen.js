@@ -92,8 +92,17 @@ function AddTaskScreen() {
 
     return (
         <View style={styles.form}>
-            <ProgressSteps>
-                <ProgressStep label="Step 1">
+            <ProgressSteps
+                activeStepIconBorderColor={'#4c669f'} 
+                progressBarColor={'#4c669f'}
+                completedProgressBarColor={'#4c669f'}
+                completedStepIconColor={'#4c669f'}
+                >
+                <ProgressStep
+                    nextBtnText='Siguiente'
+                    nextBtnTextStyle={styles.buttonText}
+                    nextBtnStyle={styles.button}
+                >
                     <Text style={styles.label}>Nombre</Text>
                     <TextInput
                         style={styles.input}
@@ -136,7 +145,15 @@ function AddTaskScreen() {
                     )}
                 </ProgressStep>
                 
-                <ProgressStep label="Step 2">
+                <ProgressStep
+                    previousBtnText='Atrás'
+                    previousBtnTextStyle={styles.buttonText}
+                    previousBtnStyle={styles.button}
+                    finishBtnText='Finalizar'
+                    nextBtnTextStyle={styles.buttonText}
+                    nextBtnStyle={styles.button}
+                    onSubmit={handleAddTask}
+                >
                     <Text style={styles.label}>Dificultad</Text>
                     <DropdownComponent
                         data={dificultades}
@@ -165,11 +182,11 @@ function AddTaskScreen() {
                         onSelect={handleSelectSubject}
                     />
 
-                    <View style={styles.buttonContainer}>
+                    {/* <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.button} onPress={handleAddTask}>
                             <Text style={styles.buttonText}>Aceptar</Text>
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
                 </ProgressStep>
             </ProgressSteps>
         </View>
@@ -180,7 +197,6 @@ const styles = StyleSheet.create({
         flex: 1,
         width: '100%',
         justifyContent: 'center',
-        alignItems: 'center',
         backgroundColor: '#FFFFFF',
     },
     label: {
@@ -228,8 +244,7 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontSize: 18,
-    },
-        
+    },        
 });
 
 export default AddTaskScreen;
