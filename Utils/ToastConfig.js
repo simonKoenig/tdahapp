@@ -46,6 +46,14 @@ export const toastConfig = {
             onPress={() => props.hide()} // Ocultar al tocar
         />
     ),
+    info: (props) => (
+        <BaseToast
+            {...props}
+            {...toastProps}
+            style={[toastProps.style, { borderLeftColor: "blue" }]}
+            onPress={() => props.hide()} // Ocultar al tocar
+        />
+    ),
 };
 
 // En tu componente principal, asegúrate de incluir el Toast
