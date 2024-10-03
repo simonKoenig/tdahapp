@@ -7,7 +7,7 @@ export const setupNotificationListeners = () => {
 
     // Listener para mensajes en primer plano
     const unsubscribeOnMessage = messaging().onMessage(async (remoteMessage) => {
-        Vibration.vibrate([500, 300, 200, 500, 500]);
+        Vibration.vibrate([0, 250, 250, 250]);
 
 
 
