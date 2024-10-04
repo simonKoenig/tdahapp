@@ -65,9 +65,11 @@ const MultiStepFormComponent = ({ steps, onComplete }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 100,
-    alignItems: 'center',
+    width: '100%',
+    paddingTop: 20,
     backgroundColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   indicatorContainer: {
     flexDirection: 'row',
@@ -88,8 +90,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   activeStep: {
-    borderColor: 'pink',
-    backgroundColor: 'pink',
+    borderColor: '#4c669f',
+    backgroundColor: '#4c669f',
   },
   stepText: {
     color: '#E7E7E7',
@@ -106,21 +108,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   activeLine: {
-    backgroundColor: 'pink',
+    backgroundColor: '#4c669f',
   },
   contentContainer: {
     flex: 1,
+    width: '100%',
     justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    marginBottom: 20,
-  },
-  button: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
   },
   backButton: {
     backgroundColor: '#E7E7E7',
@@ -130,13 +124,29 @@ const styles = StyleSheet.create({
     color: 'gray',
     fontWeight: 'bold',
   },
-  nextButton: {
-    backgroundColor: 'pink',
-  },
   nextButtonText: {
     color: 'white',
     fontWeight: 'bold',
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
+},
+button: {
+    flex: 1,
+    height: 50,
+    backgroundColor: '#4c669f',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
+    marginVertical: 10,
+    marginHorizontal: 5,
+},
+buttonText: {
+    color: '#fff',
+    fontSize: 18,
+},        
 });
 
 export default MultiStepFormComponent;

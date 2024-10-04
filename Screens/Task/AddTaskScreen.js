@@ -93,75 +93,75 @@ function AddTaskScreen() {
     // Pasos del formulario
     const steps = [
         <View>
-<Text style={styles.label}>Nombre</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder='Nombre de la nueva tarea'
-                        value={nombre}
-                        onChangeText={setNombre}
-                    />
+            <Text style={styles.label}>Nombre</Text>
+            <TextInput
+                style={styles.input}
+                placeholder='Nombre de la nueva tarea'
+                value={nombre}
+                onChangeText={setNombre}
+            />
 
-                    <Text style={styles.label}>Descripción</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder='Descripción de la nueva tarea'
-                        value={descripcion}
-                        onChangeText={setDescripcion}
-                    />
+            <Text style={styles.label}>Descripción</Text>
+            <TextInput
+                style={styles.input}
+                placeholder='Descripción de la nueva tarea'
+                value={descripcion}
+                onChangeText={setDescripcion}
+            />
 
-                    <Text style={styles.label}>Fecha y hora de vencimiento</Text>
-                    <DateTimePickerComponent
-                        date={date}
-                        setDate={setDate}
-                        mode={mode}
-                        setMode={setMode}
-                        show={show}
-                        setShow={setShow}
-                        editable={true}
-                    />
+            <Text style={styles.label}>Fecha y hora de vencimiento</Text>
+            <DateTimePickerComponent
+                date={date}
+                setDate={setDate}
+                mode={mode}
+                setMode={setMode}
+                show={show}
+                setShow={setShow}
+                editable={true}
+            />
 
-                    <Text style={styles.label}>Paciente</Text>
-                    {patients.length > 0 ? (
-                        <DropdownComponent
-                            data={transformedPatients}
-                            value={selectedPatientId}
-                            setValue={setSelectedPatientId}
-                            placeholder="Seleccione un paciente"
-                            onSelect={handleSelectPatient}
-                            editable={true}
-                        />
-                    ) : (
-                        <Text style={styles.noPatientsText}>No se encontraron pacientes.</Text>
-                    )}
+            <Text style={styles.label}>Paciente</Text>
+            {patients.length > 0 ? (
+                <DropdownComponent
+                    data={transformedPatients}
+                    value={selectedPatientId}
+                    setValue={setSelectedPatientId}
+                    placeholder="Seleccione un paciente"
+                    onSelect={handleSelectPatient}
+                    editable={true}
+                />
+            ) : (
+                <Text style={styles.noPatientsText}>No se encontraron pacientes.</Text>
+            )}
         </View>,
         <View>
             <Text style={styles.label}>Dificultad</Text>
-                    <DropdownComponent
-                        data={dificultades}
-                        value={dificultad}
-                        setValue={setDificultad}
-                        placeholder="Selecciona una dificultad"
-                        searchActivo={false}
-                    />
+            <DropdownComponent
+                data={dificultades}
+                value={dificultad}
+                setValue={setDificultad}
+                placeholder="Selecciona una dificultad"
+                searchActivo={false}
+            />
 
 
-                    <Text style={styles.label}>Recompensa</Text>
-                    <DropdownComponent
-                        data={transformedRewards}
-                        value={selectedRewardId}
-                        setValue={setSelectedRewardId}
-                        placeholder="Selecciona una recompensa"
-                        onSelect={handleSelectReward}
-                    />
+            <Text style={styles.label}>Recompensa</Text>
+            <DropdownComponent
+                data={transformedRewards}
+                value={selectedRewardId}
+                setValue={setSelectedRewardId}
+                placeholder="Selecciona una recompensa"
+                onSelect={handleSelectReward}
+            />
 
-                    <Text style={styles.label}>Materia</Text>
-                    <DropdownComponent
-                        data={transformedSubjects}
-                        value={selectedSubjectId}
-                        setValue={setSelectedSubjectId}
-                        placeholder="Selecciona una materia"
-                        onSelect={handleSelectSubject}
-                    />
+            <Text style={styles.label}>Materia</Text>
+            <DropdownComponent
+                data={transformedSubjects}
+                value={selectedSubjectId}
+                setValue={setSelectedSubjectId}
+                placeholder="Selecciona una materia"
+                onSelect={handleSelectSubject}
+            />
         </View>,
     ];
 
@@ -210,25 +210,6 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         backgroundColor: '#D9D9D9',
     },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '80%',
-    },
-    button: {
-        flex: 1,
-        height: 50,
-        backgroundColor: '#4c669f',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 20,
-        marginVertical: 10,
-        marginHorizontal: 5,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 18,
-    },        
 });
 
 export default AddTaskScreen;
