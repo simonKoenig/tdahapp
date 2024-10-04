@@ -7,12 +7,12 @@ import { useNavigation } from '@react-navigation/native';
 import DropdownComponent from '../../Components/Dropdown';
 import { dificultades } from '../../Utils/Constant';
 import DateTimePickerComponent from '../../Components/DateTimePicker';
+import MultiStepFormComponent from '../../Components/MultiStepForm';
 // Contextos
 import { TasksContext } from '../../Context/TaskProvider';
 import { RewardsContext } from '../../Context/RewardsProvider';
 import { SubjectsContext } from '../../Context/SubjectsProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';
-import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
 
 function AddTaskScreen() {
     const { patients, setSelectedPatientId, selectedPatientId } = useContext(PatientsContext);
@@ -90,20 +90,10 @@ function AddTaskScreen() {
         }
     };
 
-    return (
-        <View style={styles.form}>
-            <ProgressSteps
-                activeStepIconBorderColor={'#4c669f'} 
-                progressBarColor={'#4c669f'}
-                completedProgressBarColor={'#4c669f'}
-                completedStepIconColor={'#4c669f'}
-                >
-                <ProgressStep
-                    nextBtnText='Siguiente'
-                    nextBtnTextStyle={styles.buttonText}
-                    nextBtnStyle={styles.button}
-                >
-                    <Text style={styles.label}>Nombre</Text>
+    // Pasos del formulario
+    const steps = [
+        <View>
+<Text style={styles.label}>Nombre</Text>
                     <TextInput
                         style={styles.input}
                         placeholder='Nombre de la nueva tarea'
@@ -143,18 +133,9 @@ function AddTaskScreen() {
                     ) : (
                         <Text style={styles.noPatientsText}>No se encontraron pacientes.</Text>
                     )}
-                </ProgressStep>
-                
-                <ProgressStep
-                    previousBtnText='Atrás'
-                    previousBtnTextStyle={styles.buttonText}
-                    previousBtnStyle={styles.button}
-                    finishBtnText='Finalizar'
-                    nextBtnTextStyle={styles.buttonText}
-                    nextBtnStyle={styles.button}
-                    onSubmit={handleAddTask}
-                >
-                    <Text style={styles.label}>Dificultad</Text>
+        </View>,
+        <View>
+            <Text style={styles.label}>Dificultad</Text>
                     <DropdownComponent
                         data={dificultades}
                         value={dificultad}
@@ -181,14 +162,17 @@ function AddTaskScreen() {
                         placeholder="Selecciona una materia"
                         onSelect={handleSelectSubject}
                     />
+        </View>,
+    ];
 
+    return (
+        <View style={styles.form}>
+            <MultiStepFormComponent steps={steps} onComplete={handleAddTask} />
                     {/* <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.button} onPress={handleAddTask}>
                             <Text style={styles.buttonText}>Aceptar</Text>
                         </TouchableOpacity>
-                    </View> */}
-                </ProgressStep>
-            </ProgressSteps>
+                    </View> */}            
         </View>
     );
 }
