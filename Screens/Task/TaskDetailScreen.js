@@ -95,13 +95,13 @@ function TaskDetailScreen() {
             console.error('Error deleting task:', error);
         }
     };
-    
+
     if (loading) {
         return <LoadingScreen />;
     }
-    
+
     const recompensaNombre = rewards.find(reward => reward.id === selectedRewardId)?.nombre;
-    
+
     if (isPaciente()) {
         return (
             <View style={styles.form}>
@@ -150,7 +150,7 @@ function TaskDetailScreen() {
             </View>
         );
     }
-    
+
     return (
         <View style={styles.form}>
             <Text style={styles.label}>Nombre</Text>
@@ -171,13 +171,13 @@ function TaskDetailScreen() {
 
             <Text style={styles.label}>Fecha de creación</Text>
             <DateTimePickerComponent
-                    date={fechaCreacion}
-                    setDate={setDate}
-                    mode={mode}
-                    setMode={setMode}
-                    show={show}
-                    setShow={setShow}
-                    editable={false}
+                date={fechaCreacion}
+                setDate={setDate}
+                mode={mode}
+                setMode={setMode}
+                show={show}
+                setShow={setShow}
+                editable={false}
             />
 
 
@@ -198,6 +198,7 @@ function TaskDetailScreen() {
                 value={dificultad}
                 setValue={setDificultad}
                 placeholder="Selecciona una dificultad"
+                width='80%'
             />
             <Text style={styles.label}>Recompensa</Text>
             <DropdownComponent
@@ -205,6 +206,7 @@ function TaskDetailScreen() {
                 value={selectedRewardId}
                 setValue={setSelectedRewardId}
                 placeholder="Selecciona una recompensa"
+                width='80%'
             />
             <Text style={styles.label}>Materia</Text>
             <DropdownComponent
@@ -212,6 +214,8 @@ function TaskDetailScreen() {
                 value={selectedSubjectId}
                 setValue={setSelectedSubjectId}
                 placeholder="Selecciona una materia"
+                width='80%'
+
             />
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleUpdateTask}>

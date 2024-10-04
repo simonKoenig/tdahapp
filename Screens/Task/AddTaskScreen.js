@@ -128,6 +128,7 @@ function AddTaskScreen() {
                     placeholder="Seleccione un paciente"
                     onSelect={handleSelectPatient}
                     editable={true}
+                    width='80%'
                 />
             ) : (
                 <Text style={styles.noPatientsText}>No se encontraron pacientes.</Text>
@@ -140,6 +141,7 @@ function AddTaskScreen() {
                 setValue={setDificultad}
                 placeholder="Selecciona una dificultad"
                 searchActivo={false}
+                width='80%'
             />
 
 
@@ -150,6 +152,7 @@ function AddTaskScreen() {
                 setValue={setSelectedRewardId}
                 placeholder="Selecciona una recompensa"
                 onSelect={handleSelectReward}
+                width='80%'
             />
 
             <Text style={styles.label}>Materia</Text>
@@ -159,6 +162,7 @@ function AddTaskScreen() {
                 setValue={setSelectedSubjectId}
                 placeholder="Selecciona una materia"
                 onSelect={handleSelectSubject}
+                width='80%'
             />
 
             <View style={styles.buttonContainer}>
@@ -224,7 +228,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 18,
     },
-        
+
 });
 
 export default AddTaskScreen;

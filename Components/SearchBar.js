@@ -20,6 +20,7 @@ const SearchBar = ({ searchTerm, onSearch }) => {
 
 const styles = StyleSheet.create({
     container: {
+        width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 10,

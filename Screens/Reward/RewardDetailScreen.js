@@ -79,6 +79,7 @@ function RewardDetailScreen() {
                 value={dificultad}
                 setValue={setDificultad}
                 placeholder="Selecciona una dificultad"
+                width='80%'
             />
 
             <View style={styles.buttonContainer}>

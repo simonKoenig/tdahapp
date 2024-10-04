@@ -2,10 +2,10 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
-const DropdownComponent = ({ data, value, setValue, placeholder, onSelect, searchActivo = true }) => {
+const DropdownComponent = ({ data, value, setValue, placeholder, onSelect, searchActivo = true, width = '100%' }) => {
     return (
         <Dropdown
-            style={styles.dropdown}
+            style={[styles.dropdown, { width }]} // Se aplica el width recibido como prop
             data={data}
             labelField="label"
             valueField="value"
@@ -22,9 +22,9 @@ const DropdownComponent = ({ data, value, setValue, placeholder, onSelect, searc
         />
     );
 };
+
 const styles = StyleSheet.create({
     dropdown: {
-        width: '80%',
         height: 40,
         borderColor: '#D9D9D9',
         borderWidth: 1,
