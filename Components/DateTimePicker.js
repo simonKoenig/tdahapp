@@ -32,14 +32,18 @@ const DateTimePickerComponent = ({ date, setDate, mode, setMode, show, setShow, 
                     onPress={editable ? showDatepicker : null}
                     disabled={!editable}
                 >
-                    <Text style={styles.dateText}>{moment(date).format('DD/MM/YYYY')}</Text>
+                    <Text style={[styles.dateText, !editable && styles.disabledDateText]}>
+                        {moment(date).format('DD/MM/YYYY')}
+                    </Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                     style={styles.datetimeElement} 
                     onPress={editable ? showTimepicker : null}
                     disabled={!editable}
                 >
-                    <Text style={styles.dateText}>{moment(date).format('HH:mm')}</Text>
+                    <Text style={[styles.dateText, !editable && styles.disabledDateText]}>
+                        {moment(date).format('HH:mm')}
+                    </Text>
                 </TouchableOpacity>
             {show && (
                 <DateTimePicker
@@ -73,6 +77,9 @@ const styles = StyleSheet.create({
     },
     dateText: {
         textAlign: 'center',
+    },
+    disabledDateText: {
+        color: '#A9A9A9', // Color gris para el texto desactivado
     },
 });
 
