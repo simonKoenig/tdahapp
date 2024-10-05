@@ -119,14 +119,6 @@ function TaskDetailScreen() {
                 }
             }
         });
-
-        // })
-        // try {
-        //     await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado, fechaCreacion }, selectedPatientId);
-        //     navigation.goBack();
-        // } catch (error) {
-        //     console.error('Error updating task:', error);
-        // }
     };
 
 
@@ -142,15 +134,12 @@ function TaskDetailScreen() {
                     setLoading(true);
                     const result = await deleteTask(taskId, selectedPatientId);
                     if (result?.error) {
-                        // Si hubo un error en la eliminación
                         Toast.show({
                             type: 'error',
                             text1: 'Error',
                             text2: `${result.error} Toca aquí para cerrar.`,
                         });
-                        console.log('Error en handleDeletePatient:', result.error);
                     } else {
-                        // Si la eliminación fue exitosa
                         Toast.show({
                             type: 'success',
                             text1: 'Éxito',
