@@ -8,6 +8,9 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import LoadingScreen from '../../Components/LoadingScreen'; // Importar LoadingScreen
 import { PatientsContext } from '../../Context/PatientsProvider';
 
+import { showConfirmAlert } from '../../Utils/showConfirmAlert';
+import Toast from 'react-native-toast-message';
+
 function SubjectDetailScreen() {
     const route = useRoute();
     const { subjectId, uid } = route.params;
@@ -18,9 +21,6 @@ function SubjectDetailScreen() {
     const navigation = useNavigation();
     const { selectedPatientId } = useContext(PatientsContext);
 
-    console.log('Subject ID:', subjectId);
-    console.log('UID:', uid);
-    console.log('Selected Patient ID:', selectedPatientId);
 
     useEffect(() => {
         const fetchSubjects = async () => {
@@ -43,25 +43,82 @@ function SubjectDetailScreen() {
         fetchSubjects();
     }, [subjectId, uid]);
 
+
+
     const handleUpdateSubject = async () => {
-        try {
-            await updateSubject(subjectId, { nombre, profesor }, selectedPatientId);
-            navigation.goBack();
+        showConfirmAlert({
+            title: "Confirmar actualización",
+            message: `¿Estás seguro que deseas actualizar la tarea "${nombre}"?`,
+            confirmText: "Confirmar",
+            cancelText: "Cancelar",
+            onConfirm: async () => {
+                try {
+                    setLoading(true);
+                    const result = await updateSubject(subjectId, { nombre, profesor }, selectedPatientId);
+                    if (result?.error) {
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Error',
+                            text2: `${result.error} Toca aquí para cerrar.`,
+                        });
+                        console.log('Error en handleDeletePatient:', result.error);
+                    } else {
+                        Toast.show({
+                            type: 'success',
+                            text1: 'Éxito',
+                            text2: 'Materia actualizada correctamente. Toca aquí para cerrar.',
+                        });
+                        navigation.goBack();  
+                    }
+                } catch (error) {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        text2: 'Ocurrió un error al actualizar la materia. Toca aquí para cerrar.',
+                    });
+                } finally {
+                    setLoading(false);
+                }
+            }
+        });
+    }
 
-        } catch (error) {
-            console.error('Error updating reward:', error);
-        }
-    };
-
-    const handleDeleteSubject = async () => {
-        try {
-            await deleteSubject(subjectId, selectedPatientId);
-            navigation.goBack();
-
-
-        } catch (error) {
-            console.error('Error deleting reward:', error);
-        }
+    const handleDeleteSubject = () => {
+  
+        showConfirmAlert({
+            title: "Confirmar eliminación",
+            message: `¿Estás seguro que deseas eliminar la materia "${nombre}"?`,
+            confirmText: "Eliminar",
+            cancelText: "Cancelar",
+            onConfirm: async () => {
+                try {
+                    setLoading(true);
+                    const result = await deleteSubject(subjectId, selectedPatientId);
+                    if (result?.error) {
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Error',
+                            text2: `${result.error} Toca aquí para cerrar.`,
+                        });
+                    } else {
+                        Toast.show({
+                            type: 'success',
+                            text1: 'Éxito',
+                            text2: 'Materia eliminada correctamente. Toca aquí para cerrar.',
+                        });
+                        navigation.goBack();  
+                    }
+                } catch (error) {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        text2: 'Ocurrió un error al eliminar la tarea. Toca aquí para cerrar.',
+                    });
+                } finally {
+                    setLoading(false);
+                }
+            }
+        });
     };
 
     if (loading) {
