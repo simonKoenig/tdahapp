@@ -73,15 +73,7 @@ function TaskDetailScreen() {
         value: reward.id,
     }));
 
-    const handleUpdateTask = async () => {
-        try {
-            await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado, fechaCreacion }, selectedPatientId);
-            navigation.goBack();
-        } catch (error) {
-            console.error('Error updating task:', error);
-        }
-    };
-
+    
     const handleMarkTask = async (nuevoEstado) => {
         try {
             await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado: nuevoEstado, fechaCreacion }, selectedPatientId);
@@ -90,6 +82,53 @@ function TaskDetailScreen() {
             console.error('Error updating task:', error);
         }
     };
+    
+    const handleUpdateTask = async () => {
+        showConfirmAlert({
+            title: "Confirmar actualización",
+            message: `¿Estás seguro que deseas actualizar la tarea "${nombre}"?`,
+            confirmText: "Confirmar",
+            cancelText: "Cancelar",
+            onConfirm: async () => {
+                try {
+                    setLoading(true);
+                    const result = await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado, fechaCreacion }, selectedPatientId);
+                    if (result?.error) {
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Error',
+                            text2: `${result.error} Toca aquí para cerrar.`,
+                        });
+                        console.log('Error en handleDeletePatient:', result.error);
+                    } else {
+                        Toast.show({
+                            type: 'success',
+                            text1: 'Éxito',
+                            text2: 'Tarea actualizada correctamente. Toca aquí para cerrar.',
+                        });
+                        navigation.goBack();  
+                    }
+                } catch (error) {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        text2: 'Ocurrió un error al actualizar la tarea. Toca aquí para cerrar.',
+                    });
+                } finally {
+                    setLoading(false);
+                }
+            }
+        });
+
+        // })
+        // try {
+        //     await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado, fechaCreacion }, selectedPatientId);
+        //     navigation.goBack();
+        // } catch (error) {
+        //     console.error('Error updating task:', error);
+        // }
+    };
+
 
     const handleDeleteTask = () => {
   
