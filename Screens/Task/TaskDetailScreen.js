@@ -10,6 +10,10 @@ import { RewardsContext } from '../../Context/RewardsProvider';
 import { SubjectsContext } from '../../Context/SubjectsProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';
 import { AuthContext } from '../../Context/AuthProvider';
+import { showConfirmAlert } from '../../Utils/showConfirmAlert';
+import Toast from 'react-native-toast-message';
+
+
 
 function TaskDetailScreen() {
     const route = useRoute();
@@ -69,15 +73,7 @@ function TaskDetailScreen() {
         value: reward.id,
     }));
 
-    const handleUpdateTask = async () => {
-        try {
-            await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado, fechaCreacion }, selectedPatientId);
-            navigation.goBack();
-        } catch (error) {
-            console.error('Error updating task:', error);
-        }
-    };
-
+    
     const handleMarkTask = async (nuevoEstado) => {
         try {
             await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado: nuevoEstado, fechaCreacion }, selectedPatientId);
@@ -86,22 +82,90 @@ function TaskDetailScreen() {
             console.error('Error updating task:', error);
         }
     };
-
-    const handleDeleteTask = async () => {
-        try {
-            await deleteTask(taskId, selectedPatientId);
-            navigation.goBack();
-        } catch (error) {
-            console.error('Error deleting task:', error);
-        }
-    };
     
+    const handleUpdateTask = async () => {
+        showConfirmAlert({
+            title: "Confirmar actualización",
+            message: `¿Estás seguro que deseas actualizar la tarea "${nombre}"?`,
+            confirmText: "Confirmar",
+            cancelText: "Cancelar",
+            onConfirm: async () => {
+                try {
+                    setLoading(true);
+                    const result = await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado, fechaCreacion }, selectedPatientId);
+                    if (result?.error) {
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Error',
+                            text2: `${result.error} Toca aquí para cerrar.`,
+                        });
+                        console.log('Error en handleDeletePatient:', result.error);
+                    } else {
+                        Toast.show({
+                            type: 'success',
+                            text1: 'Éxito',
+                            text2: 'Tarea actualizada correctamente. Toca aquí para cerrar.',
+                        });
+                        navigation.goBack();  
+                    }
+                } catch (error) {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        text2: 'Ocurrió un error al actualizar la tarea. Toca aquí para cerrar.',
+                    });
+                } finally {
+                    setLoading(false);
+                }
+            }
+        });
+    };
+
+
+    const handleDeleteTask = () => {
+  
+        showConfirmAlert({
+            title: "Confirmar eliminación",
+            message: `¿Estás seguro que deseas eliminar la tarea "${nombre}"?`,
+            confirmText: "Eliminar",
+            cancelText: "Cancelar",
+            onConfirm: async () => {
+                try {
+                    setLoading(true);
+                    const result = await deleteTask(taskId, selectedPatientId);
+                    if (result?.error) {
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Error',
+                            text2: `${result.error} Toca aquí para cerrar.`,
+                        });
+                    } else {
+                        Toast.show({
+                            type: 'success',
+                            text1: 'Éxito',
+                            text2: 'Tarea eliminada correctamente. Toca aquí para cerrar.',
+                        });
+                        navigation.goBack();  
+                    }
+                } catch (error) {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        text2: 'Ocurrió un error al eliminar la tarea. Toca aquí para cerrar.',
+                    });
+                } finally {
+                    setLoading(false);
+                }
+            }
+        });
+    };
+
     if (loading) {
         return <LoadingScreen />;
     }
-    
+
     const recompensaNombre = rewards.find(reward => reward.id === selectedRewardId)?.nombre;
-    
+
     if (isPaciente()) {
         return (
             <View style={styles.form}>
@@ -150,7 +214,7 @@ function TaskDetailScreen() {
             </View>
         );
     }
-    
+
     return (
         <View style={styles.form}>
             <Text style={styles.label}>Nombre</Text>
@@ -171,13 +235,13 @@ function TaskDetailScreen() {
 
             <Text style={styles.label}>Fecha de creación</Text>
             <DateTimePickerComponent
-                    date={fechaCreacion}
-                    setDate={setDate}
-                    mode={mode}
-                    setMode={setMode}
-                    show={show}
-                    setShow={setShow}
-                    editable={false}
+                date={fechaCreacion}
+                setDate={setDate}
+                mode={mode}
+                setMode={setMode}
+                show={show}
+                setShow={setShow}
+                editable={false}
             />
 
 
@@ -198,6 +262,7 @@ function TaskDetailScreen() {
                 value={dificultad}
                 setValue={setDificultad}
                 placeholder="Selecciona una dificultad"
+                width='80%'
             />
             <Text style={styles.label}>Recompensa</Text>
             <DropdownComponent
@@ -205,6 +270,7 @@ function TaskDetailScreen() {
                 value={selectedRewardId}
                 setValue={setSelectedRewardId}
                 placeholder="Selecciona una recompensa"
+                width='80%'
             />
             <Text style={styles.label}>Materia</Text>
             <DropdownComponent
@@ -212,6 +278,8 @@ function TaskDetailScreen() {
                 value={selectedSubjectId}
                 setValue={setSelectedSubjectId}
                 placeholder="Selecciona una materia"
+                width='80%'
+
             />
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleUpdateTask}>

@@ -1,47 +1,47 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { View, FlatList, TouchableOpacity, Text, StyleSheet, Button } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, FlatList, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { SubjectsContext } from '../../Context/SubjectsProvider';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from '../../Components/SearchBar';
 import SubjectItem from '../../Components/SubjectItem';
 import PatientSelector from '../../Components/PatientSelector';
-import { getAsyncStorage } from '../../Utils/AsyncStorage';
 import { PatientsContext } from '../../Context/PatientsProvider';
-
-
+import LoadingScreen from '../../Components/LoadingScreen'; 
 
 const SubjectsListScreen = () => {
     const { subjects, fetchSubjects } = useContext(SubjectsContext);
     const { selectedPatientId } = useContext(PatientsContext);
     const [searchTerm, setSearchTerm] = useState('');
     const [refreshing, setRefreshing] = useState(false);
+    const [loading, setLoading] = useState(false); 
     const navigation = useNavigation();
     
-    // guardo subjects en una variable intermedia para que su valor se capture correctamente
-    const auxSubjects = subjects;
-    const filteredSubjects = auxSubjects.filter(subject =>
+    // Filtrar materias basadas en el término de búsqueda
+    const filteredSubjects = subjects.filter(subject =>
         subject.nombre.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // Manejar la actualización manual
     const handleRefresh = async () => {
-        setRefreshing(true);
-        await fetchSubjects(selectedPatientId);
-        setRefreshing(false);
+        if (selectedPatientId) {
+            setRefreshing(true);  
+            setLoading(true);  
+            await fetchSubjects(selectedPatientId);  
+            setRefreshing(false);  
+            setLoading(false);  
+        }
     };
 
-    return (
-        <View style={styles.container}>
-            {/* <Button
-                title="Ver Recompensas de Otro Usuario"
-                onPress={() => navigation.navigate('UserSubjects')}
-            /> */}
-            <PatientSelector />
+    const handlePatientSelection = async (patientId) => {
+        if (patientId) {
+            setLoading(true);  
+            await fetchSubjects(patientId);  
+            setLoading(false);  
+        }
+    };
 
-
-            <SearchBar
-                searchTerm={searchTerm}
-                onSearch={setSearchTerm}
-            />
+    const renderSubjectList = () => {
+        return (
             <FlatList
                 data={filteredSubjects}
                 keyExtractor={item => item.id}
@@ -52,8 +52,29 @@ const SubjectsListScreen = () => {
                     />
                 )}
                 refreshing={refreshing}
-                onRefresh={handleRefresh}
+                onRefresh={handleRefresh}  
             />
+        );
+    };
+
+    return (
+        <View style={styles.container}>
+            <PatientSelector onPatientSelected={handlePatientSelection} /> 
+            <SearchBar
+                searchTerm={searchTerm}
+                onSearch={setSearchTerm}
+            />
+
+            {loading ? (
+                <LoadingScreen />
+            ) : (
+                selectedPatientId ? (
+                    renderSubjectList()  
+                ) : (
+                    <Text style={styles.noPatientText}>Selecciona un paciente para ver sus materias.</Text>
+                )
+            )}
+
             <TouchableOpacity
                 style={styles.addButton}
                 onPress={() => navigation.navigate('AddSubject')}
@@ -86,6 +107,12 @@ const styles = StyleSheet.create({
         color: '#ffffff',
         fontSize: 24,
         fontWeight: 'bold',
+    },
+    noPatientText: {
+        textAlign: 'center',
+        fontSize: 18,
+        color: '#666666',
+        marginTop: 20,
     },
 });
 

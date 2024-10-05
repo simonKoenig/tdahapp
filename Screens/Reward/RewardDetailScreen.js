@@ -6,6 +6,8 @@ import { RewardsContext } from '../../Context/RewardsProvider';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import LoadingScreen from '../../Components/LoadingScreen'; // Importar LoadingScreen
 import { PatientsContext } from '../../Context/PatientsProvider';
+import { showConfirmAlert } from '../../Utils/showConfirmAlert';
+import Toast from 'react-native-toast-message';
 
 function RewardDetailScreen() {
     const route = useRoute();
@@ -39,26 +41,83 @@ function RewardDetailScreen() {
         fetchReward();
     }, [rewardId, uid]);
 
+
     const handleUpdateReward = async () => {
-        try {
-            await updateReward(rewardId, { nombre, dificultad }, selectedPatientId);
-            navigation.goBack();
+        showConfirmAlert({
+            title: "Confirmar actualización",
+            message: `¿Estás seguro que deseas actualizar la recompensa "${nombre}"?`,
+            confirmText: "Confirmar",
+            cancelText: "Cancelar",
+            onConfirm: async () => {
+                try {
+                    setLoading(true);
+                    const result = await updateReward(rewardId, { nombre, dificultad }, selectedPatientId);
+                    if (result?.error) {
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Error',
+                            text2: `${result.error} Toca aquí para cerrar.`,
+                        });
+                        console.log('Error en handleDeletePatient:', result.error);
+                    } else {
+                        Toast.show({
+                            type: 'success',
+                            text1: 'Éxito',
+                            text2: 'Recompensa actualizada correctamente. Toca aquí para cerrar.',
+                        });
+                        navigation.goBack();  
+                    }
+                } catch (error) {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        text2: 'Ocurrió un error al actualizar la recompensa. Toca aquí para cerrar.',
+                    });
+                } finally {
+                    setLoading(false);
+                }
+            }
+        });
+    }
 
-        } catch (error) {
-            console.error('Error updating reward:', error);
-        }
+    const handleDeleteReward = () => {
+  
+        showConfirmAlert({
+            title: "Confirmar eliminación",
+            message: `¿Estás seguro que deseas eliminar la recompensa "${nombre}"?`,
+            confirmText: "Eliminar",
+            cancelText: "Cancelar",
+            onConfirm: async () => {
+                try {
+                    setLoading(true);
+                    const result = await deleteReward(rewardId, selectedPatientId);
+                    if (result?.error) {
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Error',
+                            text2: `${result.error} Toca aquí para cerrar.`,
+                        });
+                    } else {
+                        Toast.show({
+                            type: 'success',
+                            text1: 'Éxito',
+                            text2: 'Recompensa eliminada correctamente. Toca aquí para cerrar.',
+                        });
+                        navigation.goBack();  
+                    }
+                } catch (error) {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        text2: 'Ocurrió un error al eliminar la tarea. Toca aquí para cerrar.',
+                    });
+                } finally {
+                    setLoading(false);
+                }
+            }
+        });
     };
 
-    const handleDeleteReward = async () => {
-        try {
-            await deleteReward(rewardId, selectedPatientId);
-            navigation.goBack();
-
-
-        } catch (error) {
-            console.error('Error deleting reward:', error);
-        }
-    };
 
     if (loading) {
         return <LoadingScreen />; // Mostrar pantalla de carga
@@ -79,6 +138,7 @@ function RewardDetailScreen() {
                 value={dificultad}
                 setValue={setDificultad}
                 placeholder="Selecciona una dificultad"
+                width='80%'
             />
 
             <View style={styles.buttonContainer}>

@@ -21,3 +21,7 @@ export const DeleteIcon = ({ color, size }) => <MaterialCommunityIcons name="del
 export const QrIcon = ({ color, size }) => <MaterialCommunityIcons name="qrcode" color={color} size={size} />;
 
 export const MessageIcon = ({ color, size }) => <MaterialCommunityIcons name="message" color={color} size={size} />;
+
+export const EyeIcon = ({ color, size }) => <MaterialCommunityIcons name="eye-outline" color={color} size={size} />;
+
+export const EyeOffIcon = ({ color, size }) => <MaterialCommunityIcons name="eye-off-outline" color={color} size={size} />;

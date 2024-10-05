@@ -11,24 +11,23 @@ const PatientSelector = () => {
     const { patients, selectedPatientId, setSelectedPatientId, fetchPatients } = useContext(PatientsContext);
     const [loading, setLoading] = useState(true);
 
-    
     // Si no hay pacientes cargados, se cargan
     useEffect(() => {
         const loadPatients = async () => {
             if (!patients.length && !isPaciente()) {
-                console.log("CARGANDO PACIENTESSSSSSS")
+                console.log("CARGANDO PACIENTESSSSSSS");
                 await fetchPatients();
             }
             setLoading(false);
         };
         loadPatients();
     }, [patients, fetchPatients]);
-    
+
     // Si el usuario es un paciente, no renderizar el componente
     if (isPaciente()) {
         return null;
     }
-    
+
     const handleSelectPatient = async (patientId) => {
         setSelectedPatientId(patientId);
         await Promise.all([
@@ -50,12 +49,14 @@ const PatientSelector = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.label}>Paciente</Text>
-            <DropdownComponent
-                data={transformedPatients}
-                value={selectedPatientId}
-                setValue={handleSelectPatient}
-                placeholder="Selecciona un paciente"
-            />
+            <View style={styles.dropdownWrapper}>
+                <DropdownComponent
+                    data={transformedPatients}
+                    value={selectedPatientId}
+                    setValue={handleSelectPatient}
+                    placeholder="Selecciona un paciente"
+                />
+            </View>
         </View>
     );
 };
@@ -63,16 +64,17 @@ const PatientSelector = () => {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        padding: 10,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'start',
     },
     label: {
         fontSize: 16,
         color: '#000',
         marginBottom: 5,
         paddingRight: 10,
+    },
+    dropdownWrapper: {
+        flex: 1, // Toma todo el espacio disponible después del label
     },
 });
 

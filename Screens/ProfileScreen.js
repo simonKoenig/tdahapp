@@ -11,7 +11,7 @@ import { clearStorage } from '../Utils/AsyncStorage';
 import Toast from 'react-native-toast-message';
 import { MessageIcon, QrIcon } from '../Components/Icons';
 import PacienteListItem from '../Components/PacienteListItem';
-import ConfirmDeleteAlert from '../Components/ConfirmDeleteAlert';
+import { showConfirmAlert } from '../Utils/showConfirmAlert';
 import AddPatientModal from '../Modals/AddPatientModal';
 import PatientQRCode from '../Components/QR';
 import QRScannerModal from '../Modals/QRScannerModal';
@@ -143,6 +143,23 @@ function ProfileScreen() {
         }
     };
 
+    const renderPacienteItem = ({ item }) => {
+        return (
+            <PacienteListItem
+                paciente={item}
+                onDelete={() => {
+                    showConfirmAlert({
+                        title: "Confirmar eliminación",
+                        message: `¿Estás seguro que deseas eliminar al usuario "${item.nombreApellido}"?`,
+                        confirmText: "Eliminar",  // Texto personalizado para el botón de confirmación
+                        cancelText: "Cancelar",   // Texto del botón de cancelar
+                        onConfirm: () => handleDeletePatient(item.id),  // Función para confirmar la eliminación
+                    });
+                }}
+            />
+        );
+    };
+
 
     return (
         <View style={styles.container}>
@@ -163,21 +180,7 @@ function ProfileScreen() {
                                 <FlatList
                                     data={patients} // Lista de pacientes
                                     keyExtractor={(item) => item.id} // Asegúrate de que cada paciente tiene un id
-                                    renderItem={({ item }) => {
-                                        // Configuramos la alerta de confirmación de eliminación para cada paciente
-                                        const showDeletePatientAlert = ConfirmDeleteAlert({
-                                            itemId: item.id,
-                                            itemName: item.nombreApellido,
-                                            onConfirm: handleDeletePatient, // Función que elimina al paciente
-                                        });
-
-                                        return (
-                                            <PacienteListItem
-                                                paciente={item}
-                                                onDelete={showDeletePatientAlert} // La alerta de eliminación se muestra cuando se presiona el botón
-                                            />
-                                        );
-                                    }}
+                                    renderItem={renderPacienteItem}
                                 />
                             )}
                             <View style={styles.connectionOptions}>

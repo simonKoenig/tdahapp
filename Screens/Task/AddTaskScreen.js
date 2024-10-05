@@ -13,6 +13,9 @@ import { TasksContext } from '../../Context/TaskProvider';
 import { RewardsContext } from '../../Context/RewardsProvider';
 import { SubjectsContext } from '../../Context/SubjectsProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';
+import { ScrollView } from 'react-native-gesture-handler';
+import LoadingScreen from '../../Components/LoadingScreen';
+import Toast from 'react-native-toast-message';
 
 function AddTaskScreen() {
     const { patients, setSelectedPatientId, selectedPatientId } = useContext(PatientsContext);
@@ -28,6 +31,8 @@ function AddTaskScreen() {
     const [mode, setMode] = useState('date'); // Date time picker
     const [show, setShow] = useState(false); // Date time picker
     const [fechaCreacion, setFechaCreacion] = useState(''); // Fecha de creación de la tarea
+    const [loading, setLoading] = useState(true); 
+
 
     // Transforma los pacientes para el Dropdown
     const transformedPatients = patients.map(patient => ({
@@ -68,10 +73,20 @@ function AddTaskScreen() {
         setSelectedPatientId(patientId);
     };
 
-    // Función para agregar una tarea
     const handleAddTask = async () => {
-        if (selectedPatientId) {
-            const fechaCreacion = new Date()
+        if (!selectedPatientId) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'No se ha seleccionado un paciente. Toca aquí para cerrar.',
+            });
+            navigation.goBack(); 
+            return;
+        }
+    
+        try {
+            setLoading(true);
+            const fechaCreacion = new Date();
             const newTask = {
                 nombre,
                 descripcion,
@@ -82,11 +97,23 @@ function AddTaskScreen() {
                 estado: 'En progreso', // Estado por defecto
                 fechaCreacion: Timestamp.fromDate(fechaCreacion),
             };
-
+    
             await addTask(newTask, selectedPatientId); // Pasa el UID del paciente seleccionado
+            Toast.show({
+                type: 'success',
+                text1: 'Éxito',
+                text2: 'Tarea creada correctamente. Toca aquí para cerrar.',
+            });
             navigation.goBack();
-        } else {
-            console.error('No patient selected');
+        } catch (error) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Ocurrió un error al crear la tarea. Toca aquí para cerrar.',
+            });
+            console.error('Error al agregar la tarea:', error);
+        }  finally {
+            setLoading(false);
         }
     };
 
@@ -129,6 +156,7 @@ function AddTaskScreen() {
                     placeholder="Seleccione un paciente"
                     onSelect={handleSelectPatient}
                     editable={true}
+                    width='80%'
                 />
             ) : (
                 <Text style={styles.noPatientsText}>No se encontraron pacientes.</Text>
@@ -142,6 +170,7 @@ function AddTaskScreen() {
                 setValue={setDificultad}
                 placeholder="Selecciona una dificultad"
                 searchActivo={false}
+                width='80%'
             />
 
 
@@ -152,6 +181,7 @@ function AddTaskScreen() {
                 setValue={setSelectedRewardId}
                 placeholder="Selecciona una recompensa"
                 onSelect={handleSelectReward}
+                width='80%'
             />
 
             <Text style={styles.label}>Materia</Text>
@@ -161,6 +191,7 @@ function AddTaskScreen() {
                 setValue={setSelectedSubjectId}
                 placeholder="Selecciona una materia"
                 onSelect={handleSelectSubject}
+                width='80%'
             />
         </View>,
     ];

@@ -2,6 +2,8 @@ import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import DropdownComponent from '../../Components/Dropdown';
 import { dificultades } from '../../Utils/Constant';
+import LoadingScreen from '../../Components/LoadingScreen';
+import Toast from 'react-native-toast-message';
 
 
 import { RewardsContext } from '../../Context/RewardsProvider';
@@ -13,17 +15,49 @@ function AddRewardScreen() {
     const [dificultad, setDificultad] = useState('');
     const { addReward } = useContext(RewardsContext);
     const { selectedPatientId } = useContext(PatientsContext);
+    const [loading, setLoading] = useState(true); 
 
     const navigation = useNavigation();
 
+    
     const handleAddReward = async () => {
-        if (selectedPatientId) {
-            await addReward({ nombre, dificultad }, selectedPatientId); // Pasa el UID del paciente seleccionado
-            navigation.goBack();
-        } else {
-            console.error('No patient selected');
+        if (!selectedPatientId) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'No se ha seleccionado un paciente. Toca aquí para cerrar.',
+            });
+            navigation.goBack(); 
+            return;
         }
-    };
+        try {
+            setLoading(true);
+            const result =  await addReward({ nombre, dificultad }, selectedPatientId);
+            if (result?.error) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: `${result.error} Toca aquí para cerrar.`,
+                });
+            } else {
+                Toast.show({
+                    type: 'success',
+                    text1: 'Éxito',
+                    text2: 'Recompensa creada correctamente. Toca aquí para cerrar.',
+                });
+                navigation.goBack();  
+            }
+        } catch (error) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Ocurrió un error al crear la recompensa. Toca aquí para cerrar.',
+            });
+        } finally {
+            setLoading(false);
+        }
+
+    }
 
     return (
         <View style={styles.form}>
@@ -41,6 +75,7 @@ function AddRewardScreen() {
                 setValue={setDificultad}
                 placeholder="Selecciona una dificultad"
                 searchActivo={false}
+                width='80%'
             />
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleAddReward}>

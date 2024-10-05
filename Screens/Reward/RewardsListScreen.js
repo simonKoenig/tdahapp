@@ -4,13 +4,13 @@ import { View, FlatList, TouchableOpacity, Text, StyleSheet, Button } from 'reac
 import { RewardsContext } from '../../Context/RewardsProvider';
 import { useNavigation } from '@react-navigation/native';
 import RewardItem from '../../Components/RewardItem';
-import SearchBar from '../../Components/SearchBar';  // Importamos SearchBar
-import DropdownComponent from '../../Components/Dropdown';  // Importamos DropdownComponent
+import SearchBar from '../../Components/SearchBar'; 
+import DropdownComponent from '../../Components/Dropdown';  
 
 import PatientSelector from '../../Components/PatientSelector';
+import LoadingScreen from '../../Components/LoadingScreen';  
 
-
-import { filtradoDificultades } from '../../Utils/Constant';  // Importamos las dificultades
+import { filtradoDificultades } from '../../Utils/Constant';  
 
 import { AuthContext } from '../../Context/AuthProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';
@@ -19,61 +19,38 @@ const RewardsListScreen = ({ route }) => {
     const { rewards, fetchRewards } = useContext(RewardsContext);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedDifficulty, setSelectedDifficulty] = useState('');
-    const [refreshing, setRefreshing] = useState(false); // Estado para controlar la actualización
+    const [refreshing, setRefreshing] = useState(false); 
     const navigation = useNavigation();
     const [rewardsCache, setRewardsCache] = useState({});
-
+    const [loading, setLoading] = useState(false); 
     const { selectedPatientId } = useContext(PatientsContext);
 
-    // useEffect(() => {
-    //     const loadRewards = async () => {
-    //         if (selectedPatientId) {
-    //             setRefreshing(true);
-    //             await fetchRewards(selectedPatientId);
-    //             setRefreshing(false);
-    //         }
-    //     };
 
-    //     loadRewards();
-    // }, [selectedPatientId]); // Ejecuta este efecto cuando selectedPatientId cambie
-
-    // Filtramos las recompensas en función del término de búsqueda y la dificultad seleccionada
-    const auxRewards = rewards;
-    const filteredRewards = auxRewards.filter(reward =>
+   
+    const filteredRewards = rewards.filter(reward =>
         reward.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (selectedDifficulty === '' || reward.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
     );
 
     const handleRefresh = async () => {
         setRefreshing(true);
+        setLoading(true);  
         await fetchRewards(selectedPatientId);
         setRefreshing(false);
+        setLoading(false);  
+
     };
 
-    return (
-        <View style={styles.container}>
-            {/* <Button
-                title="Ver Recompensas de Otro Usuario"
-                onPress={() => navigation.navigate('UserRewards')}
-            /> */}
-            <PatientSelector />
-            
-            <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => navigation.navigate('AddReward')}
-            >
-                <Text style={styles.addButtonText}>+</Text>
-            </TouchableOpacity>
-            <SearchBar
-                searchTerm={searchTerm}
-                onSearch={setSearchTerm}
-            />
-            <DropdownComponent
-                data={filtradoDificultades}
-                value={selectedDifficulty}
-                setValue={setSelectedDifficulty}
-                placeholder="Selecciona una dificultad"
-            />
+    const handlePatientSelection = async (patientId) => {
+        if (patientId) {
+            setLoading(true);  
+            await fetchRewards(patientId);  
+            setLoading(false);  
+        }
+    };
+
+    const renderRewardList = () => {
+        return (
             <FlatList
                 data={filteredRewards}
                 keyExtractor={item => item.id}
@@ -84,8 +61,34 @@ const RewardsListScreen = ({ route }) => {
                     />
                 )}
                 refreshing={refreshing}
-                onRefresh={handleRefresh}
+                onRefresh={handleRefresh}  
             />
+        );
+    };
+
+
+    return (
+        <View style={styles.container}>
+            <PatientSelector onPatientSelected={handlePatientSelection} /> 
+            <SearchBar
+                searchTerm={searchTerm}
+                onSearch={setSearchTerm}
+            />
+            <DropdownComponent
+                data={filtradoDificultades}
+                value={selectedDifficulty}
+                setValue={setSelectedDifficulty}
+                placeholder="Selecciona una dificultad"
+            />
+            {loading ? (
+                <LoadingScreen />
+            ) : (
+                selectedPatientId ? (
+                    renderRewardList()  
+                ) : (
+                    <Text style={styles.noPatientText}>Selecciona un paciente para ver sus recompensas.</Text>
+                )
+            )}
             <TouchableOpacity
                 style={styles.addButton}
                 onPress={() => navigation.navigate('AddReward')}
@@ -118,6 +121,12 @@ const styles = StyleSheet.create({
         color: '#ffffff',
         fontSize: 24,
         fontWeight: 'bold',
+    },
+    noPatientText: {
+        textAlign: 'center',
+        fontSize: 18,
+        color: '#666666',
+        marginTop: 20,
     },
 });
 

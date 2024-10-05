@@ -110,7 +110,7 @@ function HomeStackScreen() {
             <HomeStack.Screen name="AddTask" component={AddTaskScreen} options={{ headerShown: true, title: 'Agregar nueva tarea' }} />
             <HomeStack.Screen name="TaskDetail" component={TaskDetailScreen} options={{ headerShown: true, title: 'Detalles de la tarea' }} />
             <HomeStack.Screen name="UserTasks" component={UserTasksScreen} />
-            <HomeStack.Screen name="ObtainTask" component={ObtainTaskScreen} />
+            <HomeStack.Screen name="ObtainTask" component={ObtainTaskScreen} options={{ headerShown: true, title: 'Obtener recompensa' }} />
         </HomeStack.Navigator>
     );
 }
