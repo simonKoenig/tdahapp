@@ -92,7 +92,7 @@ function AddTaskScreen() {
 
     // Pasos del formulario
     const steps = [
-        <View>
+        <View style={styles.form}>
             <Text style={styles.label}>Nombre</Text>
             <TextInput
                 style={styles.input}
@@ -134,7 +134,7 @@ function AddTaskScreen() {
                 <Text style={styles.noPatientsText}>No se encontraron pacientes.</Text>
             )}
         </View>,
-        <View>
+        <View style={styles.form}>
             <Text style={styles.label}>Dificultad</Text>
             <DropdownComponent
                 data={dificultades}
@@ -181,6 +181,7 @@ const styles = StyleSheet.create({
         flex: 1,
         width: '100%',
         justifyContent: 'center',
+        alignItems: 'center',
         backgroundColor: '#FFFFFF',
     },
     label: {
@@ -188,7 +189,7 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         fontSize: 16,
         color: '#000',
-        textAlign: 'left', // Alinea el texto a la izquierda
+        textAlign: 'left',
     },
     input: {
         width: '80%',

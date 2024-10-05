@@ -114,6 +114,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#FFFFFF',
   },
   backButton: {
@@ -146,7 +147,7 @@ button: {
 buttonText: {
     color: '#fff',
     fontSize: 18,
-},        
+},
 });
 
 export default MultiStepFormComponent;
