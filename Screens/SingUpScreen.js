@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase-config';
 import { useNavigation } from '@react-navigation/native';
 import { roles } from '../Utils/Constant';
 import DropdownComponent from '../Components/Dropdown';
+import { EyeIcon, EyeOffIcon } from '../Components/Icons';
+
 
 function SignUpScreen() {
 
@@ -16,6 +18,7 @@ function SignUpScreen() {
     const [nombreApellido, setNombreApellido] = useState('');
     const [role, setRole] = useState(''); // Valor predeterminado
     const [errorMessage, setErrorMessage] = useState('');
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false); // Estado para la visibilidad de la contraseña
 
     const handleSignUp = async () => {
         if (!email || !password || !nombreApellido || !role) {
@@ -50,9 +53,6 @@ function SignUpScreen() {
         setNombreApellido('');
         setRole('paciente');
         navigation.goBack();
-
-
-
     };
 
     return (
@@ -70,12 +70,21 @@ function SignUpScreen() {
                 onChangeText={setEmail}
             />
             <Text style={styles.label}>Contraseña</Text>
-            <TextInput
-                style={styles.input}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-            />
+            <View style={styles.passwordContainer}>
+                <TextInput
+                    style={styles.inputPassword}
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!isPasswordVisible} // Mostrar u ocultar la contraseña
+                />
+                <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+                    {isPasswordVisible ? (
+                        <EyeOffIcon color="black" size={24} /> // Usar ícono para ocultar contraseña
+                    ) : (
+                        <EyeIcon color="black" size={24} /> // Usar ícono para mostrar contraseña
+                    )}
+                </TouchableOpacity>
+            </View>
             <Text style={styles.label}>Seleccione el rol</Text>
             <DropdownComponent
                 data={roles}
@@ -83,6 +92,7 @@ function SignUpScreen() {
                 setValue={setRole}
                 placeholder="Seleccione un role"
                 onSelect={(value) => console.log('Selected:', value)}
+                width='80%'
                 searchActivo={false}
             />
             <View style={styles.buttonContainer}>
@@ -126,6 +136,20 @@ const styles = StyleSheet.create({
         padding: 10,
         marginVertical: 10,
         backgroundColor: '#D9D9D9',
+    },
+    passwordContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '80%',
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 20,
+        padding: 10,
+        marginVertical: 10,
+        backgroundColor: '#D9D9D9',
+    },
+    inputPassword: {
+        flex: 1, // Para que ocupe el espacio disponible
     },
     picker: {
         width: '80%',
