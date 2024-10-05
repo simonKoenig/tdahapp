@@ -10,6 +10,10 @@ import { RewardsContext } from '../../Context/RewardsProvider';
 import { SubjectsContext } from '../../Context/SubjectsProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';
 import { AuthContext } from '../../Context/AuthProvider';
+import { showConfirmAlert } from '../../Utils/showConfirmAlert';
+import Toast from 'react-native-toast-message';
+
+
 
 function TaskDetailScreen() {
     const route = useRoute();
@@ -87,13 +91,45 @@ function TaskDetailScreen() {
         }
     };
 
-    const handleDeleteTask = async () => {
-        try {
-            await deleteTask(taskId, selectedPatientId);
-            navigation.goBack();
-        } catch (error) {
-            console.error('Error deleting task:', error);
-        }
+    const handleDeleteTask = () => {
+  
+        showConfirmAlert({
+            title: "Confirmar eliminación",
+            message: `¿Estás seguro que deseas eliminar la tarea "${nombre}"?`,
+            confirmText: "Eliminar",
+            cancelText: "Cancelar",
+            onConfirm: async () => {
+                try {
+                    setLoading(true);
+                    const result = await deleteTask(taskId, selectedPatientId);
+                    if (result?.error) {
+                        // Si hubo un error en la eliminación
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Error',
+                            text2: `${result.error} Toca aquí para cerrar.`,
+                        });
+                        console.log('Error en handleDeletePatient:', result.error);
+                    } else {
+                        // Si la eliminación fue exitosa
+                        Toast.show({
+                            type: 'success',
+                            text1: 'Éxito',
+                            text2: 'Tarea eliminada correctamente. Toca aquí para cerrar.',
+                        });
+                        navigation.goBack();  
+                    }
+                } catch (error) {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        text2: 'Ocurrió un error al eliminar la tarea. Toca aquí para cerrar.',
+                    });
+                } finally {
+                    setLoading(false);
+                }
+            }
+        });
     };
 
     if (loading) {
