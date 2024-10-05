@@ -45,16 +45,16 @@ const MultiStepFormComponent = ({ steps, onComplete }) => {
       <View style={styles.buttonContainer}>
         {currentStep > 0 && (
           <TouchableOpacity onPress={handlePrevious} style={[styles.button, styles.backButton]}>
-            <Text style={styles.backButtonText}>Back</Text>
+            <Text style={styles.backButtonText}>Atrás</Text>
           </TouchableOpacity>
         )}
         {currentStep < totalSteps - 1 ? (
           <TouchableOpacity onPress={handleNext} style={[styles.button, styles.nextButton]}>
-            <Text style={styles.nextButtonText}>Next</Text>
+            <Text style={styles.nextButtonText}>Siguiente</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity onPress={onComplete} style={[styles.button, styles.nextButton]}>
-            <Text style={styles.nextButtonText}>Done</Text>
+            <Text style={styles.nextButtonText}>Aceptar</Text>
           </TouchableOpacity>
         )}
       </View>
