@@ -15,13 +15,21 @@ function AddRewardScreen() {
     const [dificultad, setDificultad] = useState('');
     const { addReward } = useContext(RewardsContext);
     const { selectedPatientId } = useContext(PatientsContext);
-    const [loading, setLoading] = useState(true); // Estado de carga
+    const [loading, setLoading] = useState(true); 
 
     const navigation = useNavigation();
 
     
     const handleAddReward = async () => {
-
+        if (!selectedPatientId) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'No se ha seleccionado un paciente. Toca aquí para cerrar.',
+            });
+            navigation.goBack(); 
+            return;
+        }
         try {
             setLoading(true);
             const result =  await addReward({ nombre, dificultad }, selectedPatientId);
@@ -31,7 +39,6 @@ function AddRewardScreen() {
                     text1: 'Error',
                     text2: `${result.error} Toca aquí para cerrar.`,
                 });
-                console.log('Error en handleDeletePatient:', result.error);
             } else {
                 Toast.show({
                     type: 'success',

@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { addSubject } from '../../Context/SubjectsProvider';
-
+import LoadingScreen from '../../Components/LoadingScreen';
+import Toast from 'react-native-toast-message';
 
 
 
@@ -14,17 +15,47 @@ function AddSubjectScreen() {
     const [profesor, setProfesor] = useState('');
     const { addSubject } = useContext(SubjectsContext);
     const { selectedPatientId } = useContext(PatientsContext);
-
+    const [loading, setLoading] = useState(true); 
     const navigation = useNavigation();
 
     const handleAddSubject = async () => {
-        if (selectedPatientId) {
-            await addSubject({ nombre, profesor }, selectedPatientId); // Pasa el UID del paciente seleccionado
-            navigation.goBack();
-        } else {
-            console.error('No patient selected');
+        if (!selectedPatientId) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'No se ha seleccionado un paciente. Toca aquí para cerrar.',
+            });
+            return;
         }
-    };
+        try {
+            setLoading(true);
+            const result =  await addSubject({ nombre, profesor }, selectedPatientId);
+            if (result?.error) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: `${result.error} Toca aquí para cerrar.`,
+                });
+               
+            } else {
+                Toast.show({
+                    type: 'success',
+                    text1: 'Éxito',
+                    text2: 'Materia creada correctamente. Toca aquí para cerrar.',
+                });
+                navigation.goBack();  
+            }
+        } catch (error) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Ocurrió un error al crear la materia. Toca aquí para cerrar.',
+            });
+        } finally {
+            setLoading(false);
+        }
+
+    }
     return (
         <View style={styles.form}>
             <Text style={styles.label}>Nombre</Text>

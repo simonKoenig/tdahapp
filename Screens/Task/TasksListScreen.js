@@ -9,6 +9,7 @@ import PatientSelector from '../../Components/PatientSelector';
 import { filtradoDificultades } from '../../Utils/Constant';
 import { AuthContext } from '../../Context/AuthProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';
+import LoadingScreen from '../../Components/LoadingScreen'; // Importar tu componente de loading
 
 // Import moment para formatear la fecha y mostrarla en español
 import moment from 'moment';
@@ -27,19 +28,26 @@ const TaskListScreen = ({ route }) => {
     const [selectedDifficulty, setSelectedDifficulty] = useState('');
     const [refreshing, setRefreshing] = useState(false);
     const [showCompletedTasks, setShowCompletedTasks] = useState(true);
+    const [loading, setLoading] = useState(false); // Estado para mostrar el loading
     const navigation = useNavigation();
 
     useEffect(() => {
         const loadTasks = async () => {
-            await fetchTasks(selectedPatientId);
+            if (selectedPatientId) {
+                setLoading(true); // Mostrar loading cuando se selecciona un paciente
+                await fetchTasks(selectedPatientId); // Cargar tareas del paciente
+                setLoading(false); // Desactivar loading cuando terminen de cargarse
+            }
         };
         loadTasks();
     }, [selectedPatientId]);
 
     const handleRefresh = async () => {
-        setRefreshing(true);
-        await fetchTasks(selectedPatientId);
-        setRefreshing(false);
+        if (selectedPatientId) {
+            setRefreshing(true);
+            await fetchTasks(selectedPatientId);
+            setRefreshing(false);
+        }
     };
 
     const filteredTasks = tasks.filter(task =>
@@ -79,32 +87,43 @@ const TaskListScreen = ({ route }) => {
                 placeholder="Selecciona una dificultad"
                 searchActivo={false}
             />
-            <SectionList
-                sections={sections}
-                keyExtractor={(item, index) => item.id + index}
-                renderItem={({ item }) => (
-                    item.id === 'no-tasks' ? (
-                        <Text style={styles.noTasksText}>{item.nombre}</Text>
-                    ) : (
-                        <TaskItem
-                            item={item}
-                            onPress={() => navigation.navigate('TaskDetail', { taskId: item.id, uid: selectedPatientId })}
-                        />
-                    )
-                )}
-                renderSectionHeader={({ section: { title } }) => (
-                    <TouchableOpacity onPress={() => title === 'COMPLETAS' && setShowCompletedTasks(!showCompletedTasks)}>
-                        <View style={styles.sectionHeader}>
-                            <Text style={styles.headerTitle}>{title}</Text>
-                            {title === 'COMPLETAS' && (
-                                <Text style={styles.triangle}>{showCompletedTasks ? '▲' : '▼'}</Text>
-                            )}
-                        </View>
-                    </TouchableOpacity>
-                )}
-                refreshing={refreshing}
-                onRefresh={handleRefresh}
-            />
+            
+            {/* Usar tu componente LoadingScreen si está cargando las tareas y hay un paciente */}
+            {loading ? (
+                <LoadingScreen /> 
+            ) : (
+                selectedPatientId ? (
+                    <SectionList
+                        sections={sections}
+                        keyExtractor={(item, index) => item.id + index}
+                        renderItem={({ item }) => (
+                            item.id === 'no-tasks' ? (
+                                <Text style={styles.noTasksText}>{item.nombre}</Text>
+                            ) : (
+                                <TaskItem
+                                    item={item}
+                                    onPress={() => navigation.navigate('TaskDetail', { taskId: item.id, uid: selectedPatientId })}
+                                />
+                            )
+                        )}
+                        renderSectionHeader={({ section: { title } }) => (
+                            <TouchableOpacity onPress={() => title === 'COMPLETAS' && setShowCompletedTasks(!showCompletedTasks)}>
+                                <View style={styles.sectionHeader}>
+                                    <Text style={styles.headerTitle}>{title}</Text>
+                                    {title === 'COMPLETAS' && (
+                                        <Text style={styles.triangle}>{showCompletedTasks ? '▲' : '▼'}</Text>
+                                    )}
+                                </View>
+                            </TouchableOpacity>
+                        )}
+                        refreshing={refreshing}
+                        onRefresh={handleRefresh}
+                    />
+                ) : (
+                    <Text style={styles.noPatientText}>Selecciona un paciente para ver sus tareas.</Text>
+                )
+            )}
+
             {!isPaciente() && (
                 <TouchableOpacity
                     style={styles.addButton}
@@ -166,6 +185,12 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         marginBottom: 10,
         color: '#666666',
+    },
+    noPatientText: {
+        textAlign: 'center',
+        fontSize: 18,
+        color: '#666666',
+        marginTop: 20,
     },
 });
 
