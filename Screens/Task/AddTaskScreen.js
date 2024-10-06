@@ -1,7 +1,7 @@
 import { Timestamp } from 'firebase/firestore';
 // React 
 import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Button } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Button, Switch } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 // Componentes y constantes
 import DropdownComponent from '../../Components/Dropdown';
@@ -28,9 +28,11 @@ function AddTaskScreen() {
     const [descripcion, setDescripcion] = useState('');
     const [dificultad, setDificultad] = useState('');
     const [date, setDate] = useState(new Date()); //  Use new Date() para obtener la fecha actual
+    const [dateRewards, setDateRewards] = useState(new Date()); //  Use new Date() para obtener la fecha actual
     const [mode, setMode] = useState('date'); // Date time picker
     const [show, setShow] = useState(false); // Date time picker
     const [fechaCreacion, setFechaCreacion] = useState(''); // Fecha de creación de la tarea
+    const [rewardExpires, setRewardExpires] = useState(true); // Estado para manejar si la recompensa se vence
     const [loading, setLoading] = useState(true); 
 
 
@@ -96,6 +98,7 @@ function AddTaskScreen() {
                 selectedSubjectId,
                 estado: 'En progreso', // Estado por defecto
                 fechaCreacion: Timestamp.fromDate(fechaCreacion),
+                fechaVencimientoRecompensa: rewardExpires ? Timestamp.fromDate(dateRewards) : null, // Si la recompensa no se vence, se guarda null
             };
     
             await addTask(newTask, selectedPatientId); // Pasa el UID del paciente seleccionado
@@ -157,12 +160,22 @@ function AddTaskScreen() {
                     onSelect={handleSelectPatient}
                     editable={true}
                     width='80%'
-                />
-            ) : (
-                <Text style={styles.noPatientsText}>No se encontraron pacientes.</Text>
-            )}
+                    />
+                ) : (
+                    <Text style={styles.noPatientsText}>No se encontraron pacientes.</Text>
+                )}
         </View>,
         <View style={styles.form}>
+            <Text style={styles.label}>Materia</Text>
+            <DropdownComponent
+                data={transformedSubjects}
+                value={selectedSubjectId}
+                setValue={setSelectedSubjectId}
+                placeholder="Selecciona una materia"
+                onSelect={handleSelectSubject}
+                width='80%'
+            />
+
             <Text style={styles.label}>Dificultad</Text>
             <DropdownComponent
                 data={dificultades}
@@ -184,15 +197,25 @@ function AddTaskScreen() {
                 width='80%'
             />
 
-            <Text style={styles.label}>Materia</Text>
-            <DropdownComponent
-                data={transformedSubjects}
-                value={selectedSubjectId}
-                setValue={setSelectedSubjectId}
-                placeholder="Selecciona una materia"
-                onSelect={handleSelectSubject}
-                width='80%'
+            <Text style={styles.label}>Vencimiento de la recompensa</Text>
+            <DateTimePickerComponent
+                date={dateRewards}
+                setDate={setDateRewards}
+                mode={mode}
+                setMode={setMode}
+                show={show}
+                setShow={setShow}
+                editable={rewardExpires}
             />
+            <View style={styles.switchContainer}>
+                <Text style={styles.switchText}>¿La recompensa se vence?</Text>
+                <Switch
+                    trackColor={{ false: '#D9D9D9', true: 'lightblue' }}
+                    thumbColor={rewardExpires ? '#4c669f' : 'gray'}
+                    value={rewardExpires}
+                    onValueChange={setRewardExpires}
+                />
+            </View>
         </View>,
     ];
 
@@ -241,6 +264,15 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         marginVertical: 10,
         backgroundColor: '#D9D9D9',
+    },
+    switchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        width: '80%',
+    },
+    switchText: {
+        fontSize: 14,
     },
 });
 
