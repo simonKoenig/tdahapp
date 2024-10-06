@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DropdownComponent from '../../Components/Dropdown';
 import DateTimePickerComponent from '../../Components/DateTimePicker';
@@ -12,6 +12,7 @@ import { PatientsContext } from '../../Context/PatientsProvider';
 import { AuthContext } from '../../Context/AuthProvider';
 import { showConfirmAlert } from '../../Utils/showConfirmAlert';
 import Toast from 'react-native-toast-message';
+import moment from 'moment';
 
 
 
@@ -216,7 +217,7 @@ function TaskDetailScreen() {
     }
 
     return (
-        <View style={styles.form}>
+        <ScrollView contentContainerStyle={styles.form}>
             <Text style={styles.label}>Nombre</Text>
             <TextInput
                 style={styles.input}
@@ -233,18 +234,6 @@ function TaskDetailScreen() {
                 onChangeText={setDescripcion}
             />
 
-            <Text style={styles.label}>Fecha de creación</Text>
-            <DateTimePickerComponent
-                date={fechaCreacion}
-                setDate={setDate}
-                mode={mode}
-                setMode={setMode}
-                show={show}
-                setShow={setShow}
-                editable={false}
-            />
-
-
             <Text style={styles.label}>Fecha y hora de vencimiento</Text>
             <DateTimePickerComponent
                 date={date}
@@ -254,6 +243,15 @@ function TaskDetailScreen() {
                 show={show}
                 setShow={setShow}
                 editable={true}
+            />
+
+            <Text style={styles.label}>Materia</Text>
+            <DropdownComponent
+                data={transformedSubjects}
+                value={selectedSubjectId}
+                setValue={setSelectedSubjectId}
+                placeholder="Selecciona una materia"
+                width='80%'
             />
 
             <Text style={styles.label}>Dificultad</Text>
@@ -272,15 +270,9 @@ function TaskDetailScreen() {
                 placeholder="Selecciona una recompensa"
                 width='80%'
             />
-            <Text style={styles.label}>Materia</Text>
-            <DropdownComponent
-                data={transformedSubjects}
-                value={selectedSubjectId}
-                setValue={setSelectedSubjectId}
-                placeholder="Selecciona una materia"
-                width='80%'
 
-            />
+            <Text style={styles.tareaCreadaText}>Tarea creada {moment(fechaCreacion).format('lll')}</Text>
+
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleUpdateTask}>
                     <Text style={styles.buttonText}>Actualizar</Text>
@@ -296,7 +288,8 @@ function TaskDetailScreen() {
                     </TouchableOpacity>
                 </View>
             )}
-        </View>
+        </ScrollView>
+        
     );
 }
 
@@ -338,6 +331,9 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         backgroundColor: '#D9D9D9',
     },
+    tareaCreadaText: {
+        fontSize: 14,
+    },  
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
