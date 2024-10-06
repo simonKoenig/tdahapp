@@ -1,10 +1,12 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import 'moment/locale/es';
+import { AuthContext } from '../Context/AuthProvider';
 
 const DateTimePickerComponent = ({ date, setDate, mode, setMode, show, setShow, editable }) => {
+    const { isPaciente } = useContext(AuthContext);
 
     const onChange = (event, selectedDate) => {
         const currentDate = selectedDate;
@@ -32,8 +34,8 @@ const DateTimePickerComponent = ({ date, setDate, mode, setMode, show, setShow, 
                     onPress={editable ? showDatepicker : null}
                     disabled={!editable}
                 >
-                    <Text style={[styles.dateText, !editable && styles.disabledDateText]}>
-                        {moment(date).format('DD/MM/YYYY')}
+                    <Text style={[styles.dateText, !editable && !isPaciente() && styles.disabledDateText ]}>
+                        {editable || isPaciente() ? moment(date).format('DD/MM/YYYY') : ('Fecha')}
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
@@ -41,8 +43,8 @@ const DateTimePickerComponent = ({ date, setDate, mode, setMode, show, setShow, 
                     onPress={editable ? showTimepicker : null}
                     disabled={!editable}
                 >
-                    <Text style={[styles.dateText, !editable && styles.disabledDateText]}>
-                        {moment(date).format('HH:mm')}
+                    <Text style={[ styles.dateText, !editable && !isPaciente() && styles.disabledDateText ]}>
+                        {editable || isPaciente() ? moment(date).format('HH:mm') : ('Hora')}
                     </Text>
                 </TouchableOpacity>
             {show && (
