@@ -219,9 +219,15 @@ function TaskDetailScreen() {
                 )}
                 {estado === 'Finalizada' && (
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ObtainTask', { recompensaNombre, recompensaVencimiento })}>
-                            <Text style={styles.buttonText}>Obtener recompensa</Text>
-                        </TouchableOpacity>
+                        {!recompensaVencimiento || recompensaVencimiento > new Date() ? (
+                            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ObtainTask', { recompensaNombre, recompensaVencimiento })}>
+                                <Text style={styles.buttonText}>Obtener recompensa</Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity style={styles.buttonDisabled}>
+                                <Text style={styles.buttonDisabledText}>Recompensa vencida</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 )}
             </View>
@@ -380,6 +386,19 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: '#fff',
+        fontSize: 18,
+    },
+    buttonDisabled: {
+        flex: 1,
+        height: 50,
+        backgroundColor: '#ccc',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 20,
+        marginVertical: 10,
+        marginHorizontal: 5,
+    },
+    buttonDisabledText: {
         fontSize: 18,
     },
     switchContainer: {
