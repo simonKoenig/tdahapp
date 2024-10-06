@@ -92,7 +92,7 @@ const TaskListScreen = ({ route }) => {
             {loading ? (
                 <LoadingScreen /> 
             ) : (
-                selectedPatientId ? (
+                selectedPatientId || isPaciente() ? (
                     <SectionList
                         sections={sections}
                         keyExtractor={(item, index) => item.id + index}
