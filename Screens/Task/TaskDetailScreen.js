@@ -88,7 +88,7 @@ function TaskDetailScreen() {
     
     const handleMarkTask = async (nuevoEstado) => {
         try {
-            await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado: nuevoEstado, fechaCreacion, dateRewards }, selectedPatientId);
+            await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado: nuevoEstado, fechaCreacion, dateRewards: rewardExpires ? dateRewards : null }, selectedPatientId);
             navigation.goBack();
         } catch (error) {
             console.error('Error updating task:', error);
@@ -177,6 +177,7 @@ function TaskDetailScreen() {
     }
 
     const recompensaNombre = rewards.find(reward => reward.id === selectedRewardId)?.nombre;
+    const recompensaVencimiento = rewardExpires ? dateRewards : null;
 
     if (isPaciente()) {
         return (
@@ -218,7 +219,7 @@ function TaskDetailScreen() {
                 )}
                 {estado === 'Finalizada' && (
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ObtainTask', { recompensaNombre })}>
+                        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ObtainTask', { recompensaNombre, recompensaVencimiento })}>
                             <Text style={styles.buttonText}>Obtener recompensa</Text>
                         </TouchableOpacity>
                     </View>

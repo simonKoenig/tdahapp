@@ -1,18 +1,21 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import moment from 'moment';
 
 const ObtainTaskScreen = () => {
     const route = useRoute();
     const navigation = useNavigation();
-    const { recompensaNombre } = route.params;
+    const { recompensaNombre, recompensaVencimiento } = route.params;    
 
     return (
+        console.log(recompensaVencimiento),
         <View style={styles.container}>
             <Image source={require('../../assets/images/regalo.png')} style={styles.image} resizeMode="contain" />
             <Text style={styles.title}>¡Felicitaciones!</Text>
             <Text style={styles.message}>¡Has completado la tarea correctamente!</Text>
             <Text style={styles.time}>Podés {recompensaNombre}</Text>
+            {recompensaVencimiento && (<Text style={styles.dateText}>Tenés tiempo hasta {moment(recompensaVencimiento).format('LLL')}</Text>)}
 
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TasksList')}>
                 <Text style={styles.buttonText}>Aceptar</Text>
@@ -46,14 +49,21 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 20,
     },
+    dateText: {
+        fontSize: 18,
+        color: '#666',
+        textAlign: 'center',
+        marginBottom: 10,
+    },
     time: {
         fontSize: 24,
         color: '#333',
         fontWeight: '600',
-        marginBottom: 40,
+        marginBottom: 10,
     },
     button: {
         backgroundColor: '#8000ff',
+        marginTop: 20,
         paddingVertical: 15,
         paddingHorizontal: 40,
         borderRadius: 25,
