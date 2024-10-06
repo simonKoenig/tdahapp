@@ -98,7 +98,7 @@ function AddTaskScreen() {
                 selectedSubjectId,
                 estado: 'En progreso', // Estado por defecto
                 fechaCreacion: Timestamp.fromDate(fechaCreacion),
-                fechaVencimientoRecompensa: rewardExpires ? Timestamp.fromDate(dateRewards) : null, // Si la recompensa no se vence, se guarda null
+                dateRewards: rewardExpires ? Timestamp.fromDate(dateRewards) : null, // Si la recompensa no se vence, se guarda null
             };
     
             await addTask(newTask, selectedPatientId); // Pasa el UID del paciente seleccionado

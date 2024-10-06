@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Switch } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DropdownComponent from '../../Components/Dropdown';
 import DateTimePickerComponent from '../../Components/DateTimePicker';
@@ -28,9 +28,12 @@ function TaskDetailScreen() {
     const [loading, setLoading] = useState(true);
     const [show, setShow] = useState(false);
     const [mode, setMode] = useState('date');
+    const [show1, setShow1] = useState(false); // Añado estados pra el segundo DateTimePicker
+    const [mode1, setMode1] = useState('date');
     const [estado, setEstado] = useState('');
     const [fechaCreacion, setFechaCreacion] = useState('');
-
+    const [rewardExpires, setRewardExpires] = useState(false);
+    const [dateRewards, setDateRewards] = useState(new Date());
     const { isPaciente } = useContext(AuthContext);
     const { getTask, updateTask, deleteTask } = useContext(TasksContext);
     const navigation = useNavigation();
@@ -42,6 +45,7 @@ function TaskDetailScreen() {
         const fetchData = async () => {
             try {
                 const task = await getTask(taskId, uid);
+                console.log('task:', task);
                 if (task) {
                     setNombre(task.nombre);
                     setDescripcion(task.descripcion);
@@ -52,6 +56,13 @@ function TaskDetailScreen() {
                     setSelectedPatientId(uid);
                     setEstado(task.estado);
                     setFechaCreacion(task.fechaCreacion.toDate());
+                    if (task.dateRewards) {
+                        console.log('task.dateRewards:', task.dateRewards.toDate());
+                        setDateRewards(task.dateRewards.toDate());
+                        setRewardExpires(true);
+                    } else {
+                        setRewardExpires(false);
+                    }
                 } else {
                     console.error('Task not found');
                 }
@@ -77,7 +88,7 @@ function TaskDetailScreen() {
     
     const handleMarkTask = async (nuevoEstado) => {
         try {
-            await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado: nuevoEstado, fechaCreacion }, selectedPatientId);
+            await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado: nuevoEstado, fechaCreacion, dateRewards }, selectedPatientId);
             navigation.goBack();
         } catch (error) {
             console.error('Error updating task:', error);
@@ -93,7 +104,7 @@ function TaskDetailScreen() {
             onConfirm: async () => {
                 try {
                     setLoading(true);
-                    const result = await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado, fechaCreacion }, selectedPatientId);
+                    const result = await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado, fechaCreacion, dateRewards: rewardExpires ? dateRewards : null}, selectedPatientId);
                     if (result?.error) {
                         Toast.show({
                             type: 'error',
@@ -271,6 +282,26 @@ function TaskDetailScreen() {
                 width='80%'
             />
 
+            <Text style={styles.label}>Vencimiento de la recompensa</Text>
+            <DateTimePickerComponent
+                date={dateRewards}
+                setDate={setDateRewards}
+                mode={mode1}
+                setMode={setMode1}
+                show={show1}
+                setShow={setShow1}
+                editable={rewardExpires}
+            />
+            <View style={styles.switchContainer}>
+                <Text style={styles.switchText}>¿La recompensa se vence?</Text>
+                <Switch
+                    trackColor={{ false: '#D9D9D9', true: 'lightblue' }}
+                    thumbColor={rewardExpires ? '#4c669f' : 'gray'}
+                    value={rewardExpires}
+                    onValueChange={setRewardExpires}
+                />
+            </View>
+
             <Text style={styles.tareaCreadaText}>Tarea creada {moment(fechaCreacion).format('lll')}</Text>
 
             <View style={styles.buttonContainer}>
@@ -318,9 +349,6 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         backgroundColor: '#D9D9D9',
     },
-    fullWidth: {
-        width: '80%',
-    },
     dropdown: {
         width: '80%',
         height: 40,
@@ -352,6 +380,15 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontSize: 18,
+    },
+    switchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        width: '80%',
+    },
+    switchText: {
+        fontSize: 14,
     },
 });
 
