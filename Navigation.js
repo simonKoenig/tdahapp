@@ -57,7 +57,7 @@ function MyTabs() {
     const selectedPatient = patients.find(patient => patient.id === selectedPatientId)
 
     return (
-        <Tab.Navigator initialRouteName="Perfil">
+        <Tab.Navigator initialRouteName="Inicio">
             <Tab.Screen name="Inicio" component={HomeStackScreen} options={{
                 headerShown: false,
                 tabBarIcon: ({ color, size }) => (

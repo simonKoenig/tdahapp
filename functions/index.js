@@ -54,6 +54,16 @@ async function updateTareasVencidas() {
       // Crear un array para almacenar los tokens de los administradores que recibirán la notificación
       const notificationTokens = [];
 
+      // Consultar token del paciente, en el atributi FCMtokens del const userUID = taskRef.parent.parent.id; y guardalo en el array notificationToken
+      const userDoc = await db.collection('usuarios').doc(userUID).get();
+      const userTokens = userDoc.data().FCMtokens || []; // Recuperar tokens del usuario
+      if (userTokens.length > 0) {
+        notificationTokens.push(...userTokens);
+        console.log(`Tokens de notificación del usuario ${userUID} (Paciente):`, userTokens);
+      } else {
+        console.log(`El usuario ${userUID} (Paciente) no tiene tokens de notificación registrados.`);
+      }
+
       // Consultar cada administrador y verificar si está vinculado a este paciente
       for (const adminDoc of adminsSnapshot.docs) {
         const adminData = adminDoc.data();
