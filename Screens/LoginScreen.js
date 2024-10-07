@@ -15,7 +15,7 @@ function LoginScreen() {
 
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
-    const [isPasswordVisible, setIsPasswordVisible] = React.useState(true); // Estado para la visibilidad de la contraseña
+    const [isPasswordVisible, setIsPasswordVisible] = React.useState(false); // Estado para la visibilidad de la contraseña
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -60,7 +60,7 @@ function LoginScreen() {
                     />
                     <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
                         {isPasswordVisible ? (
-                        <EyeIcon color="gray" size={24} /> 
+                            <EyeIcon color="gray" size={24} /> 
                         ) : (
                             <EyeOffIcon color="gray" size={24} /> 
                         )}
