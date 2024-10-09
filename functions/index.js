@@ -56,7 +56,7 @@ async function updateTareasVencidas() {
 
       // Consultar token del paciente, en el atributi FCMtokens del const userUID = taskRef.parent.parent.id; y guardalo en el array notificationToken
       const userDoc = await db.collection('usuarios').doc(userUID).get();
-      const userTokens = userDoc.data().FCMtokens || []; // Recuperar tokens del usuario
+      const userTokens = userDoc.exists && userDoc.data().FCMtokens ? userDoc.data().FCMtokens : [];
       if (userTokens.length > 0) {
         notificationTokens.push(...userTokens);
         console.log(`Tokens de notificación del usuario ${userUID} (Paciente):`, userTokens);
