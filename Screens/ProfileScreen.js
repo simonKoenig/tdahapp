@@ -174,15 +174,21 @@ function ProfileScreen() {
                     {!isPaciente() ? (
                         <>
                             <Text style={styles.sectionTitle}>Usuarios vinculados</Text>
-                            {loadingPatients ? (
-                                <LoadingScreen />
-                            ) : (
-                                <FlatList
-                                    data={patients} // Lista de pacientes
-                                    keyExtractor={(item) => item.id} // Asegúrate de que cada paciente tiene un id
-                                    renderItem={renderPacienteItem}
-                                />
-                            )}
+                            <View style={styles.listContainer}>
+                                {loadingPatients ? (
+                                    <LoadingScreen />
+                                ) : patients.length === 0 ? (
+                                    <View style={styles.noPatientsContainer}>
+                                        <Text style={styles.noPatientsText}>No hay usuarios vinculados.</Text>
+                                    </View>
+                                ) : (
+                                    <FlatList
+                                        data={patients} // Lista de pacientes
+                                        keyExtractor={(item) => item.id} // Asegúrate de que cada paciente tiene un id
+                                        renderItem={renderPacienteItem}
+                                    />
+                                )}
+                            </View>
                             <View style={styles.connectionOptions}>
                                 <Text style={styles.sectionTitle}>Vincular nuevo usuario</Text>
                                 <TouchableOpacity style={styles.optionContainer} onPress={() => setEmailModalVisible(true)} >
@@ -275,6 +281,18 @@ const styles = StyleSheet.create({
         color: 'white',
         textAlign: 'center',
         fontWeight: 'bold',
+    },
+    listContainer: {
+        flex: 1,
+    },
+    noPatientsContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    noPatientsText: {
+        fontSize: 16,
+        color: 'gray',
     },
 });
 
