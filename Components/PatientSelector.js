@@ -1,4 +1,3 @@
-// Components/PatientSelector.js
 import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import DropdownComponent from './Dropdown';
@@ -8,22 +7,22 @@ import { AuthContext } from '../Context/AuthProvider';
 
 const PatientSelector = () => {
     const { isPaciente } = useContext(AuthContext);
-    const { patients, selectedPatientId, setSelectedPatientId, fetchPatients } = useContext(PatientsContext);
+    const { patients, selectedPatientId, setSelectedPatientId, fetchPatients, addPatientByEmail, deletePatient } = useContext(PatientsContext);
     const [loading, setLoading] = useState(true);
+    const [needsUpdate, setNeedsUpdate] = useState(true); // Estado para controlar la necesidad de actualización
 
-    // Si no hay pacientes cargados, se cargan
     useEffect(() => {
         const loadPatients = async () => {
-            if (!patients.length && !isPaciente()) {
-                console.log("CARGANDO PACIENTESSSSSSS");
+            if (needsUpdate && !isPaciente()) {
+                console.log('CARGANDO PACIENTESSSSSSS');
                 await fetchPatients();
+                setNeedsUpdate(false); // Restablecer el estado después de cargar los pacientes
+                setLoading(false);
             }
-            setLoading(false);
         };
         loadPatients();
-    }, [patients, fetchPatients]);
+    }, [needsUpdate]);
 
-    // Si el usuario es un paciente, no renderizar el componente
     if (isPaciente()) {
         return null;
     }
@@ -35,6 +34,16 @@ const PatientSelector = () => {
             // fetchRewards(patientId),
             // fetchTasks(patientId),
         ]);
+    };
+
+    const handleAddPatient = async (email) => {
+        await addPatientByEmail(email);
+        setNeedsUpdate(true); // Establecer la necesidad de actualización después de agregar un paciente
+    };
+
+    const handleDeletePatient = async (patientId) => {
+        await deletePatient(patientId);
+        setNeedsUpdate(true); // Establecer la necesidad de actualización después de eliminar un paciente
     };
 
     if (loading) {
@@ -55,6 +64,8 @@ const PatientSelector = () => {
                     value={selectedPatientId}
                     setValue={handleSelectPatient}
                     placeholder="Selecciona un paciente"
+                    onAdd={handleAddPatient} // Pasar la función de agregar paciente al componente Dropdown
+                    onDelete={handleDeletePatient} // Pasar la función de eliminar paciente al componente Dropdown
                 />
             </View>
         </View>
