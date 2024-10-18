@@ -24,6 +24,8 @@ function TaskDetailScreen() {
     const [descripcion, setDescripcion] = useState('');
     const [date, setDate] = useState('');
     const [dificultad, setDificultad] = useState('');
+    const [adminName, setAdminName] = useState(null);
+    const [correctionDate, setCorrectionDate] = useState(null);
     const [selectedRewardId, setSelectedRewardId] = useState('');
     const [loading, setLoading] = useState(true);
     const [show, setShow] = useState(false);
@@ -34,7 +36,7 @@ function TaskDetailScreen() {
     const [fechaCreacion, setFechaCreacion] = useState('');
     const [rewardExpires, setRewardExpires] = useState(false);
     const [dateRewards, setDateRewards] = useState(new Date());
-    const { isPaciente } = useContext(AuthContext);
+    const { isPaciente, user } = useContext(AuthContext);
     const { getTask, updateTask, deleteTask } = useContext(TasksContext);
     const navigation = useNavigation();
     const { setSelectedPatientId, selectedPatientId } = useContext(PatientsContext);
@@ -56,6 +58,10 @@ function TaskDetailScreen() {
                     setSelectedPatientId(uid);
                     setEstado(task.estado);
                     setFechaCreacion(task.fechaCreacion.toDate());
+                    if (task.correcion) {
+                        setAdminName(task.correcion.adminName);
+                        setCorrectionDate(task.correcion.correctionDate.toDate());
+                    }
                     if (task.dateRewards) {
                         console.log('task.dateRewards:', task.dateRewards.toDate());
                         setDateRewards(task.dateRewards.toDate());
@@ -85,16 +91,57 @@ function TaskDetailScreen() {
         value: reward.id,
     }));
 
-    
+
     const handleMarkTask = async (nuevoEstado) => {
         try {
-            await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado: nuevoEstado, fechaCreacion, dateRewards: rewardExpires ? dateRewards : null }, selectedPatientId);
+            // Verificar si el estado es "Finalizada"
+            if (nuevoEstado === 'Finalizada') {
+                // Crear el objeto updatedTask con los datos adicionales de la correción
+                const correcion = {
+                    adminUID: user.uid,
+                    adminName: user.nombreApellido,
+                    correctionDate: new Date()
+                };
+                const updatedTask = {
+                    nombre,
+                    descripcion,
+                    date,
+                    dificultad,
+                    selectedRewardId,
+                    selectedSubjectId,
+                    estado: nuevoEstado,
+                    fechaCreacion,
+                    dateRewards: rewardExpires ? dateRewards : null,
+                    correcion,
+                };
+
+                // Llamar a la función de actualización
+                await updateTask(taskId, updatedTask, selectedPatientId);
+            } else {
+                // Si el estado no es "Finalizada", solo actualiza los campos necesarios sin incluir los datos del administrador
+                const updatedTask = {
+                    nombre,
+                    descripcion,
+                    date,
+                    dificultad,
+                    selectedRewardId,
+                    selectedSubjectId,
+                    estado: nuevoEstado,
+                    fechaCreacion,
+                    dateRewards: rewardExpires ? dateRewards : null,
+                };
+
+                // Llamar a la función de actualización
+                await updateTask(taskId, updatedTask, selectedPatientId);
+            }
+
+            // Navegar hacia atrás después de la actualización
             navigation.goBack();
         } catch (error) {
             console.error('Error updating task:', error);
         }
     };
-    
+
     const handleUpdateTask = async () => {
         showConfirmAlert({
             title: "Confirmar actualización",
@@ -104,7 +151,7 @@ function TaskDetailScreen() {
             onConfirm: async () => {
                 try {
                     setLoading(true);
-                    const result = await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado, fechaCreacion, dateRewards: rewardExpires ? dateRewards : null}, selectedPatientId);
+                    const result = await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado, fechaCreacion, dateRewards: rewardExpires ? dateRewards : null }, selectedPatientId);
                     if (result?.error) {
                         Toast.show({
                             type: 'error',
@@ -118,7 +165,7 @@ function TaskDetailScreen() {
                             text1: 'Éxito',
                             text2: 'Tarea actualizada correctamente. Toca aquí para cerrar.',
                         });
-                        navigation.goBack();  
+                        navigation.goBack();
                     }
                 } catch (error) {
                     Toast.show({
@@ -135,7 +182,7 @@ function TaskDetailScreen() {
 
 
     const handleDeleteTask = () => {
-  
+
         showConfirmAlert({
             title: "Confirmar eliminación",
             message: `¿Estás seguro que deseas eliminar la tarea "${nombre}"?`,
@@ -157,7 +204,7 @@ function TaskDetailScreen() {
                             text1: 'Éxito',
                             text2: 'Tarea eliminada correctamente. Toca aquí para cerrar.',
                         });
-                        navigation.goBack();  
+                        navigation.goBack();
                     }
                 } catch (error) {
                     Toast.show({
@@ -309,7 +356,21 @@ function TaskDetailScreen() {
                 />
             </View>
 
-            <Text style={styles.tareaCreadaText}>Tarea creada {moment(fechaCreacion).format('lll')}</Text>
+            <Text style={styles.tareaCreadaText}>
+                Tarea creada {moment(fechaCreacion).format('lll')}
+            </Text>
+
+            {correctionDate && adminName ? (
+                <Text style={styles.tareaCorregidaText}>
+                    Tarea Corregida por {adminName} el {moment(correctionDate).format('lll')}
+                </Text>
+            ) : (
+                <Text style={styles.noCorreccionText}>
+                    Tarea aún no corregida
+                </Text>
+            )}
+
+
 
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleUpdateTask}>
@@ -327,7 +388,7 @@ function TaskDetailScreen() {
                 </View>
             )}
         </ScrollView>
-        
+
     );
 }
 
@@ -368,7 +429,19 @@ const styles = StyleSheet.create({
     },
     tareaCreadaText: {
         fontSize: 14,
-    },  
+        marginTop: 10,
+    },
+    tareaCorregidaText: {
+        fontSize: 14,
+        color: 'green',
+        flexWrap: 'wrap',  // Permite que el texto se divida en varias líneas
+        width: '80%',  // Asegura que el texto no exceda el 80% del ancho del formulario
+        textAlign: 'center',
+    },
+    noCorreccionText: {
+        fontSize: 14,
+        color: 'red',
+    },
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
