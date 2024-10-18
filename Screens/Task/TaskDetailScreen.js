@@ -58,9 +58,9 @@ function TaskDetailScreen() {
                     setSelectedPatientId(uid);
                     setEstado(task.estado);
                     setFechaCreacion(task.fechaCreacion.toDate());
-                    if (task.correcion) {
-                        setAdminName(task.correcion.adminName);
-                        setCorrectionDate(task.correcion.correctionDate.toDate());
+                    if (task.correccion) {
+                        setAdminName(task.correccion.adminName);
+                        setCorrectionDate(task.correccion.correctionDate.toDate());
                     }
                     if (task.dateRewards) {
                         console.log('task.dateRewards:', task.dateRewards.toDate());
@@ -96,7 +96,7 @@ function TaskDetailScreen() {
         try {
             // Verificar si el estado es "Finalizada"
             if (nuevoEstado === 'Finalizada') {
-                // Crear el objeto updatedTask con los datos adicionales de la correción
+                // Crear el objeto updatedTask con los datos adicionales de la corrección
                 const correccion = {
                     adminUID: user.uid,
                     adminName: user.nombreApellido,
