@@ -216,7 +216,6 @@ exports.onUpdateTarea = functions.firestore
     }
   });
 
-// Función para enviar notificación cuando la tarea pasa de 'Pendiente' a 'Finalizada'
 exports.onUpdateTareaFinalizada = functions.firestore
   .document('usuarios/{userId}/tareas/{tareaId}')
   .onUpdate(async (change, context) => {
@@ -228,24 +227,40 @@ exports.onUpdateTareaFinalizada = functions.firestore
     // Verificar si el estado ha cambiado de 'Pendiente' a 'Finalizada'
     if (tareaDataBefore.estado === 'Pendiente' && tareaDataAfter.estado === 'Finalizada') {
       try {
-        // Obtener el nombre del usuario
+        // Obtener el nombre del usuario (paciente)
         const userDoc = await db.collection('usuarios').doc(userId).get();
         const userName = userDoc.exists ? userDoc.data().nombreApellido : 'Usuario desconocido';
 
-        // Obtener los tokens del usuario (paciente)
-        const userTokens = await getUserTokens(userId);
+        // Obtener el adminUID del campo corrección
+        const adminUID = tareaDataAfter.correccion ? tareaDataAfter.correccion.adminUID : null;
+        console.log('adminUID obtenido de la tarea:', adminUID);
+
+        // Si hay un adminUID, obtener sus tokens
+        let adminTokensToRemove = [];
+        if (adminUID) {
+          const adminDoc = await db.collection('usuarios').doc(adminUID).get();
+          adminTokensToRemove = adminDoc.exists ? adminDoc.data().FCMtokens || [] : [];
+          console.log(`Tokens del administrador (${adminUID}) que serán filtrados:`, adminTokensToRemove);
+        }
 
         // Obtener los tokens de los administradores vinculados al paciente
-        const adminTokens = await getAdminTokensForPatient(userId);
+        let adminTokens = await getAdminTokensForPatient(userId);
 
-        // Notificación para los administradores, incluyendo el nombre del usuario
-        if (adminTokens.length > 0) {
+        // Filtrar los tokens del administrador que realizó la corrección
+        const filteredAdminTokens = adminTokens.filter(token => !adminTokensToRemove.includes(token));
+        console.log('Tokens después de filtrar (administradores que recibirán la notificación):', filteredAdminTokens);
+
+        // Notificación para los administradores, excluyendo al que realizó la acción
+        if (filteredAdminTokens.length > 0) {
           await sendNotification(
-            adminTokens,
-            'Tarea Finalizada ',
+            filteredAdminTokens,
+            'Tarea Finalizada',
             `La tarea "${nombreTarea}" del usuario "${userName}" ha sido finalizada correctamente.`
           );
         }
+
+        // Obtener los tokens del usuario (paciente)
+        const userTokens = await getUserTokens(userId);
 
         // Notificación para el paciente, sin el nombre del usuario
         if (userTokens.length > 0) {

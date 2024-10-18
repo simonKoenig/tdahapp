@@ -97,7 +97,7 @@ function TaskDetailScreen() {
             // Verificar si el estado es "Finalizada"
             if (nuevoEstado === 'Finalizada') {
                 // Crear el objeto updatedTask con los datos adicionales de la correción
-                const correcion = {
+                const correccion = {
                     adminUID: user.uid,
                     adminName: user.nombreApellido,
                     correctionDate: new Date()
@@ -112,7 +112,7 @@ function TaskDetailScreen() {
                     estado: nuevoEstado,
                     fechaCreacion,
                     dateRewards: rewardExpires ? dateRewards : null,
-                    correcion,
+                    correccion,
                 };
 
                 // Llamar a la función de actualización
