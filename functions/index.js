@@ -98,13 +98,26 @@ async function updateTareasVencidas() {
       const nombreTarea = taskData.nombre || 'Sin nombre';
       const userUID = taskRef.parent.parent.id;
 
+      // Obtener el nombre del usuario
+      const userDoc = await db.collection('usuarios').doc(userUID).get();
+      const userName = userDoc.exists ? userDoc.data().nombreApellido : 'Usuario desconocido';
+
       // Obtener tokens del usuario y de los administradores vinculados
       const userTokens = await getUserTokens(userUID);
       const adminTokens = await getAdminTokensForPatient(userUID);
       const allTokens = [...userTokens, ...adminTokens];
 
-      // Enviar la notificación
-      await sendNotification(allTokens, 'Tarea vencida', `La tarea "${nombreTarea}" ha vencido.`);
+      // Enviar la notificación con diferentes mensajes para usuarios y administradores
+      for (const token of allTokens) {
+        const isAdminToken = adminTokens.includes(token);
+
+        const title = 'Tarea vencida';
+        const body = isAdminToken
+          ? `La tarea "${nombreTarea}" del usuario "${userName}" ha vencido.`
+          : `La tarea "${nombreTarea}" ha vencido.`;
+
+        await sendNotification([token], title, body);
+      }
 
       // Actualizar el estado de la tarea a 'Vencida'
       batch.update(taskRef, { estado: 'Vencida' });
@@ -118,6 +131,7 @@ async function updateTareasVencidas() {
     console.error('Error actualizando tareas vencidas:', error);
   }
 }
+
 
 // Cloud Scheduler que ejecuta la función cada minuto para actualizar las tareas vencidas
 exports.updateTareasVencidas = functions.pubsub.schedule('every 1 minutes').onRun(async (context) => {
@@ -142,6 +156,7 @@ exports.onCreateTarea = functions.firestore
       console.error('Error al enviar la notificación de nueva tarea:', error);
     }
   });
+
 
 // // Función para enviar notificación cuando cambia el estado de la tarea (excluyendo "Vencida")
 // exports.onUpdateTarea = functions.firestore
