@@ -184,3 +184,34 @@ exports.onCreateTarea = functions.firestore
 //       }
 //     }
 //   });
+
+// Función para enviar notificación cuando la tarea pasa de 'En progreso' a 'Pendiente'
+exports.onUpdateTarea = functions.firestore
+  .document('usuarios/{userId}/tareas/{tareaId}')
+  .onUpdate(async (change, context) => {
+    const tareaDataBefore = change.before.data();
+    const tareaDataAfter = change.after.data();
+    const userId = context.params.userId;
+    const nombreTarea = tareaDataAfter.nombre || 'Sin nombre';
+
+    // Verificar si el estado ha cambiado de 'En progreso' a 'Pendiente'
+    if (tareaDataBefore.estado === 'En progreso' && tareaDataAfter.estado === 'Pendiente') {
+      try {
+        // Obtener el nombre del usuario
+        const userDoc = await db.collection('usuarios').doc(userId).get();
+        const userName = userDoc.exists ? userDoc.data().nombreApellido : 'Usuario desconocido';
+
+        // Obtener los tokens de los administradores vinculados al paciente
+        const adminTokens = await getAdminTokensForPatient(userId);
+
+        // Enviar la notificación solo a los administradores
+        await sendNotification(
+          adminTokens,
+          'Tarea actualizada',
+          `La tarea "${nombreTarea}" del usuario "${userName}" ha cambiado su estado a "Pendiente".`
+        );
+      } catch (error) {
+        console.error('Error al enviar la notificación de cambio de estado a los administradores:', error);
+      }
+    }
+  });
