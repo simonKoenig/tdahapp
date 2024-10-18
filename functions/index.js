@@ -215,3 +215,48 @@ exports.onUpdateTarea = functions.firestore
       }
     }
   });
+
+// Función para enviar notificación cuando la tarea pasa de 'Pendiente' a 'Finalizada'
+exports.onUpdateTareaFinalizada = functions.firestore
+  .document('usuarios/{userId}/tareas/{tareaId}')
+  .onUpdate(async (change, context) => {
+    const tareaDataBefore = change.before.data();
+    const tareaDataAfter = change.after.data();
+    const userId = context.params.userId;
+    const nombreTarea = tareaDataAfter.nombre || 'Sin nombre';
+
+    // Verificar si el estado ha cambiado de 'Pendiente' a 'Finalizada'
+    if (tareaDataBefore.estado === 'Pendiente' && tareaDataAfter.estado === 'Finalizada') {
+      try {
+        // Obtener el nombre del usuario
+        const userDoc = await db.collection('usuarios').doc(userId).get();
+        const userName = userDoc.exists ? userDoc.data().nombreApellido : 'Usuario desconocido';
+
+        // Obtener los tokens del usuario (paciente)
+        const userTokens = await getUserTokens(userId);
+
+        // Obtener los tokens de los administradores vinculados al paciente
+        const adminTokens = await getAdminTokensForPatient(userId);
+
+        // Notificación para los administradores, incluyendo el nombre del usuario
+        if (adminTokens.length > 0) {
+          await sendNotification(
+            adminTokens,
+            'Tarea Finalizada ',
+            `La tarea "${nombreTarea}" del usuario "${userName}" ha sido finalizada correctamente.`
+          );
+        }
+
+        // Notificación para el paciente, sin el nombre del usuario
+        if (userTokens.length > 0) {
+          await sendNotification(
+            userTokens,
+            'Tarea Finalizada',
+            `¡Excelente! Tu tarea "${nombreTarea}" fue corregida exitosamente. ¡Buen trabajo!`
+          );
+        }
+      } catch (error) {
+        console.error('Error al enviar la notificación de tarea finalizada:', error);
+      }
+    }
+  });
