@@ -42,7 +42,7 @@ function StatisticsScreen() {
             setTareasEnProgreso(tareasEnProgreso.length);
             setTareasTotales(tareasTotales);
         }
-    }, [selectedPatientId]);
+    }, [selectedPatientId, tasks]);
     
 
     return (
