@@ -9,9 +9,14 @@ import { TasksProvider } from './Context/TaskProvider';
 import { clearStorage } from './Utils/AsyncStorage';
 import messaging from '@react-native-firebase/messaging';
 import { setupNotificationListeners, setupBackgroundHandler } from './Utils/NotificationService';
-
+import { useFonts, AtkinsonHyperlegible_400Regular, AtkinsonHyperlegible_400Regular_Italic, AtkinsonHyperlegible_700Bold, AtkinsonHyperlegible_700Bold_Italic, } from '@expo-google-fonts/atkinson-hyperlegible';
+import LoadingScreen from './Components/LoadingScreen';
 
 const App = () => {
+  const [fontsLoaded] = useFonts({
+    AtkinsonHyperlegible_400Regular,
+    AtkinsonHyperlegible_700Bold,
+  });
   // Limpia el almacenamiento cuando la aplicación pasa a segundo plano o se cierra
   React.useEffect(() => {
     const handleAppStateChange = async (nextAppState) => {
@@ -42,65 +47,9 @@ const App = () => {
     };
   }, []);
 
-  // // Solicita permiso para recibir notificaciones
-  // const requestUserPermission = async () => {
-  //   try {
-  //     const authStatus = await messaging().requestPermission();
-  //     const enabled =
-  //       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-  //       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-
-  //     if (enabled) {
-  //       console.log('Permiso de notificaciones autorizado:', authStatus);
-  //       return true;
-  //     } else {
-  //       console.log('Permiso de notificaciones no autorizado:', authStatus);
-  //       return false;
-  //     }
-  //   } catch (error) {
-  //     console.error('Error al solicitar permisos de notificaciones:', error);
-  //     return false;
-  //   }
-  // };
-
-  // React.useEffect(() => {
-  //   const setupNotifications = async () => {
-  //     const hasPermission = await requestUserPermission();
-
-  //     if (hasPermission) {
-  //       const token = await messaging().getToken();
-  //       console.log('Token FCM del app.js:', token);
-  //       // Aquí puedes enviar el token al servidor para hacer pruebas
-  //     } else {
-  //       console.log('No se ha dado permiso para recibir notificaciones');
-  //     }
-  //     // Comprueba si la app se abrió a través de una notificación cuando estaba cerrada
-  //     messaging()
-  //       .getInitialNotification()
-  //       .then(async (remoteMessage) => {
-  //         if (remoteMessage) {
-  //           console.log('La notificación abrió la app desde el estado cerrado:', remoteMessage.notification);
-  //         }
-  //       });
-  //     // Listener para manejar notificaciones cuando la app está en segundo plano
-  //     messaging().onNotificationOpenedApp(async (remoteMessage) => {
-  //       console.log('La notificación abrió la app desde el estado de segundo plano:', remoteMessage.notification);
-  //     });
-
-  //     // Configura un manejador para mensajes en segundo plano
-  //     messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-  //       console.log('Mensaje recibido en segundo plano:', remoteMessage);
-  //     });
-  //     // Listener para mensajes en primer plano
-  //     const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-  //       Alert.alert('Llegó un nuevo mensaje de FCM:', JSON.stringify(remoteMessage));
-  //     });
-
-  //     return unsubscribe;
-  //   };
-
-  //   setupNotifications();
-  // }, []);
+  if (!fontsLoaded) {
+    return <LoadingScreen />;
+  }
 
   return (
     <AuthProvider>
