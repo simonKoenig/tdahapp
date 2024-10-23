@@ -14,7 +14,6 @@ const toastProps = {
     text2NumberOfLines: 5, // Establece el número de líneas para text2
     style: {
         height: "auto", // Permite que la altura sea automática
-        paddingVertical: 10,
         paddingHorizontal: 0,
         width: "100%",
     },

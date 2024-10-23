@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Button } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Button, Pressable, AccessibilityInfo } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../Context/AuthProvider';
 import { PatientsContext } from '../Context/PatientsProvider';
@@ -15,6 +15,10 @@ import { showConfirmAlert } from '../Utils/showConfirmAlert';
 import AddPatientModal from '../Modals/AddPatientModal';
 import PatientQRCode from '../Components/QR';
 import QRScannerModal from '../Modals/QRScannerModal';
+import { globalStyles } from '../Utils/globalStyles';
+import { SPACING, COLORS } from '../Utils/Constant';
+
+
 
 
 
@@ -69,6 +73,9 @@ function ProfileScreen() {
 
     const handleFetchUserRewards = async (email) => {
         if (!email) {
+            setTimeout(() => {
+                AccessibilityInfo.announceForAccessibility("Por favor, proporciona un mail válido.");
+            }, 500); // Esperar 500 ms después de cerrar el modal antes de hacer el anuncio
             Toast.show({
                 type: 'error',
                 text1: 'Error',
@@ -80,6 +87,9 @@ function ProfileScreen() {
             setLoadingPatients(true);
             const patientData = await addPatientByEmail(email);
             if (patientData?.error) {
+                setTimeout(() => {
+                    AccessibilityInfo.announceForAccessibility(patientData.error);
+                }, 500); // Esperar 500 ms después de cerrar el modal antes de hacer el anuncio
                 Toast.show({
                     type: 'error',
                     text1: 'Error',
@@ -87,12 +97,16 @@ function ProfileScreen() {
                 });
                 console.log('Error en handleFetchUserRewards:', patientData.error);
             } else {
+                setTimeout(() => {
+                    AccessibilityInfo.announceForAccessibility('El usuario ha sido vinculado correctamente.');
+                }, 500); // Esperar 500 ms después de cerrar el modal antes de hacer el anuncio
                 Toast.show({
                     type: 'success',
                     text1: 'Exito',
                     text2: 'Usuario agregado correctamente. Toca aquí para cerrar.',
 
                 });
+
             }
         } catch (error) {
             console.error('Error en handleAddPatientByEmail:', error);
@@ -112,10 +126,10 @@ function ProfileScreen() {
 
             // Lógica de eliminación
             const result = await deletePatient(patientId, user.uid);
-
             // Verificamos si la operación tuvo éxito o si resultó en un error
             if (result?.error) {
                 // Si hubo un error en la eliminación
+                AccessibilityInfo.announceForAccessibility('Error en handleDeletePatient', result.error);
                 Toast.show({
                     type: 'error',
                     text1: 'Error',
@@ -123,15 +137,16 @@ function ProfileScreen() {
                 });
                 console.log('Error en handleDeletePatient:', result.error);
             } else {
-                // Si la eliminación fue exitosa
+                AccessibilityInfo.announceForAccessibility('El usuario ha sido eliminado correctamente.');
                 Toast.show({
                     type: 'success',
                     text1: 'Éxito',
                     text2: 'Paciente eliminado correctamente. Toca aquí para cerrar.',
+
                 });
             }
         } catch (error) {
-            // Si algo salió mal en la operación
+            AccessibilityInfo.announceForAccessibility('Error en handleDeletePatient', result.error);
             console.error('Error en handleDeletePatient:', error);
             Toast.show({
                 type: 'error',
@@ -160,47 +175,60 @@ function ProfileScreen() {
         );
     };
 
-
     return (
-        <View style={styles.container}>
-            {loading && <LoadingScreen />}
+        <View style={[globalStyles.container, { flexDirection: 'column' }]}>
+            {loading && <LoadingScreen accessibilityLiveRegion="assertive" accessibilityLabel="Cargando, por favor espere" />}
             {!loading && (
                 <>
                     {/* Perfil del usuario */}
                     <View style={styles.profileSection}>
-                        <Text style={styles.profileName}>{user.nombreApellido}</Text>
-                        <Text style={styles.profileEmail}>{user.email}</Text>
+                        <Text style={globalStyles.title}>
+                            {user.nombreApellido}
+                        </Text>
+                        <Text style={globalStyles.text}>
+                            {user.email}
+                        </Text>
                     </View>
                     {!isPaciente() ? (
                         <>
-                            <Text style={styles.sectionTitle}>Usuarios vinculados</Text>
-                            <View style={styles.listContainer}>
+                            <Text style={[globalStyles.lessBoldText, { marginBottom: SPACING.small }]} accessibilityRole="header">Usuarios vinculados</Text>
+                            <View style={{ flex: 1 }}>
                                 {loadingPatients ? (
-                                    <LoadingScreen />
+                                    <LoadingScreen accessibilityLiveRegion="assertive" accessibilityLabel="Cargando pacientes, por favor espere" />
                                 ) : patients.length === 0 ? (
-                                    <View style={styles.noPatientsContainer}>
-                                        <Text style={styles.noPatientsText}>No hay usuarios vinculados.</Text>
+                                    <View style={globalStyles.centeredContainer}>
+                                        <Text style={globalStyles.noDataText}>No hay usuarios vinculados.</Text>
                                     </View>
                                 ) : (
                                     <FlatList
-                                        data={patients} // Lista de pacientes
-                                        keyExtractor={(item) => item.id} // Asegúrate de que cada paciente tiene un id
+                                        data={patients}
+                                        keyExtractor={(item) => item.id}
                                         renderItem={renderPacienteItem}
                                     />
                                 )}
                             </View>
                             <View style={styles.connectionOptions}>
-                                <Text style={styles.sectionTitle}>Vincular nuevo usuario</Text>
-                                <TouchableOpacity style={styles.optionContainer} onPress={() => setEmailModalVisible(true)} >
-                                    <Text style={styles.optionText}>Añadir con mail</Text>
-                                    <MessageIcon size={24} color="black" />
+                                <Text style={[globalStyles.lessBoldText, { marginTop: SPACING.small }]} accessibilityRole="header">Vincular nuevo usuario</Text>
+                                <TouchableOpacity
+                                    style={styles.optionContainer}
+                                    onPress={() => setEmailModalVisible(true)}
+                                    accessibilityLabel="Añadir usuario por correo electrónico"
+                                    accessibilityHint="A continuación se abrirá un modal para ingresar el correo del usuario">
+                                    <Text style={globalStyles.text}>Añadir con mail</Text>
+                                    <MessageIcon size={24} color="black" accessibilityLabel="Icono de mensaje para añadir usuario por email" />
                                 </TouchableOpacity>
 
-                                {/* Opción: Agregar por código QR */}
-                                <TouchableOpacity style={styles.optionContainer} onPress={() => setQRModalVisible(true)}>
-                                    <Text style={styles.optionText}>Añadir con codigo QR</Text>
+                                <Pressable
+                                    style={styles.optionContainer}
+                                    onPress={() => setQRModalVisible(true)}
+                                    accessibilityLabel="Añadir usuario mediante código Q R"
+                                    accessibilityHint="A continuación se abrirá la cámara para escanear el Q R de un usuario"
+                                    accessibilityRole="button"
+                                >
+                                    <Text style={globalStyles.text}>Añadir con código QR</Text>
                                     <QrIcon size={24} color="black" />
-                                </TouchableOpacity>
+                                </Pressable>
+
                             </View>
                             <AddPatientModal
                                 visible={isEmailModalVisible}
@@ -210,16 +238,24 @@ function ProfileScreen() {
                             <QRScannerModal
                                 visible={isQRModalVisible}
                                 onClose={() => setQRModalVisible(false)}
-                                onScan={handleFetchUserRewards} // Pasar la función handleScan al modal
+                                onScan={handleFetchUserRewards}
                             />
                         </>
                     ) : (
-                        <>
-                            <PatientQRCode email={user.email} />
-                        </>
+                        <PatientQRCode
+                            email={user.email}
+                            accessible={true} // Hacer accesible el componente
+                            accessibilityLabel={`Código Q R del usuario ${user.email}`} // Descripción clara para el lector de pantalla
+                            accessibilityHint="Use otro dispositivo para escanear este código QR si necesita compartir información del paciente." // Información adicional para guiar al usuario
+                            accessibilityRole="image" // Indica que es una imagen, ya que TalkBack entenderá esto de forma más apropiada
+                        />
                     )}
                     <View style={[styles.buttonsContainer, isPaciente() && styles.extraStyle]}>
-                        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                        <TouchableOpacity
+                            style={styles.logoutButton}
+                            onPress={handleLogout}
+                            accessibilityLabel="Cerrar sesión"
+                            accessibilityHint="Cerrar la sesión actual y regresar a la pantalla de inicio de sesión">
                             <Text style={styles.logoutButtonText}>CERRAR SESIÓN</Text>
                         </TouchableOpacity>
                     </View>
@@ -230,42 +266,19 @@ function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 16,
-        backgroundColor: '#ffffff',
-        flexDirection: 'column',
-    },
     profileSection: {
         alignItems: 'center',
-        marginBottom: 20,
-    },
-    profileName: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    profileEmail: {
-        fontSize: 16,
-        color: '#777',
-    },
-    sectionTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#333',
+        paddingVertical: SPACING.small,
     },
     optionContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between', // Para que el texto esté a la izquierda y el ícono a la derecha
+        justifyContent: 'space-between',  // Mantiene el diseño para alinear texto e ícono
         alignItems: 'center',
-        paddingVertical: 12,
+        paddingVertical: SPACING.small,  // Utiliza SPACING definido para mantener consistencia
         borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
+        borderBottomColor: COLORS.inputBorder,  // Reutiliza un color definido para bordes
     },
-    optionText: {
-        fontSize: 16,
-        color: '#333',
-    },
+
     buttonsContainer: {
         justifyContent: 'flex-end',
     },
@@ -273,7 +286,8 @@ const styles = StyleSheet.create({
         flexGrow: 1,
     },
     logoutButton: {
-        backgroundColor: '#007bff',
+        marginVertical: SPACING.small,
+        backgroundColor: '#285583',
         padding: 15,
         borderRadius: 5,
     },
@@ -281,18 +295,6 @@ const styles = StyleSheet.create({
         color: 'white',
         textAlign: 'center',
         fontWeight: 'bold',
-    },
-    listContainer: {
-        flex: 1,
-    },
-    noPatientsContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    noPatientsText: {
-        fontSize: 16,
-        color: 'gray',
     },
 });
 

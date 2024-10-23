@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Toast from 'react-native-toast-message';
 import { toastConfig } from './Utils/ToastConfig';
+import { HEADER_STYLE, TAB_BAR_STYLE } from './Utils/Constant';
 
 // Screens
 import HomeScreen from "./Screens/HomeScreen";
@@ -57,7 +58,7 @@ function MyTabs() {
     const selectedPatient = patients.find(patient => patient.id === selectedPatientId)
 
     return (
-        <Tab.Navigator initialRouteName="Inicio">
+        <Tab.Navigator initialRouteName="Inicio" screenOptions={TAB_BAR_STYLE} >
             <Tab.Screen name="Inicio" component={HomeStackScreen} options={{
                 headerShown: false,
                 tabBarIcon: ({ color, size }) => (
@@ -105,7 +106,7 @@ function MyTabs() {
 
 function HomeStackScreen() {
     return (
-        <HomeStack.Navigator initialRouteName="TasksList">
+        <HomeStack.Navigator initialRouteName="TasksList" screenOptions={HEADER_STYLE}>
             <HomeStack.Screen name="TasksList" component={TasksListScreen} options={{ headerShown: true, title: 'Inicio' }} />
             <HomeStack.Screen name="AddTask" component={AddTaskScreen} options={{ headerShown: true, title: 'Agregar nueva tarea' }} />
             <HomeStack.Screen name="TaskDetail" component={TaskDetailScreen} options={{ headerShown: true, title: 'Detalles de la tarea' }} />
@@ -124,7 +125,7 @@ function StatisticsStackScreen() {
     }
 
     return (
-        <StatisticsStack.Navigator initialRouteName="Statistics" screenOptions={{ headerShown: false }}>
+        <StatisticsStack.Navigator initialRouteName="Statistics" screenOptions={HEADER_STYLE}>
             <StatisticsStack.Screen name="Statistics" component={StatisticsScreen} />
 
         </StatisticsStack.Navigator>
@@ -138,7 +139,7 @@ function SubjectsStackScreen() {
     }
 
     return (
-        <SubjectsStack.Navigator initialRouteName="SubjectsList">
+        <SubjectsStack.Navigator initialRouteName="SubjectsList" screenOptions={HEADER_STYLE}>
             <SubjectsStack.Screen name="SubjectsList" component={SubjectsListScreen} options={{ headerShown: true, title: 'Lista de materias' }} />
             <SubjectsStack.Screen name="AddSubject" component={AddSubjectScreen} options={{ headerShown: true, title: 'Agregar nueva materia' }} />
             <SubjectsStack.Screen name="SubjectDetail" component={SubjectDetailScreen} options={{ headerShown: true, title: 'Detalles de la materia' }} />
@@ -158,7 +159,7 @@ function RewardsStackScreen() {
     }
 
     return (
-        <RewardsStack.Navigator initialRouteName="RewardsList">
+        <RewardsStack.Navigator initialRouteName="RewardsList" screenOptions={HEADER_STYLE}>
             <RewardsStack.Screen name="RewardsList" component={RewardsListScreen} options={{ headerShown: true, title: 'Lista de recompensas' }} />
             <RewardsStack.Screen name="AddReward" component={AddRewardScreen} options={{ headerShown: true, title: 'Agregar nueva recompensa' }} />
             <RewardsStack.Screen name="RewardDetail" component={RewardDetailScreen} options={{ headerShown: true, title: 'Detalles de la recompensa' }} />
@@ -169,7 +170,7 @@ function RewardsStackScreen() {
 
 function ProfileStackScreen() {
     return (
-        <ProfileStack.Navigator initialRouteName="Profile">
+        <ProfileStack.Navigator initialRouteName="Profile" screenOptions={HEADER_STYLE}>
             <ProfileStack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: true, title: 'Perfil' }} />
             <ProfileStack.Screen name="Login" component={LoginScreen} />
 
@@ -192,7 +193,7 @@ export default function Navigation() {
     return (
         <NavigationContainer>
             {isAuthenticated ? <MyTabs /> : <AuthStackScreen />}
-            <Toast autoHide={false} visibilityTime={null} config={toastConfig} />
+            <Toast autoHide={true} visibilityTime={10000} config={toastConfig} />
         </NavigationContainer>
     );
 }
