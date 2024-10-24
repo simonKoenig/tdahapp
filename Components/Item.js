@@ -7,12 +7,19 @@ const Item = ({ item, onPress, tipo, valor, mostrarFecha }) => {
     const [formattedDate, setFormattedDate] = React.useState('');
 
     React.useEffect(() => {
-        if (!item.date) {
-            return;
+        let dateToFormat = null;
+
+        // Determinar cuál fecha formatear
+        if (item.estado.toLowerCase() === 'finalizada' && item.correccion?.correctionDate) {
+            dateToFormat = item.correccion.correctionDate;
+        } else if (item.date) {
+            dateToFormat = item.date;
         }
-        
-        if (item.date && item.date.toDate) {
-            setFormattedDate(moment(item.date.toDate()).calendar());
+
+        // Convertir el timestamp a Date si es necesario y luego formatear
+        if (dateToFormat) {
+            const dateObject = dateToFormat.toDate ? dateToFormat.toDate() : dateToFormat;
+            setFormattedDate(moment(dateObject).calendar());
         }
     }, [item]);
 
@@ -67,6 +74,5 @@ const styles = StyleSheet.create({
         color: '#888',
     },
 });
-
 
 export default Item;

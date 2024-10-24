@@ -55,6 +55,8 @@ const TaskListScreen = ({ route }) => {
         (selectedDifficulty === '' || task.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
     );
 
+
+
     const sections = [
         {
             title: 'LISTA DE ACTIVIDADES',
@@ -87,10 +89,10 @@ const TaskListScreen = ({ route }) => {
                 placeholder="Selecciona una dificultad"
                 searchActivo={false}
             />
-            
+
             {/* Usar tu componente LoadingScreen si está cargando las tareas y hay un paciente */}
             {loading ? (
-                <LoadingScreen /> 
+                <LoadingScreen />
             ) : (
                 selectedPatientId || isPaciente() ? (
                     <SectionList
