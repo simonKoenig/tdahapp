@@ -50,13 +50,16 @@ const TaskListScreen = ({ route }) => {
         }
     };
 
+    console.log('Tasks en front:', tasks);
+
+    // Filtrar las tareas que cumplen con los criterios de búsqueda
     const filteredTasks = tasks.filter(task =>
         task.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (selectedDifficulty === '' || task.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
     );
+    console.log('Tasks filtradas:', filteredTasks);
 
-
-
+    // Crear las secciones dividiendo las tareas entre finalizadas y no finalizadas
     const sections = [
         {
             title: 'LISTA DE ACTIVIDADES',
@@ -66,11 +69,14 @@ const TaskListScreen = ({ route }) => {
         },
         {
             title: 'COMPLETAS',
-            data: showCompletedTasks
-                ? filteredTasks.filter(task => task.estado.toLowerCase() === 'finalizada').length > 0
-                    ? filteredTasks.filter(task => task.estado.toLowerCase() === 'finalizada')
-                    : [{ id: 'no-tasks', nombre: 'No se encontraron tareas finalizadas' }]
-                : []
+            data: showCompletedTasks && filteredTasks.filter(task => task.estado.toLowerCase() === 'finalizada').length > 0
+                ? filteredTasks
+                    .filter(task => task.estado.toLowerCase() === 'finalizada')
+                    .sort((a, b) => {
+                        // Ordenar de mayor a menor para que las tareas más recientes estén primero
+                        return b.correccion?.correctionDate?.seconds - a.correccion?.correctionDate?.seconds;
+                    })
+                : [{ id: 'no-tasks', nombre: 'No se encontraron tareas finalizadas' }]
         },
     ];
 

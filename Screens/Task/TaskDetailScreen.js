@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Switch } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Switch, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DropdownComponent from '../../Components/Dropdown';
 import DateTimePickerComponent from '../../Components/DateTimePicker';
@@ -228,21 +228,83 @@ function TaskDetailScreen() {
 
     if (isPaciente()) {
         return (
-            <View style={styles.form}>
+            <ScrollView contentContainerStyle={styles.form}>
+                <View style={styles.form}>
+                    <Text style={styles.label}>Nombre</Text>
+                    <Text style={styles.input}>{nombre}</Text>
+                    <Text style={styles.label}>Descripción</Text>
+                    <Text style={styles.input}>{descripcion}</Text>
+                    <Text style={styles.label}>Fecha de creación</Text>
+                    <DateTimePickerComponent
+                        date={fechaCreacion}
+                        setDate={setDate}
+                        mode={mode}
+                        setMode={setMode}
+                        show={show}
+                        setShow={setShow}
+                        editable={false}
+                    />
+                    <Text style={styles.label}>Fecha y hora de vencimiento</Text>
+                    <DateTimePickerComponent
+                        date={date}
+                        setDate={setDate}
+                        mode={mode}
+                        setMode={setMode}
+                        show={show}
+                        setShow={setShow}
+                        editable={false}
+                    />
+                    <Text style={styles.label}>Dificultad</Text>
+                    <Text style={styles.input}>{dificultad}</Text>
+                    <Text style={styles.label}>Materia</Text>
+                    <Text style={styles.input}>{subjects.find(subject => subject.id === selectedSubjectId)?.nombre}</Text>
+                    {estado === 'En progreso' && (
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity style={styles.button} onPress={() => handleMarkTask('Pendiente')}>
+                                <Text style={styles.buttonText}>Tarea terminada</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                    {estado === 'Finalizada' && (
+                        <View style={styles.buttonContainer}>
+                            {!recompensaVencimiento || recompensaVencimiento > new Date() ? (
+                                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ObtainTask', { recompensaNombre, recompensaVencimiento })}>
+                                    <Text style={styles.buttonText}>Obtener recompensa</Text>
+                                </TouchableOpacity>
+                            ) : (
+                                <TouchableOpacity style={styles.buttonDisabled}>
+                                    <Text style={styles.buttonDisabledText}>Recompensa vencida</Text>
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                    )}
+                </View>
+            </ScrollView>
+        );
+    }
+
+    return (
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1 }}
+        >
+            <ScrollView contentContainerStyle={styles.scrollContent}>
                 <Text style={styles.label}>Nombre</Text>
-                <Text style={styles.input}>{nombre}</Text>
-                <Text style={styles.label}>Descripción</Text>
-                <Text style={styles.input}>{descripcion}</Text>
-                <Text style={styles.label}>Fecha de creación</Text>
-                <DateTimePickerComponent
-                    date={fechaCreacion}
-                    setDate={setDate}
-                    mode={mode}
-                    setMode={setMode}
-                    show={show}
-                    setShow={setShow}
-                    editable={false}
+                <TextInput
+                    style={styles.input}
+                    placeholder='Nombre de la tarea'
+                    value={nombre}
+                    onChangeText={setNombre}
                 />
+
+                <Text style={styles.label}>Descripción</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder='Descripción de la nueva tarea'
+                    value={descripcion}
+                    onChangeText={setDescripcion}
+                />
+
                 <Text style={styles.label}>Fecha y hora de vencimiento</Text>
                 <DateTimePickerComponent
                     date={date}
@@ -251,148 +313,95 @@ function TaskDetailScreen() {
                     setMode={setMode}
                     show={show}
                     setShow={setShow}
-                    editable={false}
+                    editable={true}
                 />
-                <Text style={styles.label}>Dificultad</Text>
-                <Text style={styles.input}>{dificultad}</Text>
+
                 <Text style={styles.label}>Materia</Text>
-                <Text style={styles.input}>{subjects.find(subject => subject.id === selectedSubjectId)?.nombre}</Text>
-                {estado === 'En progreso' && (
+                <DropdownComponent
+                    data={transformedSubjects}
+                    value={selectedSubjectId}
+                    setValue={setSelectedSubjectId}
+                    placeholder="Selecciona una materia"
+                    width='80%'
+                />
+
+                <Text style={styles.label}>Dificultad</Text>
+                <DropdownComponent
+                    data={dificultades}
+                    value={dificultad}
+                    setValue={setDificultad}
+                    placeholder="Selecciona una dificultad"
+                    width='80%'
+                />
+                <Text style={styles.label}>Recompensa</Text>
+                <DropdownComponent
+                    data={transformedRewards}
+                    value={selectedRewardId}
+                    setValue={setSelectedRewardId}
+                    placeholder="Selecciona una recompensa"
+                    width='80%'
+                />
+
+                <Text style={styles.label}>Vencimiento de la recompensa</Text>
+                <DateTimePickerComponent
+                    date={dateRewards}
+                    setDate={setDateRewards}
+                    mode={mode1}
+                    setMode={setMode1}
+                    show={show1}
+                    setShow={setShow1}
+                    editable={rewardExpires}
+                />
+                <View style={styles.switchContainer}>
+                    <Text style={styles.switchText}>¿La recompensa se vence?</Text>
+                    <Switch
+                        trackColor={{ false: '#D9D9D9', true: 'lightblue' }}
+                        thumbColor={rewardExpires ? '#4c669f' : 'gray'}
+                        value={rewardExpires}
+                        onValueChange={setRewardExpires}
+                    />
+                </View>
+
+                <Text style={styles.tareaCreadaText}>
+                    Tarea creada {moment(fechaCreacion).format('lll')}
+                </Text>
+
+                {correctionDate && adminName ? (
+                    <Text style={styles.tareaCorregidaText}>
+                        Tarea Corregida por {adminName} el {moment(correctionDate).format('lll')}
+                    </Text>
+                ) : (
+                    <Text style={styles.noCorreccionText}>
+                        Tarea aún no corregida
+                    </Text>
+                )}
+
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.button} onPress={handleUpdateTask}>
+                        <Text style={styles.buttonText}>Actualizar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.button} onPress={handleDeleteTask}>
+                        <Text style={styles.buttonText}>Eliminar</Text>
+                    </TouchableOpacity>
+                </View>
+                {estado === 'Pendiente' && (
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.button} onPress={() => handleMarkTask('Pendiente')}>
-                            <Text style={styles.buttonText}>Tarea terminada</Text>
+                        <TouchableOpacity style={styles.button} onPress={() => handleMarkTask('Finalizada')}>
+                            <Text style={styles.buttonText}>Tarea correcta</Text>
                         </TouchableOpacity>
                     </View>
                 )}
-                {estado === 'Finalizada' && (
-                    <View style={styles.buttonContainer}>
-                        {!recompensaVencimiento || recompensaVencimiento > new Date() ? (
-                            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ObtainTask', { recompensaNombre, recompensaVencimiento })}>
-                                <Text style={styles.buttonText}>Obtener recompensa</Text>
-                            </TouchableOpacity>
-                        ) : (
-                            <TouchableOpacity style={styles.buttonDisabled}>
-                                <Text style={styles.buttonDisabledText}>Recompensa vencida</Text>
-                            </TouchableOpacity>
-                        )}
-                    </View>
-                )}
-            </View>
-        );
-    }
-
-    return (
-        <ScrollView contentContainerStyle={styles.form}>
-            <Text style={styles.label}>Nombre</Text>
-            <TextInput
-                style={styles.input}
-                placeholder='Nombre de la tarea'
-                value={nombre}
-                onChangeText={setNombre}
-            />
-
-            <Text style={styles.label}>Descripción</Text>
-            <TextInput
-                style={styles.input}
-                placeholder='Descripción de la nueva tarea'
-                value={descripcion}
-                onChangeText={setDescripcion}
-            />
-
-            <Text style={styles.label}>Fecha y hora de vencimiento</Text>
-            <DateTimePickerComponent
-                date={date}
-                setDate={setDate}
-                mode={mode}
-                setMode={setMode}
-                show={show}
-                setShow={setShow}
-                editable={true}
-            />
-
-            <Text style={styles.label}>Materia</Text>
-            <DropdownComponent
-                data={transformedSubjects}
-                value={selectedSubjectId}
-                setValue={setSelectedSubjectId}
-                placeholder="Selecciona una materia"
-                width='80%'
-            />
-
-            <Text style={styles.label}>Dificultad</Text>
-            <DropdownComponent
-                data={dificultades}
-                value={dificultad}
-                setValue={setDificultad}
-                placeholder="Selecciona una dificultad"
-                width='80%'
-            />
-            <Text style={styles.label}>Recompensa</Text>
-            <DropdownComponent
-                data={transformedRewards}
-                value={selectedRewardId}
-                setValue={setSelectedRewardId}
-                placeholder="Selecciona una recompensa"
-                width='80%'
-            />
-
-            <Text style={styles.label}>Vencimiento de la recompensa</Text>
-            <DateTimePickerComponent
-                date={dateRewards}
-                setDate={setDateRewards}
-                mode={mode1}
-                setMode={setMode1}
-                show={show1}
-                setShow={setShow1}
-                editable={rewardExpires}
-            />
-            <View style={styles.switchContainer}>
-                <Text style={styles.switchText}>¿La recompensa se vence?</Text>
-                <Switch
-                    trackColor={{ false: '#D9D9D9', true: 'lightblue' }}
-                    thumbColor={rewardExpires ? '#4c669f' : 'gray'}
-                    value={rewardExpires}
-                    onValueChange={setRewardExpires}
-                />
-            </View>
-
-            <Text style={styles.tareaCreadaText}>
-                Tarea creada {moment(fechaCreacion).format('lll')}
-            </Text>
-
-            {correctionDate && adminName ? (
-                <Text style={styles.tareaCorregidaText}>
-                    Tarea Corregida por {adminName} el {moment(correctionDate).format('lll')}
-                </Text>
-            ) : (
-                <Text style={styles.noCorreccionText}>
-                    Tarea aún no corregida
-                </Text>
-            )}
-
-
-
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={handleUpdateTask}>
-                    <Text style={styles.buttonText}>Actualizar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={handleDeleteTask}>
-                    <Text style={styles.buttonText}>Eliminar</Text>
-                </TouchableOpacity>
-            </View>
-            {estado === 'Pendiente' && (
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.button} onPress={() => handleMarkTask('Finalizada')}>
-                        <Text style={styles.buttonText}>Tarea correcta</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-        </ScrollView>
-
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
+
+    scrollContent: {
+        paddingBottom: 20,
+        alignItems: 'center',
+    },
     form: {
         flex: 1,
         width: '100%',

@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { collection, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { collection, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase-config';
 import { AuthContext } from './AuthProvider';
 import { PatientsContext } from './PatientsProvider';
@@ -17,17 +17,17 @@ export const TasksProvider = ({ children }) => {
     useEffect(() => {
         const loadTasks = async () => {
             // Si el usuario no está autenticado, no hace nada
-            if (!user){
+            if (!user) {
                 return;
             }
             // Si el usuario es un paciente, se suscribe a sus propias recompensas en tiempo real
             if (isPaciente()) {
-                
+
                 // Cancela la suscripción anterior si existe
                 if (unsubscribe) {
                     unsubscribe();
                 }
-                
+
                 // Usa las recompensas en caché si existen
                 const cachedTasks = await getAsyncStorage(`tasks_${user.uid}`);
                 if (cachedTasks) {
@@ -40,7 +40,7 @@ export const TasksProvider = ({ children }) => {
                 }
 
                 // Crea una referencia a la colección de recompensas del usuario
-                const tasksRef = collection(db, 'usuarios', user.uid, 'tareas');
+                const tasksRef = query(collection(db, 'usuarios', user.uid, 'tareas'), orderBy('date', 'asc'));
                 // Se suscribe a los cambios en la colección de recompensas
                 const newUnsubscribe = onSnapshot(tasksRef, async (snapshot) => {
                     const tasksList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -65,7 +65,7 @@ export const TasksProvider = ({ children }) => {
                     unsubscribe();
                 }
 
-                
+
                 // Usa las recompensas en caché si existen, sino las obtiene con el fetch
                 const cachedTasks = await getAsyncStorage(`tasks_${selectedPatientId}`);
                 if (cachedTasks) {
@@ -91,17 +91,24 @@ export const TasksProvider = ({ children }) => {
 
     //Se usa la misma función para el paciente, donde si no se le pasa el uid, se toma el uid del paciente logueado
     const fetchTasks = async (uid = null) => {
-        // Usa el uid pasado como parámetro o el uid del usuario actual
         const userId = uid || user?.uid;
         if (userId) {
             try {
                 console.log('Fetching tasks for UID:', userId);
                 const tasksRef = collection(db, 'usuarios', userId, 'tareas');
-                const tasksSnapshot = await getDocs(tasksRef);
+
+                // Consulta todas las tareas, ordenadas por 'date' de manera descendente
+                const tasksQuery = query(tasksRef, orderBy('date', 'asc'));
+                const tasksSnapshot = await getDocs(tasksQuery);
                 const tasksList = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                console.log('Tareas ordenadas desde Firestore por fecha:', tasksList);
+
+                // Establecer el estado con todas las tareas ordenadas
                 setTasks(tasksList);
                 await setAsyncStorage(`tasks_${userId}`, tasksList);
+
                 return tasksList;
+
             } catch (error) {
                 console.error('Error fetching tasks:', error);
             }
@@ -117,7 +124,13 @@ export const TasksProvider = ({ children }) => {
                 const tasksRef = collection(db, 'usuarios', uid, 'tareas');
                 const docRef = await addDoc(tasksRef, task);
                 const newTask = { id: docRef.id, ...task };
-                setTasks(prevTasks => [...prevTasks, newTask]);
+
+                // Añadir la nueva tarea y ordenar las tareas por la fecha ('date')
+                setTasks(prevTasks => {
+                    const updatedTasks = [...prevTasks, newTask];
+                    return updatedTasks.sort((a, b) => a.date - b.date);
+                });
+
                 await addAsyncStorage(`tasks_${uid}`, newTask);
             } catch (error) {
                 console.error('Error adding task:', error);
