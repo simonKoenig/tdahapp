@@ -20,6 +20,7 @@ export const TasksProvider = ({ children }) => {
             if (!user) {
                 return;
             }
+
             // Si el usuario es un paciente, se suscribe a sus propias recompensas en tiempo real
             if (isPaciente()) {
 
@@ -32,37 +33,20 @@ export const TasksProvider = ({ children }) => {
                 const cachedTasks = await getAsyncStorage(`tasks_${user.uid}`);
                 if (cachedTasks) {
                     console.log('Setting Tasks from cache');
-                    setTasks(cachedTasks);
-                }
-                else {
+                    setTasks(sortTasks(cachedTasks)); // Ordenar las tareas antes de establecerlas en el estado
+                } else {
                     console.log('Fetching tasks');
                     fetchTasks(user.uid);
                 }
 
                 // Crea una referencia a la colección de recompensas del usuario
-                const tasksRef = collection(db, 'usuarios', user.uid, 'tareas');
+                const tasksRef = query(collection(db, 'usuarios', user.uid, 'tareas'), orderBy('date', 'asc'));
                 // Se suscribe a los cambios en la colección de recompensas
                 const newUnsubscribe = onSnapshot(tasksRef, async (snapshot) => {
-                    let tasksList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-                    // Ordenar tareas directamente aquí antes de establecerlas en el estado
-                    const completedTasks = tasksList
-                        .filter(task => task.estado.toLowerCase() === 'finalizada')
-                        .sort((a, b) => {
-                            return (b.correccion?.correctionDate?.seconds || 0) - (a.correccion?.correctionDate?.seconds || 0);
-                        });
-
-                    const uncompletedTasks = tasksList
-                        .filter(task => task.estado.toLowerCase() !== 'finalizada')
-                        .sort((a, b) => {
-                            return (a.date?.seconds || 0) - (b.date?.seconds || 0);
-                        });
-
-                    const finalTasks = [...uncompletedTasks, ...completedTasks];
-
+                    const tasksList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    setTasks(tasksList);
                     console.log('Setting tasks from snapshot');
-                    setTasks(finalTasks);
-                    await setAsyncStorage(`tasks_${user.uid}`, finalTasks);
+                    await setAsyncStorage(`tasks_${user.uid}`, tasksList);
                 });
 
                 // Guarda la nueva función de desuscripción
@@ -81,14 +65,12 @@ export const TasksProvider = ({ children }) => {
                     unsubscribe();
                 }
 
-
                 // Usa las recompensas en caché si existen, sino las obtiene con el fetch
                 const cachedTasks = await getAsyncStorage(`tasks_${selectedPatientId}`);
                 if (cachedTasks) {
                     console.log('Setting Tasks from cache');
-                    setTasks(cachedTasks);
-                }
-                else {
+                    setTasks(sortTasks(cachedTasks)); // Ordenar las tareas antes de establecerlas en el estado
+                } else {
                     console.log('Fetching tasks');
                     fetchTasks(selectedPatientId);
                 }
@@ -191,7 +173,6 @@ export const TasksProvider = ({ children }) => {
     };
 
     const updateTask = async (id, updatedTask, uid = null) => {
-        // Usa el uid pasado como parámetro o el uid del usuario actual
         const userId = uid || user?.uid;
         if (userId) {
             try {
@@ -199,47 +180,29 @@ export const TasksProvider = ({ children }) => {
                 const taskRef = doc(db, 'usuarios', userId, 'tareas', id);
                 await updateDoc(taskRef, updatedTask);
 
-                // Actualiza la lista de tareas en el estado local
+                // Actualiza la lista de tareas en el estado local y luego ordena
                 setTasks(prevTasks => {
-                    // Imprimir antes de modificar las tareas
-                    console.log("Antes de modificar y ordenar:");
-
+                    // Log antes de actualizar y ordenar
+                    console.log("Tareas antes de actualizar y ordenar:");
                     prevTasks.forEach(task => {
                         console.log(`Tarea: ${task.nombre}, Estado: ${task.estado}, correctionDate: ${task.correccion?.correctionDate?.seconds}`);
                     });
 
-                    // Actualizamos la tarea correspondiente si coincide con el `id`
-                    let updatedTasks = prevTasks.map(task =>
+                    // Actualiza la tarea en la lista
+                    const updatedTasks = prevTasks.map(task =>
                         task.id === id ? { id, ...updatedTask } : task
                     );
 
-                    // Separamos las tareas finalizadas y no finalizadas
-                    let completedTasks = updatedTasks.filter(task => task.estado.toLowerCase() === 'finalizada');
-                    let uncompletedTasks = updatedTasks.filter(task => task.estado.toLowerCase() !== 'finalizada');
+                    // Ordenar las tareas después de actualizar la tarea sin importar el campo
+                    const sortedTasks = sortTasks(updatedTasks);
 
-                    // Verificar los valores de `correctionDate` de las tareas finalizadas
-                    console.log("Tareas finalizadas antes de ordenar:");
-                    completedTasks.forEach(task => {
-                        console.log(`Tarea: ${task.nombre}, correctionDate: ${task.correccion?.correctionDate?.seconds}`);
-                    });
-
-                    // Ordenar las tareas finalizadas por correctionDate de mayor a menor
-                    completedTasks = completedTasks.sort((a, b) => {
-                        const dateA = a.correccion?.correctionDate?.seconds || 0;
-                        const dateB = b.correccion?.correctionDate?.seconds || 0;
-                        return dateB - dateA;
-                    });
-
-                    // Combinar las listas para el estado final
-                    const finalTasks = [...uncompletedTasks, ...completedTasks];
-
-                    // Imprimir después de ordenar y combinar
-                    console.log("Lista final después de ordenar:");
-                    finalTasks.forEach(task => {
+                    // Log después de ordenar
+                    console.log("Tareas después de ordenar:");
+                    sortedTasks.forEach(task => {
                         console.log(`Tarea: ${task.nombre}, Estado: ${task.estado}, correctionDate: ${task.correccion?.correctionDate?.seconds}`);
                     });
 
-                    return finalTasks;
+                    return sortedTasks;
                 });
 
                 // Actualiza también AsyncStorage (opcional)
@@ -252,7 +215,6 @@ export const TasksProvider = ({ children }) => {
             console.error('UID or user is not defined');
         }
     };
-
 
 
 
@@ -289,6 +251,27 @@ export const TasksProvider = ({ children }) => {
             }
         }
     }
+
+    const sortTasks = (tasks) => {
+        // Crear dos grupos: tareas no finalizadas y tareas finalizadas
+        const uncompletedTasks = tasks.filter(task => task.estado.toLowerCase() !== 'finalizada');
+        const completedTasks = tasks.filter(task => task.estado.toLowerCase() === 'finalizada');
+
+        // Ordenar las tareas no finalizadas por 'date' de menor a mayor
+        uncompletedTasks.sort((a, b) => {
+            return a.date.seconds - b.date.seconds;
+        });
+
+        // Ordenar las tareas finalizadas por 'correctionDate' de mayor a menor
+        completedTasks.sort((a, b) => {
+            return (b.correccion?.correctionDate?.seconds || 0) - (a.correccion?.correctionDate?.seconds || 0);
+        });
+
+        // Combinar los grupos: primero no finalizadas, luego finalizadas
+        return [...uncompletedTasks, ...completedTasks];
+    };
+
+
 
     return (
         <TasksContext.Provider value={{ tasks, setTasks, fetchTasks, addTask, updateTask, deleteTask, getTask }}>
