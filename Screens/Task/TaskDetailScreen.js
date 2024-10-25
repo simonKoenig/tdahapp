@@ -13,6 +13,8 @@ import { AuthContext } from '../../Context/AuthProvider';
 import { showConfirmAlert } from '../../Utils/showConfirmAlert';
 import Toast from 'react-native-toast-message';
 import moment from 'moment';
+import { Timestamp } from 'firebase/firestore';
+
 
 
 
@@ -100,7 +102,7 @@ function TaskDetailScreen() {
                 const correccion = {
                     adminUID: user.uid,
                     adminName: user.nombreApellido,
-                    correctionDate: new Date()
+                    correctionDate: Timestamp.fromDate(new Date()) // Convertir explícitamente a Timestamp
                 };
                 const updatedTask = {
                     nombre,
