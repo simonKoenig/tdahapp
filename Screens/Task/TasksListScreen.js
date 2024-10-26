@@ -73,15 +73,26 @@ const TaskListScreen = ({ route }) => {
         {
             title: 'LISTA DE ACTIVIDADES',
             data: filteredTasks.filter(task => task.estado.toLowerCase() !== 'finalizada').length > 0
-                ? filteredTasks.filter(task => task.estado.toLowerCase() !== 'finalizada')
+                ? filteredTasks
+                    .filter(task => task.estado.toLowerCase() !== 'finalizada')
+                    .sort((a, b) => {
+                        // Ordenar por 'date' de menor a mayor para que las tareas que vencen primero estén arriba
+                        return a.date?.seconds - b.date?.seconds; // Comparación directa de los segundos
+                    })
                 : [{ id: 'no-tasks', nombre: 'No se encontraron tareas' }]
         },
         {
             title: 'COMPLETAS',
-            data: filteredTasks.filter(task => task.estado.toLowerCase() === 'finalizada').length > 0
-                ? filteredTasks.filter(task => task.estado.toLowerCase() === 'finalizada')
+            data: showCompletedTasks && filteredTasks.filter(task => task.estado.toLowerCase() === 'finalizada').length > 0
+                ? filteredTasks
+                    .filter(task => task.estado.toLowerCase() === 'finalizada')
+                    .sort((a, b) => {
+                        // Ordenar de mayor a menor para que las tareas más recientes estén primero
+                        return b.correccion?.correctionDate?.seconds - a.correccion?.correctionDate?.seconds;
+                    })
                 : [{ id: 'no-tasks', nombre: 'No se encontraron tareas finalizadas' }]
-        }
+        },
+
     ];
 
     return (

@@ -40,15 +40,35 @@ export const TasksProvider = ({ children }) => {
                 }
 
                 // Crea una referencia a la colección de recompensas del usuario
-                const tasksRef = query(collection(db, 'usuarios', user.uid, 'tareas'), orderBy('date', 'asc'));
+                const tasksRef = collection(db, 'usuarios', user.uid, 'tareas');
+
                 // Se suscribe a los cambios en la colección de recompensas
                 const newUnsubscribe = onSnapshot(tasksRef, async (snapshot) => {
-                    const tasksList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    setTasks(tasksList);
-                    console.log('Setting tasks from snapshot');
-                    await setAsyncStorage(`tasks_${user.uid}`, tasksList);
-                });
+                    // Convertir los documentos de Firestore en objetos
+                    let tasksList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
+                    // Log antes de ordenar
+                    console.log("Tareas desde snapshot antes de ordenar:");
+                    tasksList.forEach(task => {
+                        console.log(`Tarea: ${task.nombre}, Estado: ${task.estado}, correctionDate: ${task.correccion?.correctionDate?.seconds}`);
+                    });
+
+                    // Ordenar las tareas usando la función `sortTasks`
+                    const sortedTasks = sortTasks(tasksList);
+
+                    // Log después de ordenar
+                    console.log("Tareas después de ordenar desde snapshot:");
+                    sortedTasks.forEach(task => {
+                        console.log(`Tarea: ${task.nombre}, Estado: ${task.estado}, correctionDate: ${task.correccion?.correctionDate?.seconds}`);
+                    });
+
+                    // Actualizar el estado con la lista ordenada
+                    setTasks(sortedTasks);
+                    console.log('Setting tasks from snapshot');
+
+                    // Guardar las tareas ordenadas en AsyncStorage
+                    await setAsyncStorage(`tasks_${user.uid}`, sortedTasks);
+                });
                 // Guarda la nueva función de desuscripción
                 setUnsubscribe(() => newUnsubscribe);
             }
