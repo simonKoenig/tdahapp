@@ -18,13 +18,13 @@ const PriorityBadge = ({ tipo, valor }) => {
         } else if (tipo === 'estado') {
             switch (valor.toLowerCase()) {
                 case 'en progreso':
-                    return '#ffb74d'; // Naranja claro
+                    return '#a46200'; // Naranja claro
                 case 'finalizada':
-                    return '#81c784'; // Verde
+                    return '#037208'; // Verde
                 case 'pendiente':
-                    return '#64b5f6'; // Azul claro
+                    return '#3c729e'; // Azul claro
                 case 'vencida':
-                    return '#e57373'; // Rojo claro
+                    return '#a41b1b'; // Rojo claro
                 default:
                     return '#e0e0e0'; // Gris por defecto
             }
@@ -42,6 +42,8 @@ const styles = StyleSheet.create({
     priorityContainer: {
         paddingHorizontal: 10,
         paddingVertical: 5,
+        borderRadius: 5,
+        paddingHorizontal: 5,
         borderRadius: 5,
     },
     priorityText: {
