@@ -29,14 +29,14 @@ export const COLORS = {
 };
 
 export const FONT_SIZES = {
-    small: 16,  // Tamaño aumentado para mejorar la legibilidad
+    small: 15,  // Tamaño aumentado para mejorar la legibilidad
     medium: 18, // Tamaño aumentado para textos generales
     large: 20,  // Tamaño para subtítulos o encabezados
     xlarge: 28, // Tamaño mayor para encabezados principales
 };
 
 export const SPACING = {
-    small: 12,  // Aumentado ligeramente para mejorar el confort de lectura y navegación
+    small: 10,  // Aumentado ligeramente para mejorar el confort de lectura y navegación
     medium: 18,
     large: 24,
 };
