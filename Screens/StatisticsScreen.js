@@ -1,6 +1,6 @@
 // React y React Native
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 // Contexts
 import { PatientsContext } from '../Context/PatientsProvider';
 import { RewardsContext } from '../Context/RewardsProvider';
@@ -9,6 +9,7 @@ import { TasksContext } from '../Context/TaskProvider';
 // Componentes
 import PatientSelector from '../Components/PatientSelector';
 import LoadingScreen from '../Components/LoadingScreen';
+import GraphPie from '../Components/GraphPie';
 
 function StatisticsScreen() {
     const { selectedPatientId } = useContext(PatientsContext);
@@ -114,7 +115,7 @@ function StatisticsScreen() {
                 <LoadingScreen />
             ) : (
                 selectedPatientId ? (
-                    <View>
+                    <ScrollView>
                         <Text style={styles.statText}>Cantidad de tareas: {tareasTotales}</Text>
                         <Text style={styles.statText}>Tareas en progreso: {tareasEnProgreso.length}</Text>
                         <Text style={styles.statText}>Tareas pendientes: {tareasPendientes.length}</Text>
@@ -135,7 +136,8 @@ function StatisticsScreen() {
                         <Text style={styles.statText}>Materia con más tareas vencidas: 
                             {cantidadMateriasConTareasVencidas.length > 0 ? cantidadMateriasConTareasVencidas[0].materia : 'No hay materias'}
                         </Text>
-                    </View>
+                        <GraphPie data={cantidadMateriasConTareas} />
+                    </ScrollView>
                 ) : (
                     <Text style={styles.noPatientText}>Selecciona un paciente para ver sus estadísticas.</Text>
                 )
