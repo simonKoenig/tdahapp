@@ -10,7 +10,8 @@ import { filtradoDificultades } from '../../Utils/Constant';
 import { AuthContext } from '../../Context/AuthProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';
 import LoadingScreen from '../../Components/LoadingScreen'; // Importar tu componente de loading
-
+import { globalStyles } from '../../Utils/globalStyles';
+import { SPACING, COLORS } from '../../Utils/Constant';
 // Import moment para formatear la fecha y mostrarla en español
 import moment from 'moment';
 import 'moment/locale/es';
@@ -74,7 +75,7 @@ const TaskListScreen = ({ route }) => {
     ];
 
     return (
-        <View style={styles.container}>
+        <View style={globalStyles.container}>
             <Text style={styles.fechaText}>{fechaHoy}</Text>
             <PatientSelector />
             <SearchBar
@@ -99,7 +100,9 @@ const TaskListScreen = ({ route }) => {
                         keyExtractor={(item, index) => item.id + index}
                         renderItem={({ item }) => (
                             item.id === 'no-tasks' ? (
-                                <Text style={styles.noTasksText}>{item.nombre}</Text>
+                                <View style={globalStyles.centeredContainer}>
+                                    <Text style={globalStyles.noDataText}>{item.nombre}</Text>
+                                </View>
                             ) : (
                                 <TaskItem
                                     item={item}
@@ -110,7 +113,7 @@ const TaskListScreen = ({ route }) => {
                         renderSectionHeader={({ section: { title } }) => (
                             <TouchableOpacity onPress={() => title === 'COMPLETAS' && setShowCompletedTasks(!showCompletedTasks)}>
                                 <View style={styles.sectionHeader}>
-                                    <Text style={styles.headerTitle}>{title}</Text>
+                                    <Text style={globalStyles.lessBoldText}>{title}</Text>
                                     {title === 'COMPLETAS' && (
                                         <Text style={styles.triangle}>{showCompletedTasks ? '▲' : '▼'}</Text>
                                     )}
@@ -138,32 +141,21 @@ const TaskListScreen = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 16,
-        backgroundColor: '#ffffff',
-    },
     sectionHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 10,
-        marginTop: 20,
-    },
-    headerTitle: {
-        paddingVertical: 5,
-        fontSize: 18,
-        fontWeight: 'bold',
+        marginTop: SPACING.small,
     },
     triangle: {
         fontSize: 28,
-        paddingRight: 10,
+        color: COLORS.text,
     },
     addButton: {
         position: 'absolute',
-        bottom: 30,
-        right: 30,
-        backgroundColor: '#d32f2f',
+        bottom: SPACING.large,
+        right: SPACING.large,
+        backgroundColor: '#285583',
         width: 60,
         height: 60,
         borderRadius: 30,
@@ -172,26 +164,21 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     addButtonText: {
-        color: '#ffffff',
+        color: 'white',
         fontSize: 24,
-        fontWeight: 'bold',
-    },
-    noTasksText: {
-        textAlign: 'center',
-        marginTop: 10,
-        fontStyle: 'italic',
+        fontFamily: 'bold',
     },
     fechaText: {
         fontSize: 18,
-        fontWeight: '800',
-        marginBottom: 10,
-        color: '#666666',
+        fontFamily: 'bold',
+        marginBottom: SPACING.small,
+        color: COLORS.text,
     },
     noPatientText: {
         textAlign: 'center',
         fontSize: 18,
-        color: '#666666',
-        marginTop: 20,
+        color: COLORS.text,
+        marginTop: SPACING.medium,
     },
 });
 
