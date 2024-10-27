@@ -4,13 +4,13 @@ import { View, FlatList, TouchableOpacity, Text, StyleSheet, Button } from 'reac
 import { RewardsContext } from '../../Context/RewardsProvider';
 import { useNavigation } from '@react-navigation/native';
 import RewardItem from '../../Components/RewardItem';
-import SearchBar from '../../Components/SearchBar'; 
-import DropdownComponent from '../../Components/Dropdown';  
+import SearchBar from '../../Components/SearchBar';
+import DropdownComponent from '../../Components/Dropdown';
 
 import PatientSelector from '../../Components/PatientSelector';
-import LoadingScreen from '../../Components/LoadingScreen';  
+import LoadingScreen from '../../Components/LoadingScreen';
 
-import { filtradoDificultades } from '../../Utils/Constant';  
+import { filtradoDificultades } from '../../Utils/Constant';
 
 import { AuthContext } from '../../Context/AuthProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';
@@ -19,14 +19,14 @@ const RewardsListScreen = ({ route }) => {
     const { rewards, fetchRewards } = useContext(RewardsContext);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedDifficulty, setSelectedDifficulty] = useState('');
-    const [refreshing, setRefreshing] = useState(false); 
+    const [refreshing, setRefreshing] = useState(false);
     const navigation = useNavigation();
     const [rewardsCache, setRewardsCache] = useState({});
-    const [loading, setLoading] = useState(false); 
+    const [loading, setLoading] = useState(false);
     const { selectedPatientId } = useContext(PatientsContext);
 
 
-   
+
     const filteredRewards = rewards.filter(reward =>
         reward.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (selectedDifficulty === '' || reward.dificultad.toLowerCase() === selectedDifficulty.toLowerCase())
@@ -34,18 +34,18 @@ const RewardsListScreen = ({ route }) => {
 
     const handleRefresh = async () => {
         setRefreshing(true);
-        setLoading(true);  
+        // setLoading(true);  
         await fetchRewards(selectedPatientId);
         setRefreshing(false);
-        setLoading(false);  
+        // setLoading(false);  
 
     };
 
     const handlePatientSelection = async (patientId) => {
         if (patientId) {
-            setLoading(true);  
-            await fetchRewards(patientId);  
-            setLoading(false);  
+            setLoading(true);
+            await fetchRewards(patientId);
+            setLoading(false);
         }
     };
 
@@ -61,7 +61,7 @@ const RewardsListScreen = ({ route }) => {
                     />
                 )}
                 refreshing={refreshing}
-                onRefresh={handleRefresh}  
+                onRefresh={handleRefresh}
             />
         );
     };
@@ -69,7 +69,7 @@ const RewardsListScreen = ({ route }) => {
 
     return (
         <View style={styles.container}>
-            <PatientSelector onPatientSelected={handlePatientSelection} /> 
+            <PatientSelector onPatientSelected={handlePatientSelection} />
             <SearchBar
                 searchTerm={searchTerm}
                 onSearch={setSearchTerm}
@@ -84,7 +84,7 @@ const RewardsListScreen = ({ route }) => {
                 <LoadingScreen />
             ) : (
                 selectedPatientId ? (
-                    renderRewardList()  
+                    renderRewardList()
                 ) : (
                     <Text style={styles.noPatientText}>Selecciona un paciente para ver sus recompensas.</Text>
                 )

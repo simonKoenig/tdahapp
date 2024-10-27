@@ -27,7 +27,8 @@ const Item = ({ item, onPress, tipo, valor = '', mostrarFecha }) => {
         <TouchableOpacity
             accessible={true}
             accessibilityRole="button"
-            accessibilityLabel={`${item.nombre}. ${valor === 'Finalizada' ? `Corregida el ${formattedDate}` : formattedDate ? `Vence el ${formattedDate}` : ''}. Estado: ${valor}`}
+            accessibilityHint="Toque dos veces para ver los detalles"
+            accessibilityLabel={`${item.nombre}. ${valor === 'Finalizada' ? `Corregida el ${formattedDate}` : formattedDate ? `Vencimiento ${formattedDate}` : ''}. Estado: ${valor}`}
             style={styles.itemContainer}
             onPress={onPress}
         >

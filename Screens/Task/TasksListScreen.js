@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, SectionList, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, SectionList, Text, StyleSheet, TouchableOpacity, AccessibilityInfo } from 'react-native';
 import { TasksContext } from '../../Context/TaskProvider';
 import TaskItem from '../../Components/TaskItem';
 import { useNavigation } from '@react-navigation/native';
@@ -35,9 +35,10 @@ const TaskListScreen = ({ route }) => {
     useEffect(() => {
         const loadTasks = async () => {
             if (selectedPatientId) {
-                setLoading(true); // Mostrar loading cuando se selecciona un paciente
+                // setLoading(true); // Mostrar loading cuando se selecciona un paciente
                 await fetchTasks(selectedPatientId); // Cargar tareas del paciente
-                setLoading(false); // Desactivar loading cuando terminen de cargarse
+                // setLoading(false); // Desactivar loading cuando terminen de cargarse
+                AccessibilityInfo.announceForAccessibility('Lista de tareas actualizada');
             }
         };
         loadTasks();
@@ -48,6 +49,7 @@ const TaskListScreen = ({ route }) => {
             setRefreshing(true);
             await fetchTasks(selectedPatientId);
             setRefreshing(false);
+            AccessibilityInfo.announceForAccessibility('Lista de tareas refrescada');
         }
     };
 
@@ -76,7 +78,9 @@ const TaskListScreen = ({ route }) => {
 
     return (
         <View style={globalStyles.container}>
-            <Text style={styles.fechaText}>{fechaHoy}</Text>
+            <Text style={styles.fechaText} accessible={true} accessibilityLabel={`Fecha de hoy: ${fechaHoy}`}>
+                {fechaHoy}
+            </Text>
             <PatientSelector />
             <SearchBar
                 searchTerm={searchTerm}
@@ -92,7 +96,7 @@ const TaskListScreen = ({ route }) => {
 
             {/* Usar tu componente LoadingScreen si está cargando las tareas y hay un paciente */}
             {loading ? (
-                <LoadingScreen />
+                <LoadingScreen accessibilityLabel="Cargando tareas, por favor espere" />
             ) : (
                 selectedPatientId || isPaciente() ? (
                     <SectionList
@@ -111,27 +115,40 @@ const TaskListScreen = ({ route }) => {
                             )
                         )}
                         renderSectionHeader={({ section: { title } }) => (
-                            <TouchableOpacity onPress={() => title === 'COMPLETAS' && setShowCompletedTasks(!showCompletedTasks)}>
-                                <View style={styles.sectionHeader}>
-                                    <Text style={globalStyles.lessBoldText}>{title}</Text>
-                                    {title === 'COMPLETAS' && (
+                            title === 'COMPLETAS' ? (
+                                <TouchableOpacity
+                                    onPress={() => setShowCompletedTasks(!showCompletedTasks)}
+                                    accessible={true}
+                                    accessibilityLabel={`Sección de tareas completas. ${showCompletedTasks ? 'Ocultar' : 'Mostrar'} tareas completadas`}
+                                    accessibilityState={{ expanded: showCompletedTasks }}
+                                >
+                                    <View style={styles.sectionHeader}>
+                                        <Text style={globalStyles.lessBoldText}>{title}</Text>
                                         <Text style={styles.triangle}>{showCompletedTasks ? '▲' : '▼'}</Text>
-                                    )}
+                                    </View>
+                                </TouchableOpacity>
+                            ) : (
+                                <View style={styles.sectionHeader} accessible={true} accessibilityRole="header">
+                                    <Text style={globalStyles.lessBoldText}>{title}</Text>
                                 </View>
-                            </TouchableOpacity>
+                            )
                         )}
                         refreshing={refreshing}
                         onRefresh={handleRefresh}
                     />
                 ) : (
-                    <Text style={styles.noPatientText}>Selecciona un paciente para ver sus tareas.</Text>
-                )
+                    <Text style={styles.noPatientText} accessible={true} accessibilityLabel="Selecciona un paciente para ver sus tareas">
+                        Selecciona un paciente para ver sus tareas.
+                    </Text>)
             )}
 
             {!isPaciente() && (
                 <TouchableOpacity
                     style={styles.addButton}
                     onPress={() => navigation.navigate('AddTask')}
+                    accessible={true}
+                    accessibilityLabel="Botón para agregar nueva tarea"
+                    accessibilityRole="button"
                 >
                     <Text style={styles.addButtonText}>+</Text>
                 </TouchableOpacity>

@@ -6,16 +6,16 @@ import SearchBar from '../../Components/SearchBar';
 import SubjectItem from '../../Components/SubjectItem';
 import PatientSelector from '../../Components/PatientSelector';
 import { PatientsContext } from '../../Context/PatientsProvider';
-import LoadingScreen from '../../Components/LoadingScreen'; 
+import LoadingScreen from '../../Components/LoadingScreen';
 
 const SubjectsListScreen = () => {
     const { subjects, fetchSubjects } = useContext(SubjectsContext);
     const { selectedPatientId } = useContext(PatientsContext);
     const [searchTerm, setSearchTerm] = useState('');
     const [refreshing, setRefreshing] = useState(false);
-    const [loading, setLoading] = useState(false); 
+    const [loading, setLoading] = useState(false);
     const navigation = useNavigation();
-    
+
     // Filtrar materias basadas en el término de búsqueda
     const filteredSubjects = subjects.filter(subject =>
         subject.nombre.toLowerCase().includes(searchTerm.toLowerCase())
@@ -24,19 +24,19 @@ const SubjectsListScreen = () => {
     // Manejar la actualización manual
     const handleRefresh = async () => {
         if (selectedPatientId) {
-            setRefreshing(true);  
-            setLoading(true);  
-            await fetchSubjects(selectedPatientId);  
-            setRefreshing(false);  
-            setLoading(false);  
+            setRefreshing(true);
+            setLoading(true);
+            await fetchSubjects(selectedPatientId);
+            setRefreshing(false);
+            setLoading(false);
         }
     };
 
     const handlePatientSelection = async (patientId) => {
         if (patientId) {
-            setLoading(true);  
-            await fetchSubjects(patientId);  
-            setLoading(false);  
+            // setLoading(true);  
+            await fetchSubjects(patientId);
+            // setLoading(false);  
         }
     };
 
@@ -52,14 +52,14 @@ const SubjectsListScreen = () => {
                     />
                 )}
                 refreshing={refreshing}
-                onRefresh={handleRefresh}  
+                onRefresh={handleRefresh}
             />
         );
     };
 
     return (
         <View style={styles.container}>
-            <PatientSelector onPatientSelected={handlePatientSelection} /> 
+            <PatientSelector onPatientSelected={handlePatientSelection} />
             <SearchBar
                 searchTerm={searchTerm}
                 onSearch={setSearchTerm}
@@ -69,7 +69,7 @@ const SubjectsListScreen = () => {
                 <LoadingScreen />
             ) : (
                 selectedPatientId ? (
-                    renderSubjectList()  
+                    renderSubjectList()
                 ) : (
                     <Text style={styles.noPatientText}>Selecciona un paciente para ver sus materias.</Text>
                 )
