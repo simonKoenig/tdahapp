@@ -14,6 +14,9 @@ import { showConfirmAlert } from '../../Utils/showConfirmAlert';
 import Toast from 'react-native-toast-message';
 import moment from 'moment';
 import { Timestamp } from 'firebase/firestore';
+import { globalStyles } from '../../Utils/globalStyles';
+import { PLACEHOLDER_TEXT_COLOR } from '../../Utils/globalStyles';
+
 
 
 
@@ -230,60 +233,66 @@ function TaskDetailScreen() {
 
     if (isPaciente()) {
         return (
-            <ScrollView contentContainerStyle={styles.form}>
-                <View style={styles.form}>
-                    <Text style={styles.label}>Nombre</Text>
-                    <Text style={styles.input}>{nombre}</Text>
-                    <Text style={styles.label}>Descripción</Text>
-                    <Text style={styles.input}>{descripcion}</Text>
-                    <Text style={styles.label}>Fecha de creación</Text>
-                    <DateTimePickerComponent
-                        date={fechaCreacion}
-                        setDate={setDate}
-                        mode={mode}
-                        setMode={setMode}
-                        show={show}
-                        setShow={setShow}
-                        editable={false}
-                    />
-                    <Text style={styles.label}>Fecha y hora de vencimiento</Text>
-                    <DateTimePickerComponent
-                        date={date}
-                        setDate={setDate}
-                        mode={mode}
-                        setMode={setMode}
-                        show={show}
-                        setShow={setShow}
-                        editable={false}
-                    />
-                    <Text style={styles.label}>Dificultad</Text>
-                    <Text style={styles.input}>{dificultad}</Text>
-                    <Text style={styles.label}>Materia</Text>
-                    <Text style={styles.input}>{subjects.find(subject => subject.id === selectedSubjectId)?.nombre}</Text>
-                    {estado === 'En progreso' && (
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity style={styles.button} onPress={() => handleMarkTask('Pendiente')}>
-                                <Text style={styles.buttonText}>Tarea terminada</Text>
-                            </TouchableOpacity>
-                        </View>
-                    )}
-                    {estado === 'Finalizada' && (
-                        <View style={styles.buttonContainer}>
-                            {!recompensaVencimiento || recompensaVencimiento > new Date() ? (
-                                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ObtainTask', { recompensaNombre, recompensaVencimiento })}>
-                                    <Text style={styles.buttonText}>Obtener recompensa</Text>
+            <ScrollView contentContainerStyle={globalStyles.form}>
+                {loading ? (
+                    <LoadingScreen />
+                ) : (
+                    <View style={globalStyles.form}>
+                        <Text style={globalStyles.label}>Nombre</Text>
+                        <Text style={globalStyles.input}>{nombre}</Text>
+                        <Text style={globalStyles.label}>Descripción</Text>
+                        <Text style={globalStyles.input}>{descripcion}</Text>
+                        <Text style={globalStyles.label}>Fecha de creación</Text>
+                        <DateTimePickerComponent
+                            date={fechaCreacion}
+                            setDate={setDate}
+                            mode={mode}
+                            setMode={setMode}
+                            show={show}
+                            setShow={setShow}
+                            editable={false}
+                        />
+                        <Text style={globalStyles.label}>Fecha y hora de vencimiento</Text>
+                        <DateTimePickerComponent
+                            date={date}
+                            setDate={setDate}
+                            mode={mode}
+                            setMode={setMode}
+                            show={show}
+                            setShow={setShow}
+                            editable={false}
+                        />
+                        <Text style={globalStyles.label}>Dificultad</Text>
+                        <Text style={globalStyles.input}>{dificultad}</Text>
+                        <Text style={globalStyles.label}>Materia</Text>
+                        <Text style={globalStyles.input}>{subjects.find(subject => subject.id === selectedSubjectId)?.nombre}</Text>
+
+                        {estado === 'En progreso' && (
+                            <View style={styles.buttonContainer}>
+                                <TouchableOpacity style={[globalStyles.button, { flex: 1 }]} onPress={() => handleMarkTask('Pendiente')}>
+                                    <Text style={globalStyles.buttonText}>Tarea terminada</Text>
                                 </TouchableOpacity>
-                            ) : (
-                                <TouchableOpacity style={styles.buttonDisabled}>
-                                    <Text style={styles.buttonDisabledText}>Recompensa vencida</Text>
-                                </TouchableOpacity>
-                            )}
-                        </View>
-                    )}
-                </View>
+                            </View>
+                        )}
+                        {estado === 'Finalizada' && (
+                            <View style={styles.buttonContainer}>
+                                {!recompensaVencimiento || recompensaVencimiento > new Date() ? (
+                                    <TouchableOpacity style={[globalStyles.button, { flex: 1 }]} onPress={() => navigation.navigate('ObtainTask', { recompensaNombre, recompensaVencimiento })}>
+                                        <Text style={styles.buttonText}>Obtener recompensa</Text>
+                                    </TouchableOpacity>
+                                ) : (
+                                    <TouchableOpacity style={[globalStyles.backbutton, { flex: 1 }]}>
+                                        <Text style={globalStyles.backbuttonText}>Recompensa vencida</Text>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+                        )}
+                    </View>
+                )}
             </ScrollView>
         );
     }
+
 
     return (
         <KeyboardAvoidingView
@@ -291,23 +300,25 @@ function TaskDetailScreen() {
             style={{ flex: 1 }}
         >
             <ScrollView contentContainerStyle={styles.scrollContent}>
-                <Text style={styles.label}>Nombre</Text>
+                <Text style={globalStyles.label}>Nombre</Text>
                 <TextInput
-                    style={styles.input}
+                    style={globalStyles.input}
+                    placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
                     placeholder='Nombre de la tarea'
                     value={nombre}
                     onChangeText={setNombre}
                 />
 
-                <Text style={styles.label}>Descripción</Text>
+                <Text style={globalStyles.label}>Descripción</Text>
                 <TextInput
-                    style={styles.input}
+                    style={globalStyles.input}
+                    placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
                     placeholder='Descripción de la nueva tarea'
                     value={descripcion}
                     onChangeText={setDescripcion}
                 />
 
-                <Text style={styles.label}>Fecha y hora de vencimiento</Text>
+                <Text style={globalStyles.label}>Fecha y hora de vencimiento</Text>
                 <DateTimePickerComponent
                     date={date}
                     setDate={setDate}
@@ -318,7 +329,7 @@ function TaskDetailScreen() {
                     editable={true}
                 />
 
-                <Text style={styles.label}>Materia</Text>
+                <Text style={globalStyles.label}>Materia</Text>
                 <DropdownComponent
                     data={transformedSubjects}
                     value={selectedSubjectId}
@@ -327,7 +338,7 @@ function TaskDetailScreen() {
                     width='80%'
                 />
 
-                <Text style={styles.label}>Dificultad</Text>
+                <Text style={globalStyles.label}>Dificultad</Text>
                 <DropdownComponent
                     data={dificultades}
                     value={dificultad}
@@ -335,7 +346,7 @@ function TaskDetailScreen() {
                     placeholder="Selecciona una dificultad"
                     width='80%'
                 />
-                <Text style={styles.label}>Recompensa</Text>
+                <Text style={globalStyles.label}>Recompensa</Text>
                 <DropdownComponent
                     data={transformedRewards}
                     value={selectedRewardId}
@@ -344,7 +355,7 @@ function TaskDetailScreen() {
                     width='80%'
                 />
 
-                <Text style={styles.label}>Vencimiento de la recompensa</Text>
+                <Text style={globalStyles.label}>Vencimiento de la recompensa</Text>
                 <DateTimePickerComponent
                     date={dateRewards}
                     setDate={setDateRewards}
@@ -379,17 +390,17 @@ function TaskDetailScreen() {
                 )}
 
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.button} onPress={handleUpdateTask}>
-                        <Text style={styles.buttonText}>Actualizar</Text>
+                    <TouchableOpacity style={[globalStyles.button, { flex: 1, marginRight: 10 }]} onPress={handleUpdateTask}>
+                        <Text style={globalStyles.buttonText}>Actualizar</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} onPress={handleDeleteTask}>
-                        <Text style={styles.buttonText}>Eliminar</Text>
+                    <TouchableOpacity style={[globalStyles.button, { flex: 1 }]} onPress={handleDeleteTask}>
+                        <Text style={globalStyles.buttonText}>Eliminar</Text>
                     </TouchableOpacity>
                 </View>
                 {estado === 'Pendiente' && (
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.button} onPress={() => handleMarkTask('Finalizada')}>
-                            <Text style={styles.buttonText}>Tarea correcta</Text>
+                        <TouchableOpacity style={[globalStyles.button, { flex: 1 }]} onPress={() => handleMarkTask('Finalizada')}>
+                            <Text style={globalStyles.buttonText}>Tarea correcta</Text>
                         </TouchableOpacity>
                     </View>
                 )}

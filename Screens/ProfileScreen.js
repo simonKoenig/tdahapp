@@ -137,7 +137,6 @@ function ProfileScreen() {
                 });
                 console.log('Error en handleDeletePatient:', result.error);
             } else {
-                AccessibilityInfo.announceForAccessibility('El usuario ha sido eliminado correctamente.');
                 Toast.show({
                     type: 'success',
                     text1: 'Éxito',
@@ -252,11 +251,11 @@ function ProfileScreen() {
                     )}
                     <View style={[styles.buttonsContainer, isPaciente() && styles.extraStyle]}>
                         <TouchableOpacity
-                            style={styles.logoutButton}
+                            style={globalStyles.button}
                             onPress={handleLogout}
                             accessibilityLabel="Cerrar sesión"
                             accessibilityHint="Cerrar la sesión actual y regresar a la pantalla de inicio de sesión">
-                            <Text style={styles.logoutButtonText}>CERRAR SESIÓN</Text>
+                            <Text style={globalStyles.buttonText}>Cerrar sesión</Text>
                         </TouchableOpacity>
                     </View>
                 </>
@@ -284,18 +283,7 @@ const styles = StyleSheet.create({
     },
     extraStyle: {
         flexGrow: 1,
-    },
-    logoutButton: {
-        marginVertical: SPACING.small,
-        backgroundColor: '#285583',
-        padding: 15,
-        borderRadius: 5,
-    },
-    logoutButtonText: {
-        color: 'white',
-        textAlign: 'center',
-        fontWeight: 'bold',
-    },
+    }
 });
 
 

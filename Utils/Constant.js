@@ -26,6 +26,8 @@ export const COLORS = {
     background: '#F9F9F4',  // Fondo claro para maximizar el contraste con el texto
     text: '#1A1A1A',  // Texto principal con mejor contraste
     infoText: '#565454',
+    disableInput: '#D9D9D9'
+
 };
 
 export const FONT_SIZES = {

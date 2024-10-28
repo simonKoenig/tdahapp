@@ -7,6 +7,7 @@ import SubjectItem from '../../Components/SubjectItem';
 import PatientSelector from '../../Components/PatientSelector';
 import { PatientsContext } from '../../Context/PatientsProvider';
 import LoadingScreen from '../../Components/LoadingScreen';
+import { globalStyles } from '../../Utils/globalStyles';
 
 const SubjectsListScreen = () => {
     const { subjects, fetchSubjects } = useContext(SubjectsContext);
@@ -69,7 +70,12 @@ const SubjectsListScreen = () => {
                 <LoadingScreen />
             ) : (
                 selectedPatientId ? (
-                    renderSubjectList()
+                    <>
+                        {/* Título antes de mostrar la FlatList */}
+                        <Text style={[globalStyles.lessBoldText]} accessibilityRole="header">Lista de materias</Text>
+                        {renderSubjectList()}
+                    </>
+
                 ) : (
                     <Text style={styles.noPatientText}>Selecciona un paciente para ver sus materias.</Text>
                 )

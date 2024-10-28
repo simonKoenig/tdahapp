@@ -1,5 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { globalStyles } from '../../Utils/globalStyles';
+import { PLACEHOLDER_TEXT_COLOR } from '../../Utils/globalStyles';
 
 
 
@@ -68,7 +70,7 @@ function SubjectDetailScreen() {
                             text1: 'Éxito',
                             text2: 'Materia actualizada correctamente. Toca aquí para cerrar.',
                         });
-                        navigation.goBack();  
+                        navigation.goBack();
                     }
                 } catch (error) {
                     Toast.show({
@@ -84,7 +86,7 @@ function SubjectDetailScreen() {
     }
 
     const handleDeleteSubject = () => {
-  
+
         showConfirmAlert({
             title: "Confirmar eliminación",
             message: `¿Estás seguro que deseas eliminar la materia "${nombre}"?`,
@@ -106,7 +108,7 @@ function SubjectDetailScreen() {
                             text1: 'Éxito',
                             text2: 'Materia eliminada correctamente. Toca aquí para cerrar.',
                         });
-                        navigation.goBack();  
+                        navigation.goBack();
                     }
                 } catch (error) {
                     Toast.show({
@@ -126,26 +128,28 @@ function SubjectDetailScreen() {
     }
 
     return (
-        <View style={styles.form}>
-            <Text style={styles.label}>Nombre</Text>
+        <View style={globalStyles.form}>
+            <Text style={globalStyles.label}>Nombre</Text>
             <TextInput
-                style={styles.input}
+                style={globalStyles.input}
                 placeholder='Nombre de la tarea'
+                placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
                 value={nombre}
                 onChangeText={setNombre}
             />
-            <Text style={styles.label}>Profesor</Text>
+            <Text style={globalStyles.label}>Profesor</Text>
             <TextInput
-                style={styles.input}
+                style={globalStyles.input}
+                placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
                 placeholder='Nombre del profesor de la materia'
                 value={profesor}
                 onChangeText={setProfesor}
             />
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={handleUpdateSubject}>
-                    <Text style={styles.buttonText}>Actualizar</Text>
+                <TouchableOpacity style={[globalStyles.button, { flex: 1, marginRight: 10 }]} onPress={handleUpdateSubject}>
+                    <Text style={globalStyles.buttonText}>Actualizar</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={handleDeleteSubject}>
+                <TouchableOpacity style={[globalStyles.button, { flex: 1 }]} onPress={handleDeleteSubject}>
                     <Text style={styles.buttonText}>Eliminar</Text>
                 </TouchableOpacity>
             </View>

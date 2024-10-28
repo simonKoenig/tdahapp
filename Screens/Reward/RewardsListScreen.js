@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import RewardItem from '../../Components/RewardItem';
 import SearchBar from '../../Components/SearchBar';
 import DropdownComponent from '../../Components/Dropdown';
+import { globalStyles } from '../../Utils/globalStyles';
 
 import PatientSelector from '../../Components/PatientSelector';
 import LoadingScreen from '../../Components/LoadingScreen';
@@ -84,7 +85,11 @@ const RewardsListScreen = ({ route }) => {
                 <LoadingScreen />
             ) : (
                 selectedPatientId ? (
-                    renderRewardList()
+                    <>
+                        {/* Título antes de mostrar la FlatList */}
+                        <Text style={[globalStyles.lessBoldText]} accessibilityRole="header">Lista de recompensas</Text>
+                        {renderRewardList()}
+                    </>
                 ) : (
                     <Text style={styles.noPatientText}>Selecciona un paciente para ver sus recompensas.</Text>
                 )

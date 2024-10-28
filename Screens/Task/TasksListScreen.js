@@ -35,9 +35,9 @@ const TaskListScreen = ({ route }) => {
     useEffect(() => {
         const loadTasks = async () => {
             if (selectedPatientId) {
-                // setLoading(true); // Mostrar loading cuando se selecciona un paciente
+                setLoading(true); // Mostrar loading cuando se selecciona un paciente
                 await fetchTasks(selectedPatientId); // Cargar tareas del paciente
-                // setLoading(false); // Desactivar loading cuando terminen de cargarse
+                setLoading(false); // Desactivar loading cuando terminen de cargarse
                 AccessibilityInfo.announceForAccessibility('Lista de tareas actualizada');
             }
         };

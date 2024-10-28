@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { globalStyles } from '../Utils/globalStyles';
+
 
 const MultiStepFormComponent = ({ steps, onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -44,17 +46,17 @@ const MultiStepFormComponent = ({ steps, onComplete }) => {
 
       <View style={styles.buttonContainer}>
         {currentStep > 0 && (
-          <TouchableOpacity onPress={handlePrevious} style={[styles.button, styles.backButton]}>
-            <Text style={styles.backButtonText}>Atrás</Text>
+          <TouchableOpacity onPress={handlePrevious} style={[globalStyles.backbutton, { flex: 1, marginRight: 10 }]}>
+            <Text style={globalStyles.backbuttonText}>Atrás</Text>
           </TouchableOpacity>
         )}
         {currentStep < totalSteps - 1 ? (
-          <TouchableOpacity onPress={handleNext} style={[styles.button, styles.nextButton]}>
-            <Text style={styles.nextButtonText}>Siguiente</Text>
+          <TouchableOpacity onPress={handleNext} style={[globalStyles.button, { flex: 1 }]}>
+            <Text style={globalStyles.buttonText}>Siguiente</Text>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity onPress={onComplete} style={[styles.button, styles.nextButton]}>
-            <Text style={styles.nextButtonText}>Aceptar</Text>
+          <TouchableOpacity onPress={onComplete} style={[globalStyles.button, { flex: 1 }]}>
+            <Text style={globalStyles.buttonText}>Aceptar</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -67,7 +69,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     paddingTop: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#F9F9F4',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -84,7 +86,7 @@ const styles = StyleSheet.create({
     height: 35,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: '#E7E7E7',
+    borderColor: '#525252',
     backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
@@ -94,7 +96,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#4c669f',
   },
   stepText: {
-    color: '#E7E7E7',
+    color: '#6e6e6e',
     fontWeight: 'bold',
     fontSize: 16,
   },
@@ -104,7 +106,7 @@ const styles = StyleSheet.create({
   line: {
     width: 20,
     height: 2,
-    backgroundColor: '#E7E7E7',
+    backgroundColor: '#6e6e6e',
     marginHorizontal: 10,
   },
   activeLine: {
@@ -133,21 +135,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '80%',
-},
-button: {
+  },
+  button: {
     flex: 1,
     height: 50,
-    backgroundColor: '#4c669f',
+    backgroundColor: '#285583',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 20,
+    borderRadius: 5,
     marginVertical: 10,
     marginHorizontal: 5,
-},
-buttonText: {
-    color: '#fff',
-    fontSize: 18,
-},
+    padding: 15,
+
+  },
+  buttonText: {
+    color: '#white',
+    fontWeight: 'bold',
+
+  },
+
 });
 
 export default MultiStepFormComponent;

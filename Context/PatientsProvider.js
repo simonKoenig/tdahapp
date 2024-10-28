@@ -1,8 +1,10 @@
 
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, } from 'react';
 import { collection, getDocs, addDoc, doc, getDoc, setDoc, query, where, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase-config';
 import { AuthContext } from './AuthProvider';
+import { AccessibilityInfo } from 'react-native';
+
 
 export const PatientsContext = createContext();
 
@@ -87,6 +89,7 @@ export const PatientsProvider = ({ children }) => {
                 rol: sourceUserData.rol || 'paciente',
             };
 
+
             await setDoc(patientsRef, newPatientData);
             setPatients(prevPatients => [...prevPatients, { id: sourceUserId, ...newPatientData }]);
 
@@ -102,6 +105,7 @@ export const PatientsProvider = ({ children }) => {
                 console.log('Deleting patient with UID:', patientUid, 'for user UID:', userUid);
                 const patientRef = doc(db, 'usuarios', userUid, 'pacientes', patientUid);
                 await deleteDoc(patientRef);
+                AccessibilityInfo.announceForAccessibility('El usuario ha sido eliminado correctamente.');
                 setPatients(prevPatients => prevPatients.filter(patient => patient.id !== patientUid));
             } catch (error) {
                 console.error('Error deleting patient:', error);

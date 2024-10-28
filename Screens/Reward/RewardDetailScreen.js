@@ -8,6 +8,8 @@ import LoadingScreen from '../../Components/LoadingScreen'; // Importar LoadingS
 import { PatientsContext } from '../../Context/PatientsProvider';
 import { showConfirmAlert } from '../../Utils/showConfirmAlert';
 import Toast from 'react-native-toast-message';
+import { globalStyles } from '../../Utils/globalStyles';
+import { PLACEHOLDER_TEXT_COLOR } from '../../Utils/globalStyles';
 
 function RewardDetailScreen() {
     const route = useRoute();
@@ -65,7 +67,7 @@ function RewardDetailScreen() {
                             text1: 'Éxito',
                             text2: 'Recompensa actualizada correctamente. Toca aquí para cerrar.',
                         });
-                        navigation.goBack();  
+                        navigation.goBack();
                     }
                 } catch (error) {
                     Toast.show({
@@ -81,7 +83,7 @@ function RewardDetailScreen() {
     }
 
     const handleDeleteReward = () => {
-  
+
         showConfirmAlert({
             title: "Confirmar eliminación",
             message: `¿Estás seguro que deseas eliminar la recompensa "${nombre}"?`,
@@ -103,7 +105,7 @@ function RewardDetailScreen() {
                             text1: 'Éxito',
                             text2: 'Recompensa eliminada correctamente. Toca aquí para cerrar.',
                         });
-                        navigation.goBack();  
+                        navigation.goBack();
                     }
                 } catch (error) {
                     Toast.show({
@@ -124,29 +126,31 @@ function RewardDetailScreen() {
     }
 
     return (
-        <View style={styles.form}>
-            <Text style={styles.label}>Nombre</Text>
+        <View style={globalStyles.form}>
+            <Text style={globalStyles.label}>Nombre</Text>
             <TextInput
-                style={styles.input}
+                style={globalStyles.input}
                 placeholder='Nombre de la tarea'
+                placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
                 value={nombre}
                 onChangeText={setNombre}
             />
-            <Text style={styles.label}>Dificultad</Text>
+            <Text style={globalStyles.label}>Dificultad</Text>
             <DropdownComponent
                 data={dificultades}
                 value={dificultad}
                 setValue={setDificultad}
+                placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
                 placeholder="Selecciona una dificultad"
                 width='80%'
             />
 
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={handleUpdateReward}>
-                    <Text style={styles.buttonText}>Actualizar</Text>
+                <TouchableOpacity style={[globalStyles.button, { flex: 1, marginRight: 10 }]} onPress={handleUpdateReward}>
+                    <Text style={globalStyles.buttonText}>Actualizar</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={handleDeleteReward}>
-                    <Text style={styles.buttonText}>Eliminar</Text>
+                <TouchableOpacity style={[globalStyles.button, { flex: 1 }]} onPress={handleDeleteReward}>
+                    <Text style={globalStyles.buttonText}>Eliminar</Text>
                 </TouchableOpacity>
             </View>
         </View>

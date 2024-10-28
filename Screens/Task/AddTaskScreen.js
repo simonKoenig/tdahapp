@@ -1,7 +1,7 @@
 import { Timestamp } from 'firebase/firestore';
 // React 
 import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Button, Switch } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Button, Switch, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 // Componentes y constantes
 import DropdownComponent from '../../Components/Dropdown';
@@ -16,6 +16,10 @@ import { PatientsContext } from '../../Context/PatientsProvider';
 import { ScrollView } from 'react-native-gesture-handler';
 import LoadingScreen from '../../Components/LoadingScreen';
 import Toast from 'react-native-toast-message';
+import { globalStyles } from '../../Utils/globalStyles';
+import { PLACEHOLDER_TEXT_COLOR } from '../../Utils/globalStyles';
+
+
 
 function AddTaskScreen() {
     const { patients, setSelectedPatientId, selectedPatientId } = useContext(PatientsContext);
@@ -33,7 +37,7 @@ function AddTaskScreen() {
     const [show, setShow] = useState(false); // Date time picker
     const [fechaCreacion, setFechaCreacion] = useState(''); // Fecha de creación de la tarea
     const [rewardExpires, setRewardExpires] = useState(true); // Estado para manejar si la recompensa se vence
-    const [loading, setLoading] = useState(true); 
+    const [loading, setLoading] = useState(true);
 
 
     // Transforma los pacientes para el Dropdown
@@ -82,10 +86,10 @@ function AddTaskScreen() {
                 text1: 'Error',
                 text2: 'No se ha seleccionado un paciente. Toca aquí para cerrar.',
             });
-            navigation.goBack(); 
+            navigation.goBack();
             return;
         }
-    
+
         try {
             setLoading(true);
             const fechaCreacion = new Date();
@@ -100,7 +104,7 @@ function AddTaskScreen() {
                 fechaCreacion: Timestamp.fromDate(fechaCreacion),
                 dateRewards: rewardExpires ? Timestamp.fromDate(dateRewards) : null, // Si la recompensa no se vence, se guarda null
             };
-    
+
             await addTask(newTask, selectedPatientId); // Pasa el UID del paciente seleccionado
             Toast.show({
                 type: 'success',
@@ -115,31 +119,33 @@ function AddTaskScreen() {
                 text2: 'Ocurrió un error al crear la tarea. Toca aquí para cerrar.',
             });
             console.error('Error al agregar la tarea:', error);
-        }  finally {
+        } finally {
             setLoading(false);
         }
     };
 
     // Pasos del formulario
     const steps = [
-        <View style={styles.form}>
-            <Text style={styles.label}>Nombre</Text>
+        <View style={globalStyles.form}>
+            <Text style={globalStyles.label}>Nombre</Text>
             <TextInput
-                style={styles.input}
+                style={globalStyles.input}
+                placeholderTextColor={PLACEHOLDER_TEXT_COLOR} // Usar el color definido en los estilos globales
                 placeholder='Nombre de la nueva tarea'
                 value={nombre}
                 onChangeText={setNombre}
             />
 
-            <Text style={styles.label}>Descripción</Text>
+            <Text style={globalStyles.label}>Descripción</Text>
             <TextInput
-                style={styles.input}
+                style={globalStyles.input}
                 placeholder='Descripción de la nueva tarea'
+                placeholderTextColor={PLACEHOLDER_TEXT_COLOR} // Usar el color definido en los estilos globales
                 value={descripcion}
                 onChangeText={setDescripcion}
             />
 
-            <Text style={styles.label}>Fecha y hora de vencimiento</Text>
+            <Text style={globalStyles.label}>Fecha y hora de vencimiento</Text>
             <DateTimePickerComponent
                 date={date}
                 setDate={setDate}
@@ -150,7 +156,7 @@ function AddTaskScreen() {
                 editable={true}
             />
 
-            <Text style={styles.label}>Paciente</Text>
+            <Text style={globalStyles.label}>Paciente</Text>
             {patients.length > 0 ? (
                 <DropdownComponent
                     data={transformedPatients}
@@ -160,13 +166,13 @@ function AddTaskScreen() {
                     onSelect={handleSelectPatient}
                     editable={true}
                     width='80%'
-                    />
-                ) : (
-                    <Text style={styles.noPatientsText}>No se encontraron pacientes.</Text>
-                )}
+                />
+            ) : (
+                <Text style={styles.noPatientsText}>No se encontraron pacientes.</Text>
+            )}
         </View>,
-        <View style={styles.form}>
-            <Text style={styles.label}>Materia</Text>
+        <View style={globalStyles.form}>
+            <Text style={globalStyles.label}>Materia</Text>
             <DropdownComponent
                 data={transformedSubjects}
                 value={selectedSubjectId}
@@ -176,7 +182,7 @@ function AddTaskScreen() {
                 width='80%'
             />
 
-            <Text style={styles.label}>Dificultad</Text>
+            <Text style={globalStyles.label}>Dificultad</Text>
             <DropdownComponent
                 data={dificultades}
                 value={dificultad}
@@ -187,7 +193,7 @@ function AddTaskScreen() {
             />
 
 
-            <Text style={styles.label}>Recompensa</Text>
+            <Text style={globalStyles.label}>Recompensa</Text>
             <DropdownComponent
                 data={transformedRewards}
                 value={selectedRewardId}
@@ -197,7 +203,7 @@ function AddTaskScreen() {
                 width='80%'
             />
 
-            <Text style={styles.label}>Vencimiento de la recompensa</Text>
+            <Text style={globalStyles.label}>Vencimiento de la recompensa</Text>
             <DateTimePickerComponent
                 date={dateRewards}
                 setDate={setDateRewards}
@@ -208,7 +214,7 @@ function AddTaskScreen() {
                 editable={rewardExpires}
             />
             <View style={styles.switchContainer}>
-                <Text style={styles.switchText}>¿La recompensa se vence?</Text>
+                <Text style={globalStyles.text}>¿La recompensa se vence?</Text>
                 <Switch
                     trackColor={{ false: '#D9D9D9', true: 'lightblue' }}
                     thumbColor={rewardExpires ? '#4c669f' : 'gray'}
@@ -220,40 +226,23 @@ function AddTaskScreen() {
     ];
 
     return (
-        <View style={styles.form}>
-            <MultiStepFormComponent steps={steps} onComplete={handleAddTask} />
-                    {/* <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.button} onPress={handleAddTask}>
-                            <Text style={styles.buttonText}>Aceptar</Text>
-                        </TouchableOpacity>
-                    </View> */}            
-        </View>
+        <KeyboardAvoidingView style={{ flex: 1, backgroundColor: '#F9F9F4' }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+                {/* Indicador de pasos + Formulario */}
+                <View style={styles.container}>
+                    <MultiStepFormComponent steps={steps} onComplete={handleAddTask} />
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
 const styles = StyleSheet.create({
-    form: {
-        flex: 1,
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#FFFFFF',
-    },
     label: {
         width: '80%',
         marginLeft: 10,
         fontSize: 16,
         color: '#000',
         textAlign: 'left',
-    },
-    input: {
-        width: '80%',
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 20,
-        padding: 10,
-        marginVertical: 10,
-        backgroundColor: '#D9D9D9',
     },
     dropdown: {
         width: '80%',
