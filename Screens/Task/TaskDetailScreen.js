@@ -122,6 +122,11 @@ function TaskDetailScreen() {
 
                 // Llamar a la función de actualización
                 await updateTask(taskId, updatedTask, selectedPatientId);
+                Toast.show({
+                    type: 'success',
+                    text1: 'Éxito',
+                    text2: 'Tarea corregida correctamente. Toca aquí para cerrar.',
+                });
             } else {
                 // Si el estado no es "Finalizada", solo actualiza los campos necesarios sin incluir los datos del administrador
                 const updatedTask = {
@@ -138,6 +143,11 @@ function TaskDetailScreen() {
 
                 // Llamar a la función de actualización
                 await updateTask(taskId, updatedTask, selectedPatientId);
+                Toast.show({
+                    type: 'success',
+                    text1: 'Éxito',
+                    text2: 'Tarea actualizada correctamente. Toca aquí para cerrar.',
+                });
             }
 
             // Navegar hacia atrás después de la actualización

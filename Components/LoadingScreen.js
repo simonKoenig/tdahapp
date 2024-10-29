@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject, // Hace que el componente ocupe toda la pantalla
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Fondo blanco semitransparente para dar la sensación de overlay
+        backgroundColor: 'F9F9F4', // Fondo blanco semitransparente para dar la sensación de overlay
         zIndex: 10, // Asegura que esté por encima del contenido
     },
 });

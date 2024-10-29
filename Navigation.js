@@ -140,7 +140,7 @@ function SubjectsStackScreen() {
 
     return (
         <SubjectsStack.Navigator initialRouteName="SubjectsList" screenOptions={HEADER_STYLE}>
-            <SubjectsStack.Screen name="SubjectsList" component={SubjectsListScreen} options={{ headerShown: true, title: 'Lista de materias' }} />
+            <SubjectsStack.Screen name="SubjectsList" component={SubjectsListScreen} options={{ headerShown: true, title: 'Materias' }} />
             <SubjectsStack.Screen name="AddSubject" component={AddSubjectScreen} options={{ headerShown: true, title: 'Agregar nueva materia' }} />
             <SubjectsStack.Screen name="SubjectDetail" component={SubjectDetailScreen} options={{ headerShown: true, title: 'Detalles de la materia' }} />
             <SubjectsStack.Screen name="UserSubjects" component={UserSubjectsScreen} />
@@ -160,7 +160,7 @@ function RewardsStackScreen() {
 
     return (
         <RewardsStack.Navigator initialRouteName="RewardsList" screenOptions={HEADER_STYLE}>
-            <RewardsStack.Screen name="RewardsList" component={RewardsListScreen} options={{ headerShown: true, title: 'Lista de recompensas' }} />
+            <RewardsStack.Screen name="RewardsList" component={RewardsListScreen} options={{ headerShown: true, title: 'Recompensas' }} />
             <RewardsStack.Screen name="AddReward" component={AddRewardScreen} options={{ headerShown: true, title: 'Agregar nueva recompensa' }} />
             <RewardsStack.Screen name="RewardDetail" component={RewardDetailScreen} options={{ headerShown: true, title: 'Detalles de la recompensa' }} />
             <RewardsStack.Screen name="UserRewards" component={UserRewardsScreen} />
