@@ -10,6 +10,11 @@ import { TasksContext } from '../Context/TaskProvider';
 import PatientSelector from '../Components/PatientSelector';
 import LoadingScreen from '../Components/LoadingScreen';
 import GraphPie from '../Components/GraphPie';
+import GraphBar from '../Components/GraphBar';
+// Import moment para formatear la fecha y mostrarla en español
+import moment from 'moment';
+import 'moment/locale/es';
+moment.locale('es');
 
 function StatisticsScreen() {
     const { selectedPatientId } = useContext(PatientsContext);
@@ -28,6 +33,7 @@ function StatisticsScreen() {
     const [cantidadMateriasConTareasPendiente, setcantidadMateriasConTareasPendiente] = useState('');
     const [cantidadMateriasConTareasFinalizadas, setcantidadMateriasConTareasFinalizadas] = useState('');
     const [cantidadMateriasConTareasVencidas, setcantidadMateriasConTareasVencidas] = useState('');
+    const [cantidadTareasPorDia, setCantidadTareasPorDia] = useState([]);
 
     // Función para manejar la selección de un paciente
     const handlePatientSelection = async (patientId) => {
@@ -54,6 +60,7 @@ function StatisticsScreen() {
         const tareasEnProgreso = tasks.filter(task => task.estado === 'En progreso');
         const tareasPendientes = tasks.filter(task => task.estado === 'Pendiente');
         const tareasFinalizadas = tasks.filter(task => task.estado === 'Finalizada');
+        //console.log(tareasFinalizadas);
         const tareasVencidas = tasks.filter(task => task.estado === 'Vencida');
 
         setTareasTotales(cantidadTareasTotales);
@@ -63,6 +70,9 @@ function StatisticsScreen() {
         setTareasVencidas(tareasVencidas);
 
         filtrarMaterias();
+        if (tareasFinalizadas.length > 0) {
+            contarTareasFinalizadasPorDia(tareasFinalizadas);
+        }
     }
 
     // Función para filtrar las materias que tienen tareas
@@ -108,6 +118,37 @@ function StatisticsScreen() {
         return materiasOrdenadas;
     };
 
+    // Función para contar la cantidad de tareas finalizadas según el día de la semana
+    const contarTareasFinalizadasPorDia = (tareasFinalizadas) => {
+        const dias = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+
+        // Iniciar el conteo con todos los días en 0
+        const conteo = dias.reduce((acc, dia) => {
+            acc[dia] = 0;
+            return acc;
+        }, {});
+
+        // Contar las tareas finalizadas según el día de la semana
+        tareasFinalizadas.forEach((tarea) => {
+            const dia = tarea.correccion.correctionDate && tarea.correccion.correctionDate.toDate 
+                ? moment(tarea.correccion.correctionDate.toDate()).format('dddd')
+                : '';
+
+            if (conteo[dia] !== undefined) { // Evitar días no válidos
+                conteo[dia]++;
+            }
+        });
+
+        // Convertir el objeto en un array de objetos, preservando el orden de días
+        const cantidadTareasPorDia = dias.map((dia) => ({
+            dia,
+            cantidad: conteo[dia],
+        }));
+        
+        setCantidadTareasPorDia(cantidadTareasPorDia);
+    };
+
+
     return (
         <View style={styles.container}>
             <PatientSelector onPatientSelected={handlePatientSelection} />
@@ -137,6 +178,8 @@ function StatisticsScreen() {
                             {cantidadMateriasConTareasVencidas.length > 0 ? cantidadMateriasConTareasVencidas[0].materia : 'No hay materias'}
                         </Text>
                         <GraphPie data={cantidadMateriasConTareas} />
+                        {console.log(cantidadTareasPorDia)}
+                        <GraphBar cantidadTareasPorDia={cantidadTareasPorDia} />
                     </ScrollView>
                 ) : (
                     <Text style={styles.noPatientText}>Selecciona un paciente para ver sus estadísticas.</Text>
