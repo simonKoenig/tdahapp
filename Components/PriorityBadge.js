@@ -7,11 +7,11 @@ const PriorityBadge = ({ tipo, valor }) => {
         if (tipo === 'dificultad') {
             switch (valor.toLowerCase()) {
                 case 'baja':
-                    return '#81c784'; // Verde claro
+                    return '#037208'; // Verde claro
                 case 'media':
-                    return '#ffb74d'; // Naranja claro
+                    return '#a46200'; // Naranja claro
                 case 'alta':
-                    return '#e57373'; // Rojo claro
+                    return '#a41b1b'; // Rojo claro
                 default:
                     return '#e0e0e0'; // Gris por defecto
             }
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingVertical: 5,
         borderRadius: 5,
-        paddingHorizontal: 8,
+        paddingHorizontal: 12,
         borderRadius: 5,
     },
     priorityText: {

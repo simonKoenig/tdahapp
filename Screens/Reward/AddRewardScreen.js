@@ -4,7 +4,8 @@ import DropdownComponent from '../../Components/Dropdown';
 import { dificultades } from '../../Utils/Constant';
 import LoadingScreen from '../../Components/LoadingScreen';
 import Toast from 'react-native-toast-message';
-
+import { globalStyles } from '../../Utils/globalStyles';
+import { PLACEHOLDER_TEXT_COLOR } from '../../Utils/globalStyles';
 
 import { RewardsContext } from '../../Context/RewardsProvider';
 import { useNavigation } from '@react-navigation/native';
@@ -15,11 +16,11 @@ function AddRewardScreen() {
     const [dificultad, setDificultad] = useState('');
     const { addReward } = useContext(RewardsContext);
     const { selectedPatientId } = useContext(PatientsContext);
-    const [loading, setLoading] = useState(true); 
+    const [loading, setLoading] = useState(true);
 
     const navigation = useNavigation();
 
-    
+
     const handleAddReward = async () => {
         if (!selectedPatientId) {
             Toast.show({
@@ -27,12 +28,12 @@ function AddRewardScreen() {
                 text1: 'Error',
                 text2: 'No se ha seleccionado un paciente. Toca aquí para cerrar.',
             });
-            navigation.goBack(); 
+            navigation.goBack();
             return;
         }
         try {
             setLoading(true);
-            const result =  await addReward({ nombre, dificultad }, selectedPatientId);
+            const result = await addReward({ nombre, dificultad }, selectedPatientId);
             if (result?.error) {
                 Toast.show({
                     type: 'error',
@@ -45,7 +46,7 @@ function AddRewardScreen() {
                     text1: 'Éxito',
                     text2: 'Recompensa creada correctamente. Toca aquí para cerrar.',
                 });
-                navigation.goBack();  
+                navigation.goBack();
             }
         } catch (error) {
             Toast.show({
@@ -60,15 +61,16 @@ function AddRewardScreen() {
     }
 
     return (
-        <View style={styles.form}>
-            <Text style={styles.label}>Nombre</Text>
+        <View style={globalStyles.form}>
+            <Text style={globalStyles.label}>Nombre</Text>
             <TextInput
-                style={styles.input}
+                style={globalStyles.input}
                 placeholder='Nombre de nueva tarea'
                 value={nombre}
                 onChangeText={setNombre}
+                placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
             />
-            <Text style={styles.label}>Dificultad</Text>
+            <Text style={globalStyles.label}>Dificultad</Text>
             <DropdownComponent
                 data={dificultades}
                 value={dificultad}
@@ -76,10 +78,11 @@ function AddRewardScreen() {
                 placeholder="Selecciona una dificultad"
                 searchActivo={false}
                 width='80%'
+                placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
             />
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={handleAddReward}>
-                    <Text style={styles.buttonText}>Aceptar</Text>
+                <TouchableOpacity style={[globalStyles.button, { flex: 1 }]} onPress={handleAddReward}>
+                    <Text style={globalStyles.buttonText}>Aceptar</Text>
                 </TouchableOpacity>
             </View>
         </View>

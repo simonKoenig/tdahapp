@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TextInput, StyleSheet } from 'react-native';
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SearchIcon } from './Icons';
+
 
 const SearchBar = ({ searchTerm, onSearch }) => {
     return (
@@ -9,7 +9,7 @@ const SearchBar = ({ searchTerm, onSearch }) => {
             <TextInput
                 style={styles.input}
                 placeholder="Buscar..."
-                placeholderTextColor="#A9A9A9" // Color gris claro para el placeholder
+                placeholderTextColor="#565454" // Color gris claro para el placeholder
                 value={searchTerm}
                 onChangeText={onSearch}
             />
@@ -26,7 +26,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         marginVertical: 10,
         borderRadius: 25,
-        backgroundColor: '#E0E0E0',
+        backgroundColor: '#F9F9F4',
+        borderColor: '#000000',
+        borderWidth: 1,
+        borderRadius: 25,
     },
     input: {
         flex: 1,
@@ -34,6 +37,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         paddingHorizontal: 10,
         color: '#000000',
+        fontFamily: 'AtkinsonHyperlegible_400Regular', // Usar la familia de fuente desde las constantes
     },
 });
 

@@ -127,8 +127,10 @@ function AddTaskScreen() {
     // Pasos del formulario
     const steps = [
         <View style={globalStyles.form}>
-            <Text style={globalStyles.label}>Nombre</Text>
+            <Text style={globalStyles.label} accessibilityLabel="Campo de nombre de la tarea">Nombre</Text>
             <TextInput
+                accessible={true}
+                accessibilityLabel={`Editar nombre de la tarea. Actualmente es ${nombre}`}
                 style={globalStyles.input}
                 placeholderTextColor={PLACEHOLDER_TEXT_COLOR} // Usar el color definido en los estilos globales
                 placeholder='Nombre de la nueva tarea'
@@ -136,17 +138,19 @@ function AddTaskScreen() {
                 onChangeText={setNombre}
             />
 
-            <Text style={globalStyles.label}>Descripción</Text>
+            <Text style={globalStyles.label} accessibilityLabel="Campo de descripción de la tarea">Descripción</Text>
             <TextInput
                 style={globalStyles.input}
                 placeholder='Descripción de la nueva tarea'
                 placeholderTextColor={PLACEHOLDER_TEXT_COLOR} // Usar el color definido en los estilos globales
                 value={descripcion}
                 onChangeText={setDescripcion}
+                accessibilityLabel={`Editar descripción de la tarea. Actualmente es ${descripcion}`}
             />
 
-            <Text style={globalStyles.label}>Fecha y hora de vencimiento</Text>
+            <Text style={globalStyles.label} accessibilityLabel="Campo de fecha y hora de vencimiento de la tarea" > Fecha y hora de vencimiento</Text>
             <DateTimePickerComponent
+                accessibilityHint
                 date={date}
                 setDate={setDate}
                 mode={mode}
@@ -154,9 +158,10 @@ function AddTaskScreen() {
                 show={show}
                 setShow={setShow}
                 editable={true}
+
             />
 
-            <Text style={globalStyles.label}>Paciente</Text>
+            <Text style={globalStyles.label} accessibilityLabel='Campo de selección del paciente'>Paciente</Text>
             {patients.length > 0 ? (
                 <DropdownComponent
                     data={transformedPatients}
@@ -180,6 +185,8 @@ function AddTaskScreen() {
                 placeholder="Selecciona una materia"
                 onSelect={handleSelectSubject}
                 width='80%'
+                accessible={true}
+                accessibilityLabel={`Seleccionar la materia de la tarea. Actualmente es ${subjects.find(subject => subject.id === selectedSubjectId)?.nombre || 'Ninguna'}`}
             />
 
             <Text style={globalStyles.label}>Dificultad</Text>
@@ -229,7 +236,7 @@ function AddTaskScreen() {
         <KeyboardAvoidingView style={{ flex: 1, backgroundColor: '#F9F9F4' }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
                 {/* Indicador de pasos + Formulario */}
-                <View style={styles.container}>
+                <View style={styles.container} accessible={true} accessibilityLabel="Formulario para agregar tarea">
                     <MultiStepFormComponent steps={steps} onComplete={handleAddTask} />
                 </View>
             </ScrollView>

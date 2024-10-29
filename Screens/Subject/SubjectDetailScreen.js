@@ -150,7 +150,9 @@ function SubjectDetailScreen() {
                     <Text style={globalStyles.buttonText}>Actualizar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[globalStyles.button, { flex: 1 }]} onPress={handleDeleteSubject}>
-                    <Text style={styles.buttonText}>Eliminar</Text>
+                    <Text style={globalStyles
+
+                        .buttonText}>Eliminar</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -197,20 +199,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '80%',
     },
-    button: {
-        flex: 1,
-        height: 50,
-        backgroundColor: '#4c669f',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 20,
-        marginVertical: 10,
-        marginHorizontal: 5,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 18,
-    },
+
 });
 
 export default SubjectDetailScreen;

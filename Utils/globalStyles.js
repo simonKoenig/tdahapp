@@ -2,6 +2,7 @@ import { StyleSheet } from 'react-native';
 import { COLORS, FONT_SIZES, SPACING, FONTS } from './Constant';
 import { InfoToast } from 'react-native-toast-message';
 
+
 export const globalStyles = StyleSheet.create({
     container: {
         flex: 1,
@@ -67,7 +68,7 @@ export const globalStyles = StyleSheet.create({
     },
     input: {
         width: '80%',
-        height: 40, // Aumentado a 48 para accesibilidad si lo prefieres
+        height: 48, // Aumentado a 48 para accesibilidad si lo prefieres
         borderColor: COLORS.inputBorder,
         borderWidth: 1,
         borderRadius: 20, // O cambia a 8 para consistencia si en otros lados usas menos redondeo
@@ -81,7 +82,7 @@ export const globalStyles = StyleSheet.create({
     disabledInput: {
         backgroundColor: COLORS.disableInput,
         width: '80%',
-        height: 40, // Aumentado a 48 para accesibilidad si lo prefieres
+        height: 48, // Aumentado a 48 para accesibilidad si lo prefieres
         borderColor: COLORS.inputBorder,
         borderWidth: 1,
         borderRadius: 20, // O cambia a 8 para consistencia si en otros lados usas menos redondeo
@@ -93,7 +94,7 @@ export const globalStyles = StyleSheet.create({
     },
     dateTimeElement: {
         width: '45%',
-        height: 40,
+        height: 48,
         borderColor: COLORS.inputBorder,
         borderWidth: 1,
         borderRadius: 20,
@@ -126,6 +127,23 @@ export const globalStyles = StyleSheet.create({
         color: COLORS.infoText,
         fontFamily: FONTS.regular,
     },
+    addButton: {
+        position: 'absolute',
+        bottom: SPACING.large,
+        right: SPACING.large,
+        backgroundColor: '#285583',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 3,
+    },
+    addButtonText: {
+        color: 'white',
+        fontSize: 24,
+        fontFamily: 'bold',
+    }
 });
 
 export const PLACEHOLDER_TEXT_COLOR = COLORS.infoText;

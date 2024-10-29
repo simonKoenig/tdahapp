@@ -3,7 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import { addSubject } from '../../Context/SubjectsProvider';
 import LoadingScreen from '../../Components/LoadingScreen';
 import Toast from 'react-native-toast-message';
-
+import { globalStyles } from '../../Utils/globalStyles';
+import { PLACEHOLDER_TEXT_COLOR } from '../../Utils/globalStyles';
 
 
 import { SubjectsContext } from '../../Context/SubjectsProvider';
@@ -15,7 +16,7 @@ function AddSubjectScreen() {
     const [profesor, setProfesor] = useState('');
     const { addSubject } = useContext(SubjectsContext);
     const { selectedPatientId } = useContext(PatientsContext);
-    const [loading, setLoading] = useState(true); 
+    const [loading, setLoading] = useState(true);
     const navigation = useNavigation();
 
     const handleAddSubject = async () => {
@@ -29,21 +30,21 @@ function AddSubjectScreen() {
         }
         try {
             setLoading(true);
-            const result =  await addSubject({ nombre, profesor }, selectedPatientId);
+            const result = await addSubject({ nombre, profesor }, selectedPatientId);
             if (result?.error) {
                 Toast.show({
                     type: 'error',
                     text1: 'Error',
                     text2: `${result.error} Toca aquí para cerrar.`,
                 });
-               
+
             } else {
                 Toast.show({
                     type: 'success',
                     text1: 'Éxito',
                     text2: 'Materia creada correctamente. Toca aquí para cerrar.',
                 });
-                navigation.goBack();  
+                navigation.goBack();
             }
         } catch (error) {
             Toast.show({
@@ -57,24 +58,27 @@ function AddSubjectScreen() {
 
     }
     return (
-        <View style={styles.form}>
-            <Text style={styles.label}>Nombre</Text>
+        <View style={globalStyles.form}>
+            <Text style={globalStyles.label}>Nombre</Text>
             <TextInput
-                style={styles.input}
+                style={globalStyles.input}
                 placeholder='Nombre de nueva materia'
                 value={nombre}
                 onChangeText={setNombre}
+                placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
             />
-            <Text style={styles.label}>Profesor</Text>
+            <Text style={globalStyles.label}>Profesor</Text>
             <TextInput
-                style={styles.input}
-                placeholder='Nombre del profesor de la materia'
+                style={globalStyles.input}
+                placeholder='Nombre del profesor'
                 value={profesor}
                 onChangeText={setProfesor}
+                placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
+
             />
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={handleAddSubject}>
-                    <Text style={styles.buttonText}>Aceptar</Text>
+                <TouchableOpacity style={[globalStyles.button, { flex: 1 }]} onPress={handleAddSubject}>
+                    <Text style={globalStyles.buttonText}>Aceptar</Text>
                 </TouchableOpacity>
             </View>
         </View>

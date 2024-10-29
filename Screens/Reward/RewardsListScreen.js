@@ -69,7 +69,7 @@ const RewardsListScreen = ({ route }) => {
 
 
     return (
-        <View style={styles.container}>
+        <View style={globalStyles.container}>
             <PatientSelector onPatientSelected={handlePatientSelection} />
             <SearchBar
                 searchTerm={searchTerm}
@@ -95,10 +95,10 @@ const RewardsListScreen = ({ route }) => {
                 )
             )}
             <TouchableOpacity
-                style={styles.addButton}
+                style={globalStyles.addButton}
                 onPress={() => navigation.navigate('AddReward')}
             >
-                <Text style={styles.addButtonText}>+</Text>
+                <Text style={globalStyles.addButtonText}>+</Text>
             </TouchableOpacity>
         </View>
     );

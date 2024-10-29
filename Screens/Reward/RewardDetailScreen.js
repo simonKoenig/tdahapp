@@ -25,6 +25,7 @@ function RewardDetailScreen() {
     useEffect(() => {
         const fetchReward = async () => {
             try {
+                setLoading(true);  // Asegurarse de que se establece en 'true' al iniciar la carga
                 console.log('Fetching reward details for ID:', rewardId);
                 const reward = await getReward(rewardId, uid); // Asegúrate de pasar el UID correcto
                 if (reward) {

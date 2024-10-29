@@ -59,7 +59,7 @@ const SubjectsListScreen = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={globalStyles.container}>
             <PatientSelector onPatientSelected={handlePatientSelection} />
             <SearchBar
                 searchTerm={searchTerm}
@@ -82,10 +82,10 @@ const SubjectsListScreen = () => {
             )}
 
             <TouchableOpacity
-                style={styles.addButton}
+                style={globalStyles.addButton}
                 onPress={() => navigation.navigate('AddSubject')}
             >
-                <Text style={styles.addButtonText}>+</Text>
+                <Text style={globalStyles.addButtonText}>+</Text>
             </TouchableOpacity>
         </View>
     );
