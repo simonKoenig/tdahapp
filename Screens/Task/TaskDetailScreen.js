@@ -243,7 +243,7 @@ function TaskDetailScreen() {
 
     if (isPaciente()) {
         return (
-            <ScrollView contentContainerStyle={globalStyles.form}>
+            <ScrollView contentContainerStyle={styles.scrollContent}>
                 {loading ? (
                     <LoadingScreen />
                 ) : (
@@ -424,6 +424,7 @@ const styles = StyleSheet.create({
     scrollContent: {
         paddingBottom: 20,
         alignItems: 'center',
+        backgroundColor: '#F9F9F4',
     },
     form: {
         flex: 1,

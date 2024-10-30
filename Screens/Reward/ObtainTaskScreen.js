@@ -2,22 +2,57 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import moment from 'moment';
+import { globalStyles } from '../../Utils/globalStyles';
 
 const ObtainTaskScreen = () => {
     const route = useRoute();
     const navigation = useNavigation();
-    const { recompensaNombre, recompensaVencimiento } = route.params;    
+    const { recompensaNombre, recompensaVencimiento } = route.params;
 
     return (
-        console.log(recompensaVencimiento),
-        <View style={styles.container}>
-            <Image source={require('../../assets/images/regalo.png')} style={styles.image} resizeMode="contain" />
-            <Text style={styles.title}>¡Felicitaciones!</Text>
-            <Text style={styles.message}>¡Has completado la tarea correctamente!</Text>
-            <Text style={styles.time}>Podés {recompensaNombre}</Text>
-            {recompensaVencimiento && (<Text style={styles.dateText}>Tenés tiempo hasta {moment(recompensaVencimiento).format('LLL')}</Text>)}
+        <View style={[globalStyles.container, { alignItems: 'center' }]}>
+            <Image
+                source={require('../../assets/images/regalo.png')}
+                style={styles.image}
+                resizeMode="contain"
+                accessible={true}
+                accessibilityLabel="Imagen de un regalo, representando la recompensa ganada"
+            />
+            <Text
+                style={[globalStyles.title, { fontSize: 32 }]}
+                accessible={true}
+                accessibilityLabel="Felicitaciones, has completado la tarea correctamente"
+            >
+                ¡Felicitaciones!
+            </Text>
+            <Text
+                style={[globalStyles.text, { fontSize: 25, textAlign: 'center', marginTop: 10 }]} accessible={true}
+                accessibilityLabel="Has completado la tarea correctamente"
+            >
+                ¡Has completado la tarea correctamente!
+            </Text>
+            <Text
+                style={[globalStyles.title, { fontSize: 25, marginVertical: 20 }]} accessible={true}
+                accessibilityLabel={`Puedes reclamar la recompensa: ${recompensaNombre}`}
+            >
+                Podés {recompensaNombre}
+            </Text>
+            {recompensaVencimiento && (
+                <Text
+                    style={[globalStyles.text, { fontSize: 20, textAlign: 'center' }]} accessible={true}
+                    accessibilityLabel={`Tienes hasta ${moment(recompensaVencimiento).format('LLL')} para reclamar la recompensa`}
+                >
+                    Tenés tiempo hasta {moment(recompensaVencimiento).format('LLL')}
+                </Text>
+            )}
 
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TasksList')}>
+            <TouchableOpacity
+                style={[globalStyles.button, { width: '80%', marginTop: 30 }]}
+                onPress={() => navigation.navigate('TasksList')}
+                accessible={true}
+                accessibilityLabel="Aceptar"
+                accessibilityHint="Toca dos veces para regresar a la lista de tareas"
+            >
                 <Text style={styles.buttonText}>Aceptar</Text>
             </TouchableOpacity>
         </View>
