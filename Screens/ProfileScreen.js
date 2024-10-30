@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Button, Pressable, AccessibilityInfo } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Button, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../Context/AuthProvider';
 import { PatientsContext } from '../Context/PatientsProvider';
@@ -73,9 +73,6 @@ function ProfileScreen() {
 
     const handleFetchUserRewards = async (email) => {
         if (!email) {
-            setTimeout(() => {
-                AccessibilityInfo.announceForAccessibility("Por favor, proporciona un mail válido.");
-            }, 500); // Esperar 500 ms después de cerrar el modal antes de hacer el anuncio
             Toast.show({
                 type: 'error',
                 text1: 'Error',
@@ -87,9 +84,6 @@ function ProfileScreen() {
             setLoadingPatients(true);
             const patientData = await addPatientByEmail(email);
             if (patientData?.error) {
-                setTimeout(() => {
-                    AccessibilityInfo.announceForAccessibility(patientData.error);
-                }, 500); // Esperar 500 ms después de cerrar el modal antes de hacer el anuncio
                 Toast.show({
                     type: 'error',
                     text1: 'Error',
@@ -97,9 +91,6 @@ function ProfileScreen() {
                 });
                 console.log('Error en handleFetchUserRewards:', patientData.error);
             } else {
-                setTimeout(() => {
-                    AccessibilityInfo.announceForAccessibility('El usuario ha sido vinculado correctamente.');
-                }, 500); // Esperar 500 ms después de cerrar el modal antes de hacer el anuncio
                 Toast.show({
                     type: 'success',
                     text1: 'Exito',
@@ -129,7 +120,6 @@ function ProfileScreen() {
             // Verificamos si la operación tuvo éxito o si resultó en un error
             if (result?.error) {
                 // Si hubo un error en la eliminación
-                AccessibilityInfo.announceForAccessibility('Error en handleDeletePatient', result.error);
                 Toast.show({
                     type: 'error',
                     text1: 'Error',
@@ -145,7 +135,6 @@ function ProfileScreen() {
                 });
             }
         } catch (error) {
-            AccessibilityInfo.announceForAccessibility('Error en handleDeletePatient', result.error);
             console.error('Error en handleDeletePatient:', error);
             Toast.show({
                 type: 'error',

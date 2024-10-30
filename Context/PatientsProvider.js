@@ -59,6 +59,7 @@ export const PatientsProvider = ({ children }) => {
             const querySnapshot = await getDocs(q);
 
             if (querySnapshot.empty) {
+                AccessibilityInfo.announceForAccessibility("Por favor, proporciona un mail válido.");
                 return { error: 'No se encontró ningún usuario con el email ingresado.' };
             }
 
@@ -68,6 +69,7 @@ export const PatientsProvider = ({ children }) => {
 
             // Verificar si el rol del usuario es "administrador"
             if (sourceUserData.rol === 'administrador') {
+                AccessibilityInfo.announceForAccessibility("No se puede agregar a un administrador como paciente.");
                 return { error: 'No se puede agregar a un administrador como paciente.' };
             }
 
@@ -78,6 +80,7 @@ export const PatientsProvider = ({ children }) => {
 
             // Verificar si el paciente ya existe
             if (patientDoc.exists()) {
+                AccessibilityInfo.announceForAccessibility("El usuario ya se encuentra vinculado");
                 return { error: 'El usuario ya se encuentra vinculado' };
             }
 
@@ -89,8 +92,8 @@ export const PatientsProvider = ({ children }) => {
                 rol: sourceUserData.rol || 'paciente',
             };
 
-
             await setDoc(patientsRef, newPatientData);
+            AccessibilityInfo.announceForAccessibility('El usuario ha sido vinculado correctamente.');
             setPatients(prevPatients => [...prevPatients, { id: sourceUserId, ...newPatientData }]);
 
         } catch (error) {
@@ -104,8 +107,8 @@ export const PatientsProvider = ({ children }) => {
             try {
                 console.log('Deleting patient with UID:', patientUid, 'for user UID:', userUid);
                 const patientRef = doc(db, 'usuarios', userUid, 'pacientes', patientUid);
-                await deleteDoc(patientRef);
                 AccessibilityInfo.announceForAccessibility('El usuario ha sido eliminado correctamente.');
+                await deleteDoc(patientRef);
                 setPatients(prevPatients => prevPatients.filter(patient => patient.id !== patientUid));
             } catch (error) {
                 console.error('Error deleting patient:', error);
