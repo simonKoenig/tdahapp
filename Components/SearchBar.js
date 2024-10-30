@@ -2,7 +2,6 @@ import React from 'react';
 import { View, TextInput, StyleSheet } from 'react-native';
 import { SearchIcon } from './Icons';
 
-
 const SearchBar = ({ searchTerm, onSearch }) => {
     return (
         <View style={styles.container}>
@@ -12,8 +11,14 @@ const SearchBar = ({ searchTerm, onSearch }) => {
                 placeholderTextColor="#565454" // Color gris claro para el placeholder
                 value={searchTerm}
                 onChangeText={onSearch}
+                accessible={true}
+                accessibilityLabel="Barra de búsqueda"
+                accessibilityHint="Ingrese texto para buscar"
             />
-            <SearchIcon size={20} />
+            <SearchIcon
+                size={20}
+                accessible={false} // Marcar el ícono como no accesible para que sea ignorado por el lector de pantalla
+            />
         </View>
     );
 };
@@ -29,7 +34,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#F9F9F4',
         borderColor: '#000000',
         borderWidth: 1,
-        borderRadius: 25,
     },
     input: {
         flex: 1,
@@ -37,7 +41,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         paddingHorizontal: 10,
         color: '#000000',
-        fontFamily: 'AtkinsonHyperlegible_400Regular', // Usar la familia de fuente desde las constantes
+        fontFamily: 'AtkinsonHyperlegible_400Regular',
     },
 });
 

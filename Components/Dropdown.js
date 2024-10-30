@@ -22,6 +22,9 @@ const DropdownComponent = ({ data, value, setValue, placeholder, onSelect, searc
                     onSelect(item.value);
                 }
             }}
+            accessible={true}
+            accessibilityLabel={`Desplegable: ${placeholder ? placeholder : ''}`} // Describe la función del dropdown
+            accessibilityHint="Toque dos veces para abrir el desplegable y seleccionar una opción" // Instrucciones adicionales para los usuarios del lector de pantalla
         />
     );
 };
@@ -29,29 +32,29 @@ const DropdownComponent = ({ data, value, setValue, placeholder, onSelect, searc
 const styles = StyleSheet.create({
     dropdown: {
         height: 48,
-        borderColor: '#D9D9D9', // Usando el color de border desde las constantes
+        borderColor: '#D9D9D9',
         borderWidth: 1,
         borderRadius: 15,
         paddingHorizontal: 10,
         marginVertical: 10,
-        borderColor: '#000000', // Usando el color de border desde las constantes
-        backgroundColor: '#F9F9F4', // Usando el color de fondo desde las constantes
+        borderColor: '#000000',
+        backgroundColor: '#F9F9F4',
     },
     placeholderStyle: {
-        fontSize: 18, // Usar tamaño de fuente desde las constantes
-        color: '#1A1A1A', // Usar color desde las constantes
-        fontFamily: 'AtkinsonHyperlegible_400Regular', // Usar la familia de fuente desde las constantes
+        fontSize: 18,
+        color: '#1A1A1A',
+        fontFamily: 'AtkinsonHyperlegible_400Regular',
     },
     selectedTextStyle: {
-        fontSize: 18, // Usar tamaño de fuente desde las constantes
-        color: '#1A1A1A', // Usar color desde las constantes
-        fontFamily: 'AtkinsonHyperlegible_400Regular', // Usar la familia de fuente desde las constantes
+        fontSize: 18,
+        color: '#1A1A1A',
+        fontFamily: 'AtkinsonHyperlegible_400Regular',
     },
     inputSearchStyle: {
         height: 48,
-        fontSize: 18, // Usar tamaño de fuente desde las constantes
-        color: '#1A1A1A', // Usar color desde las constantes
-        fontFamily: 'AtkinsonHyperlegible_400Regular', // Usar la familia de fuente desde las constantes
+        fontSize: 18,
+        color: '#1A1A1A',
+        fontFamily: 'AtkinsonHyperlegible_400Regular',
     },
 });
 

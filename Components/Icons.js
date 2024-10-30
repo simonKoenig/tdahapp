@@ -10,7 +10,8 @@ export const ChartBarIcon = ({ color, size }) => <MaterialCommunityIcons name="c
 export const GiftIcon = ({ color, size }) => <MaterialCommunityIcons name="gift" color={color} size={size} />;
 
 
-export const SearchIcon = ({ color, size }) => <MaterialCommunityIcons name="magnify" color={color} size={size} />;
+export const SearchIcon = ({ color, size }) => <MaterialCommunityIcons name="magnify" color={color} size={size} accessible={false} // Marcar el ícono como no accesible para los lectores de pantalla
+    importantForAccessibility="no" />;
 
 export const AccountIcon = ({ color, size }) => <MaterialCommunityIcons name="account" color={color} size={size} />;
 
