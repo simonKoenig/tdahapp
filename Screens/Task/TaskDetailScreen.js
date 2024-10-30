@@ -31,6 +31,7 @@ function TaskDetailScreen() {
     const [dificultad, setDificultad] = useState('');
     const [adminName, setAdminName] = useState(null);
     const [correctionDate, setCorrectionDate] = useState(null);
+    const [tareaTerminada, setTareaTerminada] = useState(null);
     const [selectedRewardId, setSelectedRewardId] = useState('');
     const [loading, setLoading] = useState(true);
     const [show, setShow] = useState(false);
@@ -73,6 +74,9 @@ function TaskDetailScreen() {
                         setRewardExpires(true);
                     } else {
                         setRewardExpires(false);
+                    }
+                    if (task.tareaTerminada) {
+                        setTareaTerminada(task.tareaTerminada.toDate());
                     }
                 } else {
                     console.error('Task not found');
@@ -139,6 +143,7 @@ function TaskDetailScreen() {
                     estado: nuevoEstado,
                     fechaCreacion,
                     dateRewards: rewardExpires ? dateRewards : null,
+                    tareaTerminada: Timestamp.fromDate(new Date())
                 };
 
                 // Llamar a la función de actualización
@@ -243,7 +248,7 @@ function TaskDetailScreen() {
 
     if (isPaciente()) {
         return (
-            <ScrollView contentContainerStyle={styles.scrollContent}>
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                 {loading ? (
                     <LoadingScreen />
                 ) : (
@@ -277,6 +282,12 @@ function TaskDetailScreen() {
                         <Text style={globalStyles.label}>Materia</Text>
                         <Text style={globalStyles.input}>{subjects.find(subject => subject.id === selectedSubjectId)?.nombre}</Text>
 
+                        {tareaTerminada && (
+                            <Text style={styles.tareaCorregidaText}>
+                                Tarea terminada el {moment(tareaTerminada).format('lll')}
+                            </Text>
+                        )}
+
                         {estado === 'En progreso' && (
                             <View style={styles.buttonContainer}>
                                 <TouchableOpacity style={[globalStyles.button, { flex: 1 }]} onPress={() => handleMarkTask('Pendiente')}>
@@ -305,11 +316,8 @@ function TaskDetailScreen() {
 
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={{ flex: 1 }}
-        >
-            <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView >
+            <View style={globalStyles.form}>
                 <Text style={globalStyles.label}>Nombre</Text>
                 <TextInput
                     style={globalStyles.input}
@@ -388,17 +396,17 @@ function TaskDetailScreen() {
                 <Text style={styles.tareaCreadaText}>
                     Tarea creada {moment(fechaCreacion).format('lll')}
                 </Text>
-
-                {correctionDate && adminName ? (
+                {tareaTerminada && (
                     <Text style={styles.tareaCorregidaText}>
-                        Tarea Corregida por {adminName} el {moment(correctionDate).format('lll')}
-                    </Text>
-                ) : (
-                    <Text style={styles.noCorreccionText}>
-                        Tarea aún no corregida
+                        Tarea terminada el {moment(tareaTerminada).format('lll')}
                     </Text>
                 )}
 
+                {correctionDate && adminName(
+                    <Text style={styles.tareaCorregidaText}>
+                        Tarea corregida por {adminName} el {moment(correctionDate).format('lll')}
+                    </Text>
+                )}
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={[globalStyles.button, { flex: 1, marginRight: 10 }]} onPress={handleUpdateTask}>
                         <Text style={globalStyles.buttonText}>Actualizar</Text>
@@ -414,18 +422,13 @@ function TaskDetailScreen() {
                         </TouchableOpacity>
                     </View>
                 )}
-            </ScrollView>
-        </KeyboardAvoidingView>
+            </View>
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
 
-    scrollContent: {
-        paddingBottom: 20,
-        alignItems: 'center',
-        backgroundColor: '#F9F9F4',
-    },
     form: {
         flex: 1,
         width: '100%',
