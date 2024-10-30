@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Dimensions } from 'react-native';
+import { Text, View, Dimensions, StyleSheet } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
 
 const GraphBar = ({cantidadTareasPorDia}) => {
@@ -14,6 +14,7 @@ const GraphBar = ({cantidadTareasPorDia}) => {
         datasets: [
             {
                 data: cantidadTareasPorDia.map((item) => item.cantidad),
+                color: () => '#4c669f'
             }
         ]
     };
@@ -23,22 +24,45 @@ const GraphBar = ({cantidadTareasPorDia}) => {
     const chartConfig = {
         backgroundGradientFrom: "#ffffff",
         backgroundGradientTo: "#ffffff",
-        color: (opacity = 1) => `rgba(0, 123, 255, ${opacity})`, // Color de fondo
+        color: () => '#4c669f',
         strokeWidth: 2,
         useShadowColorFromDataset: false,
     };
 
     return (
-        <View>
-            <BarChart
-                data={data}
-                width={screenWidth}
-                height={220}
-                chartConfig={chartConfig}
-                fromZero={true}
-            />
-        </View>
+        <View style={styles.container}>
+            { data.length === 0 ? 
+                <Text>No hay tareas</Text>
+            : 
+                <View>
+                    <Text style={styles.title} >Cantidad de tareas finalizadas por día</Text>
+                    <BarChart
+                        data={data}
+                        width={screenWidth}
+                        height={220}
+                        chartConfig={chartConfig}
+                        fromZero={true}
+                        withInnerLines={false}
+                        showValuesOnTopOfBars={true}
+                        withHorizontalLabels={false}
+                    />
+                </View>
+            }
+        </View>            
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        paddingHorizontal: 10,
+    },
+});
 
 export default GraphBar;
