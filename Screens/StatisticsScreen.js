@@ -35,6 +35,9 @@ function StatisticsScreen() {
     const [cantidadMateriasConTareasVencidas, setcantidadMateriasConTareasVencidas] = useState('');
     const [cantidadTareasPorDia, setCantidadTareasPorDia] = useState([]);
     const [tiempoPromedioDeFinalizacion, setTiempoPromedioDeFinalizacion] = useState(0);
+    const [horarioMayorProductividad, setHorarioMayorProductividad] = useState(null);
+    const [tareasPorHora, setTareasPorHora] = useState(Array(24).fill(0));
+    const [diaConMasTareasFinalizadas, setDiaConMasTareasFinalizadas] = useState('');
 
     // Función para manejar la selección de un paciente
     const handlePatientSelection = async (patientId) => {
@@ -74,6 +77,7 @@ function StatisticsScreen() {
         if (tareasFinalizadas.length > 0) {
             contarTareasFinalizadasPorDia(tareasFinalizadas);
             calcularTiempoPromedioDeFinalizacion(tareasFinalizadas);
+            calcularHorarioMayorProductividad(tareasFinalizadas);
         }
     }
 
@@ -147,6 +151,12 @@ function StatisticsScreen() {
             cantidad: conteo[dia],
         }));
         
+        const DiaConMasTareasFinalizadas = cantidadTareasPorDia.reduce((max, item) => 
+            item.cantidad > max.cantidad ? item : max
+        );
+
+
+        setDiaConMasTareasFinalizadas(DiaConMasTareasFinalizadas.dia);
         setCantidadTareasPorDia(cantidadTareasPorDia);
     };
 
@@ -163,7 +173,6 @@ function StatisticsScreen() {
                 const fechaCreacion = tarea.fechaCreacion?.toDate();
                 const fechaFinalizacion = tarea.correccion?.correctionDate?.toDate();
                 const tiempo = moment(fechaFinalizacion).diff(moment(fechaCreacion));
-                console.log(tarea.nombre, tiempo);
                 return acc + tiempo;
             }
             return acc; // Si alguna fecha es inválida, se ignora esa tarea en el cálculo
@@ -181,8 +190,44 @@ function StatisticsScreen() {
             ? `${Math.floor(dias)} días` 
             : `${Math.floor(horas)} horas`;
     
-        console.log('Tiempo promedio de finalización:', tiempoPromedioFormateado);
         setTiempoPromedioDeFinalizacion(tiempoPromedioFormateado);
+    };
+
+    // Función para calcular el horario de mayor productividad
+    const calcularHorarioMayorProductividad = (tareasFinalizadas) => {
+    
+        if (!tareasFinalizadas || tareasFinalizadas.length === 0) {
+            setHorarioMayorProductividad("No hay tareas finalizadas");
+            return;
+        }
+
+        // Crear un array para contar tareas en cada hora (0–23)
+        const tareasPorHoraTemp = Array(24).fill(0);
+
+        // Recorrer tareas y acumular en el array según la hora de finalización
+        tareasFinalizadas.forEach((tarea) => {
+            if (!tarea.tareaTerminada || !tarea.tareaTerminada.toDate) {
+                return;
+            }
+
+            const fechaFinalizacion = tarea.tareaTerminada.toDate();
+
+            if (fechaFinalizacion) {
+                const hora = moment(fechaFinalizacion).hour();
+                tareasPorHoraTemp[hora]++;
+            }
+        });
+
+        // Encontrar la hora con más tareas completadas
+        const maxTareas = Math.max(...tareasPorHoraTemp);
+        const horario = tareasPorHoraTemp.indexOf(maxTareas);
+
+        // Actualizar los estados con los resultados
+        setHorarioMayorProductividad(horario);
+        setTareasPorHora(tareasPorHoraTemp);
+    
+        console.log(tareasPorHoraTemp);
+        console.log("Hora con + completados", horario);
     };
     
     return (
@@ -215,6 +260,12 @@ function StatisticsScreen() {
                         </Text>
                         <Text style={styles.statText}>Tiempo promedio de finalización de tareas: 
                             {tiempoPromedioDeFinalizacion}
+                        </Text>
+                        <Text style={styles.statText}>Día de la semana con más tareas finalizadas:
+                            {diaConMasTareasFinalizadas}
+                        </Text>
+                        <Text style={styles.statText}>Horario de mayor productividad: 
+                            {horarioMayorProductividad !== null ? `${horarioMayorProductividad}:00` : 'No hay tareas finalizadas'}
                         </Text>
                         <GraphPie data={cantidadMateriasConTareas} />
                         <GraphBar cantidadTareasPorDia={cantidadTareasPorDia} />
