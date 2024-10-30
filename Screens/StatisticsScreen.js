@@ -34,6 +34,7 @@ function StatisticsScreen() {
     const [cantidadMateriasConTareasFinalizadas, setcantidadMateriasConTareasFinalizadas] = useState('');
     const [cantidadMateriasConTareasVencidas, setcantidadMateriasConTareasVencidas] = useState('');
     const [cantidadTareasPorDia, setCantidadTareasPorDia] = useState([]);
+    const [tiempoPromedioDeFinalizacion, setTiempoPromedioDeFinalizacion] = useState(0);
 
     // Función para manejar la selección de un paciente
     const handlePatientSelection = async (patientId) => {
@@ -72,6 +73,7 @@ function StatisticsScreen() {
         filtrarMaterias();
         if (tareasFinalizadas.length > 0) {
             contarTareasFinalizadasPorDia(tareasFinalizadas);
+            calcularTiempoPromedioDeFinalizacion(tareasFinalizadas);
         }
     }
 
@@ -148,7 +150,41 @@ function StatisticsScreen() {
         setCantidadTareasPorDia(cantidadTareasPorDia);
     };
 
+    // Función para calcular el tiempo promedio de finalización de las tareas
+    const calcularTiempoPromedioDeFinalizacion = (tareasFinalizadas) => {
+        if (!tareasFinalizadas || tareasFinalizadas.length === 0) {
+            setTiempoPromedioDeFinalizacion("No hay tareas finalizadas");
+            return;
+        }
+    
+        const tiempoTotal = tareasFinalizadas.reduce((acc, tarea) => {
 
+            if (tarea.fechaCreacion && tarea.fechaCreacion.toDate && tarea.correccion && tarea.correccion.correctionDate && tarea.correccion.correctionDate.toDate) {
+                const fechaCreacion = tarea.fechaCreacion?.toDate();
+                const fechaFinalizacion = tarea.correccion?.correctionDate?.toDate();
+                const tiempo = moment(fechaFinalizacion).diff(moment(fechaCreacion));
+                console.log(tarea.nombre, tiempo);
+                return acc + tiempo;
+            }
+            return acc; // Si alguna fecha es inválida, se ignora esa tarea en el cálculo
+        }, 0);
+    
+        // Promedio en milisegundos
+        const tiempoPromedio = tiempoTotal / tareasFinalizadas.length;
+    
+        // Convertir el tiempo promedio usando Moment.js
+        const horas = moment.duration(tiempoPromedio).asHours();
+        const dias = moment.duration(tiempoPromedio).asDays();
+    
+        const tiempoPromedioFormateado = 
+            dias >= 1 
+            ? `${Math.floor(dias)} días` 
+            : `${Math.floor(horas)} horas`;
+    
+        console.log('Tiempo promedio de finalización:', tiempoPromedioFormateado);
+        setTiempoPromedioDeFinalizacion(tiempoPromedioFormateado);
+    };
+    
     return (
         <View style={styles.container}>
             <PatientSelector onPatientSelected={handlePatientSelection} />
@@ -177,8 +213,10 @@ function StatisticsScreen() {
                         <Text style={styles.statText}>Materia con más tareas vencidas: 
                             {cantidadMateriasConTareasVencidas.length > 0 ? cantidadMateriasConTareasVencidas[0].materia : 'No hay materias'}
                         </Text>
+                        <Text style={styles.statText}>Tiempo promedio de finalización de tareas: 
+                            {tiempoPromedioDeFinalizacion}
+                        </Text>
                         <GraphPie data={cantidadMateriasConTareas} />
-                        {console.log(cantidadTareasPorDia)}
                         <GraphBar cantidadTareasPorDia={cantidadTareasPorDia} />
                     </ScrollView>
                 ) : (
