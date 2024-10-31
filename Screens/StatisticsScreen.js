@@ -40,25 +40,73 @@ function StatisticsScreen() {
     const [tareasPorHora, setTareasPorHora] = useState(Array(24).fill(0));
     const [diaConMasTareasFinalizadas, setDiaConMasTareasFinalizadas] = useState('');
 
-    // Función para manejar la selección de un paciente
-    const handlePatientSelection = async (patientId) => {
-        if (patientId) {
-            setLoading(true);
-            Promise.all([
-                fetchRewards(patientId),
-                fetchSubjects(patientId),
-                fetchTasks(patientId)]);
-            setLoading(false);  
-        }
-    };
+    // useEffect(() => {
+    //     const fetchDataAndProcessStats = async () => {
+    //         if (selectedPatientId) {
+    //             setLoading(true); // Activar loading mientras se cargan y procesan los datos
+    //             await Promise.all([
+    //                 fetchRewards(selectedPatientId),
+    //                 fetchSubjects(selectedPatientId),
+    //                 fetchTasks(selectedPatientId)
+    //             ]);
 
-    // useEffect para filtrar las tareas cuando se selecciona un paciente
-    useEffect(() =>{
+    //             // Procesar estadísticas después de cargar los datos
+    //             filtrarTareas();
+    //             setLoading(false); // Desactivar loading cuando todo esté listo
+    //         }
+    //     };
+
+    //     fetchDataAndProcessStats();
+    // }, [selectedPatientId]);
+
+    // Función para manejar la selección de un paciente
+    // const handlePatientSelection = async (patientId) => {
+    //     if (patientId) {
+    //         setLoading(true);
+    //         await Promise.all([
+    //             fetchRewards(patientId),
+    //             fetchSubjects(patientId),
+    //             fetchTasks(patientId)
+    //         ]);
+    //         setLoading(false); // Finalizar pantalla de carga una vez que todos los datos se hayan cargado
+    //     }
+    // };
+
+    // // useEffect para filtrar las tareas cuando se selecciona un paciente
+    // useEffect(() => {
+    //     if (selectedPatientId && tasks.length > 0 && subjects.length > 0) {
+    //         filtrarTareas();
+    //     }
+    // }, [selectedPatientId, tasks, subjects]);
+
+    useEffect(() => {
+        const loadDataAndProcessStats = async () => {
+            if (selectedPatientId) {
+                setLoading(true);
+
+                await Promise.all([
+                    fetchRewards(selectedPatientId),
+                    fetchSubjects(selectedPatientId),
+                    fetchTasks(selectedPatientId)
+                ]);
+
+                setLoading(false);
+            }
+        };
+
+        loadDataAndProcessStats();
+    }, [selectedPatientId]);
+
+    useEffect(() => {
+        // Ejecuta `filtrarTareas` solo cuando `tasks` y `subjects` estén cargados
         if (selectedPatientId && tasks.length > 0 && subjects.length > 0) {
             filtrarTareas();
         }
-    }, [selectedPatientId, tasks]);
-    
+    }, [tasks, subjects]);
+
+
+
+
     // función para filtrar las tareas
     const filtrarTareas = () => {
         const cantidadTareasTotales = tasks.length;
@@ -84,7 +132,7 @@ function StatisticsScreen() {
 
     // Función para filtrar las materias que tienen tareas
     const filtrarMaterias = () => {
-        const cantidadMateriasConTareas = contarTareasPorMateria(tasks);  
+        const cantidadMateriasConTareas = contarTareasPorMateria(tasks);
         const cantidadMateriasConTareasEnProgreso = contarTareasPorMateria(tareasEnProgreso);
         const cantidadMateriasConTareasPendiente = contarTareasPorMateria(tareasPendientes);
         const cantidadMateriasConTareasFinalizadas = contarTareasPorMateria(tareasFinalizadas);
@@ -119,8 +167,8 @@ function StatisticsScreen() {
 
         // Convertir el objeto `conteo` a un array de objetos con materia y cantidad
         const materiasOrdenadas = Object.entries(conteo)
-        .map(([materia, cantidad]) => ({ materia, cantidad })) // Convertir a objetos
-        .sort((a, b) => b.cantidad - a.cantidad); // Ordenar de mayor a menor por cantidad
+            .map(([materia, cantidad]) => ({ materia, cantidad })) // Convertir a objetos
+            .sort((a, b) => b.cantidad - a.cantidad); // Ordenar de mayor a menor por cantidad
 
         return materiasOrdenadas;
     };
@@ -137,7 +185,7 @@ function StatisticsScreen() {
 
         // Contar las tareas finalizadas según el día de la semana
         tareasFinalizadas.forEach((tarea) => {
-            const dia = tarea.correccion.correctionDate && tarea.correccion.correctionDate.toDate 
+            const dia = tarea.correccion.correctionDate && tarea.correccion.correctionDate.toDate
                 ? moment(tarea.correccion.correctionDate.toDate()).format('dddd')
                 : '';
 
@@ -151,8 +199,8 @@ function StatisticsScreen() {
             dia,
             cantidad: conteo[dia],
         }));
-        
-        const DiaConMasTareasFinalizadas = cantidadTareasPorDia.reduce((max, item) => 
+
+        const DiaConMasTareasFinalizadas = cantidadTareasPorDia.reduce((max, item) =>
             item.cantidad > max.cantidad ? item : max
         );
 
@@ -167,7 +215,7 @@ function StatisticsScreen() {
             setTiempoPromedioDeFinalizacion("No hay tareas finalizadas");
             return;
         }
-    
+
         const tiempoTotal = tareasFinalizadas.reduce((acc, tarea) => {
 
             if (tarea.fechaCreacion && tarea.fechaCreacion.toDate && tarea.correccion && tarea.correccion.correctionDate && tarea.correccion.correctionDate.toDate) {
@@ -178,25 +226,25 @@ function StatisticsScreen() {
             }
             return acc; // Si alguna fecha es inválida, se ignora esa tarea en el cálculo
         }, 0);
-    
+
         // Promedio en milisegundos
         const tiempoPromedio = tiempoTotal / tareasFinalizadas.length;
-    
+
         // Convertir el tiempo promedio usando Moment.js
         const horas = moment.duration(tiempoPromedio).asHours();
         const dias = moment.duration(tiempoPromedio).asDays();
-    
-        const tiempoPromedioFormateado = 
-            dias >= 1 
-            ? `${Math.floor(dias)} días` 
-            : `${Math.floor(horas)} horas`;
-    
+
+        const tiempoPromedioFormateado =
+            dias >= 1
+                ? `${Math.floor(dias)} días`
+                : `${Math.floor(horas)} horas`;
+
         setTiempoPromedioDeFinalizacion(tiempoPromedioFormateado);
     };
 
     // Función para calcular el horario de mayor productividad
     const calcularHorarioMayorProductividad = (tareasFinalizadas) => {
-    
+
         if (!tareasFinalizadas || tareasFinalizadas.length === 0) {
             setHorarioMayorProductividad("No hay tareas finalizadas");
             return;
@@ -226,14 +274,14 @@ function StatisticsScreen() {
         // Actualizar los estados con los resultados
         setHorarioMayorProductividad(horario);
         setTareasPorHora(tareasPorHoraTemp);
-    
+
         console.log(tareasPorHoraTemp);
         console.log("Hora con + completados", horario);
     };
-    
+
     return (
         <View style={styles.container}>
-            <PatientSelector onPatientSelected={handlePatientSelection} />
+            <PatientSelector />
             {loading ? (
                 <LoadingScreen />
             ) : (
@@ -244,28 +292,28 @@ function StatisticsScreen() {
                         <Text style={styles.statText}>Tareas pendientes: {tareasPendientes.length}</Text>
                         <Text style={styles.statText}>Tareas completadas: {tareasFinalizadas.length}</Text>
                         <Text style={styles.statText}>Tareas vencidas: {tareasVencidas.length}</Text>
-                        <Text style={styles.statText}>Materia con más tareas: 
+                        <Text style={styles.statText}>Materia con más tareas:
                             {cantidadMateriasConTareas.length > 0 ? cantidadMateriasConTareas[0].materia : 'No hay materias'}
                         </Text>
-                        <Text style={styles.statText}>Materia con más tareas en progreso: 
+                        <Text style={styles.statText}>Materia con más tareas en progreso:
                             {cantidadMateriasConTareasEnProgreso.length > 0 ? cantidadMateriasConTareasEnProgreso[0].materia : 'No hay materias'}
                         </Text>
-                        <Text style={styles.statText}>Materia con más tareas pendientes: 
+                        <Text style={styles.statText}>Materia con más tareas pendientes:
                             {cantidadMateriasConTareasPendiente.length > 0 ? cantidadMateriasConTareasPendiente[0].materia : 'No hay materias'}
                         </Text>
-                        <Text style={styles.statText}>Materia con más tareas finalizadas: 
+                        <Text style={styles.statText}>Materia con más tareas finalizadas:
                             {cantidadMateriasConTareasFinalizadas.length > 0 ? cantidadMateriasConTareasFinalizadas[0].materia : 'No hay materias'}
                         </Text>
-                        <Text style={styles.statText}>Materia con más tareas vencidas: 
+                        <Text style={styles.statText}>Materia con más tareas vencidas:
                             {cantidadMateriasConTareasVencidas.length > 0 ? cantidadMateriasConTareasVencidas[0].materia : 'No hay materias'}
                         </Text>
-                        <Text style={styles.statText}>Tiempo promedio de finalización de tareas: 
+                        <Text style={styles.statText}>Tiempo promedio de finalización de tareas:
                             {tiempoPromedioDeFinalizacion}
                         </Text>
                         <Text style={styles.statText}>Día de la semana con más tareas finalizadas:
                             {diaConMasTareasFinalizadas}
                         </Text>
-                        <Text style={styles.statText}>Horario de mayor productividad: 
+                        <Text style={styles.statText}>Horario de mayor productividad:
                             {horarioMayorProductividad !== null ? `${horarioMayorProductividad}:00` : 'No hay tareas finalizadas'}
                         </Text>
                         <GraphPie data={cantidadMateriasConTareas} />
@@ -284,7 +332,7 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         justifyContent: 'center',
-        flexGrow: 1,
+        flex: 1,
         backgroundColor: '#ffffff',
         padding: 10,
     },
