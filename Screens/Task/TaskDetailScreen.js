@@ -42,6 +42,7 @@ function TaskDetailScreen() {
     const { setSelectedPatientId, selectedPatientId } = useContext(PatientsContext);
     const { subjects, setSelectedSubjectId, selectedSubjectId } = useContext(SubjectsContext);
     const { rewards } = useContext(RewardsContext);
+    const { tareaTerminada, setTareaTerminada } = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -61,6 +62,9 @@ function TaskDetailScreen() {
                     if (task.correccion) {
                         setAdminName(task.correccion.adminName);
                         setCorrectionDate(task.correccion.correctionDate.toDate());
+                    }
+                    if (task.tareaTerminada) {
+                        setTareaTerminada(task.tareaTerminada.toDate());
                     }
                     if (task.dateRewards) {
                         console.log('task.dateRewards:', task.dateRewards.toDate());
@@ -112,6 +116,7 @@ function TaskDetailScreen() {
                     estado: nuevoEstado,
                     fechaCreacion,
                     dateRewards: rewardExpires ? dateRewards : null,
+                    tareaTerminada: tareaTerminada ? tareaTerminada : null,
                     correccion,
                 };
 
@@ -129,6 +134,7 @@ function TaskDetailScreen() {
                     estado: nuevoEstado,
                     fechaCreacion,
                     dateRewards: rewardExpires ? dateRewards : null,
+                    tareaTerminada: tareaTerminada ? tareaTerminada : null,
                 };
 
                 // Llamar a la función de actualización
@@ -151,7 +157,7 @@ function TaskDetailScreen() {
             onConfirm: async () => {
                 try {
                     setLoading(true);
-                    const result = await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado, fechaCreacion, dateRewards: rewardExpires ? dateRewards : null }, selectedPatientId);
+                    const result = await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado, fechaCreacion, dateRewards: rewardExpires ? dateRewards : null, tareaTerminada: tareaTerminada ? tareaTerminada : null, }, selectedPatientId);
                     if (result?.error) {
                         Toast.show({
                             type: 'error',

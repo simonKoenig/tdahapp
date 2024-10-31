@@ -11,6 +11,7 @@ import PatientSelector from '../Components/PatientSelector';
 import LoadingScreen from '../Components/LoadingScreen';
 import GraphPie from '../Components/GraphPie';
 import GraphBar from '../Components/GraphBar';
+import GraphBarHours from '../Components/GraphBarHours';
 // Import moment para formatear la fecha y mostrarla en español
 import moment from 'moment';
 import 'moment/locale/es';
@@ -269,6 +270,7 @@ function StatisticsScreen() {
                         </Text>
                         <GraphPie data={cantidadMateriasConTareas} />
                         <GraphBar cantidadTareasPorDia={cantidadTareasPorDia} />
+                        <GraphBarHours tareasPorHora={tareasPorHora} />
                     </ScrollView>
                 ) : (
                     <Text style={styles.noPatientText}>Selecciona un paciente para ver sus estadísticas.</Text>
@@ -280,9 +282,11 @@ function StatisticsScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        padding: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexGrow: 1,
         backgroundColor: '#ffffff',
+        padding: 10,
     },
     statText: {
         fontSize: 18,
