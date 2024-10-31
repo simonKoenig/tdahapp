@@ -13,6 +13,8 @@ export const TasksProvider = ({ children }) => {
     const [tasks, setTasks] = useState([]);
     const { selectedPatientId } = useContext(PatientsContext);
     const [unsubscribe, setUnsubscribe] = useState(null);
+    const [loadingTasks, setLoadingTasks] = useState(true);
+
 
     useEffect(() => {
         const loadTasks = async () => {
@@ -20,14 +22,18 @@ export const TasksProvider = ({ children }) => {
 
             if (isPaciente()) {
                 if (unsubscribe) unsubscribe();
+                setLoadingTasks(true); // Arranca en true cuando comienza la carga
 
                 const cachedTasks = await getAsyncStorage(`tasks_${user.uid}`);
                 if (cachedTasks) {
                     console.log('Setting Tasks from cache');
                     setTasks(sortTasks(cachedTasks));
+                    setLoadingTasks(false); // Desactivar el indicador de carga si se encuentran en caché
+
                 } else {
                     console.log('Fetching tasks');
                     fetchTasks(user.uid);
+
                 }
 
                 const tasksRef = collection(db, 'usuarios', user.uid, 'tareas');
@@ -35,12 +41,15 @@ export const TasksProvider = ({ children }) => {
                     let tasksList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     const sortedTasks = sortTasks(tasksList);
                     setTasks(sortedTasks);
+                    setLoadingTasks(false); // Desactivar el indicador de carga si se encuentran en caché
                     await setAsyncStorage(`tasks_${user.uid}`, sortedTasks);
+
                 });
                 setUnsubscribe(() => newUnsubscribe);
             } else {
                 if (!selectedPatientId) {
                     console.error('No selected patient ID');
+                    setLoadingTasks(false); // Cambia a false cuando se cargan del caché
                     return;
                 }
 
@@ -50,6 +59,8 @@ export const TasksProvider = ({ children }) => {
                 if (cachedTasks) {
                     console.log('Setting Tasks from cache');
                     setTasks(sortTasks(cachedTasks));
+                    setLoadingTasks(false); // Cambia a false cuando se cargan del caché
+
                 } else {
                     console.log('Fetching tasks');
                     fetchTasks(selectedPatientId);
@@ -68,6 +79,7 @@ export const TasksProvider = ({ children }) => {
     const fetchTasks = async (uid = null) => {
         const userId = uid || user?.uid;
         if (userId) {
+            setLoadingTasks(true); // Activa el indicador de carga al inicio de fetchTasks
             try {
                 console.log('Fetching tasks for UID:', userId);
 
@@ -89,11 +101,15 @@ export const TasksProvider = ({ children }) => {
                 return finalTasks;
             } catch (error) {
                 console.error('Error fetching tasks:', error);
+            } finally {
+                setLoadingTasks(false); // Desactiva `loadingTasks` después de completar o fallar
             }
         } else {
             console.error('UID or user is not defined');
+            setLoadingTasks(false); // Desactiva si no hay UID
         }
     };
+
 
     const addTask = async (task, uid) => {
         if (uid) {
@@ -219,7 +235,7 @@ export const TasksProvider = ({ children }) => {
 
 
     return (
-        <TasksContext.Provider value={{ tasks, setTasks, fetchTasks, addTask, updateTask, deleteTask, getTask }}>
+        <TasksContext.Provider value={{ tasks, loadingTasks, setTasks, fetchTasks, addTask, updateTask, deleteTask, getTask }}>
             {children}
         </TasksContext.Provider>
     );
