@@ -19,7 +19,7 @@ const GraphBar = ({cantidadTareasPorDia}) => {
         ]
     };
 
-    const screenWidth = Dimensions.get('window').width;
+    const screenWidth = Dimensions.get('window').width * 0.9;
     
     const chartConfig = {
         backgroundGradientFrom: "#ffffff",
@@ -30,12 +30,12 @@ const GraphBar = ({cantidadTareasPorDia}) => {
     };
 
     return (
-        <View style={styles.container}>
+        <View >
+            <Text style={styles.title} >Cantidad de tareas finalizadas por día</Text>
             { data.length === 0 ? 
                 <Text>No hay tareas</Text>
             : 
                 <View>
-                    <Text style={styles.title} >Cantidad de tareas finalizadas por día</Text>
                     <BarChart
                         data={data}
                         width={screenWidth}
@@ -45,6 +45,7 @@ const GraphBar = ({cantidadTareasPorDia}) => {
                         withInnerLines={false}
                         showValuesOnTopOfBars={true}
                         withHorizontalLabels={false}
+                        style={{ paddingRight: 0 }} // Ajusta el espacio a la derecha
                     />
                 </View>
             }

@@ -9,7 +9,7 @@ const GraphBarHours = ({tareasPorHora}) => {
         return null;
     }
     
-    const screenWidth = Dimensions.get('window').width;
+    const screenWidth = Dimensions.get('window').width * 0.9;
 
     const data = {
         labels: Array.from({ length: 24 }, (_, i) => i), // Horas de 0 a 23
@@ -31,16 +31,18 @@ const GraphBarHours = ({tareasPorHora}) => {
             // Muestra solo labels específicos
             return [0, 4, 8, 12, 16, 20, 23].includes(Number(value)) ? value : '';
         },
+        barPercentage: 0.3, // Cambia este valor para ajustar el tamaño de las barras
+        
     };
     
 
     return (
         <View>
+            <Text style={styles.title} >Cantidad de tareas finalizadas por hora</Text>
             { data.length === 0 ? 
                 <Text>No hay tareas</Text>
             : 
                 <View>
-                    <Text style={styles.title} >Cantidad de tareas finalizadas por hora</Text>
                     <BarChart
                         data={data}
                         width={screenWidth}
@@ -50,6 +52,7 @@ const GraphBarHours = ({tareasPorHora}) => {
                         withInnerLines={false}
                         showValuesOnTopOfBars={true}
                         withHorizontalLabels={false}
+                        style={{ paddingRight: 0 }} // Ajusta el espacio a la derecha
                     />
                 </View>
             }
