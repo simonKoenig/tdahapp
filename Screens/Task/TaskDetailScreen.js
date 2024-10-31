@@ -49,6 +49,7 @@ function TaskDetailScreen() {
     const { subjects, setSelectedSubjectId, selectedSubjectId } = useContext(SubjectsContext);
     const { rewards } = useContext(RewardsContext);
 
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -67,6 +68,9 @@ function TaskDetailScreen() {
                     if (task.correccion) {
                         setAdminName(task.correccion.adminName);
                         setCorrectionDate(task.correccion.correctionDate.toDate());
+                    }
+                    if (task.tareaTerminada) {
+                        setTareaTerminada(task.tareaTerminada.toDate());
                     }
                     if (task.dateRewards) {
                         console.log('task.dateRewards:', task.dateRewards.toDate());
@@ -121,6 +125,7 @@ function TaskDetailScreen() {
                     estado: nuevoEstado,
                     fechaCreacion,
                     dateRewards: rewardExpires ? dateRewards : null,
+                    tareaTerminada: tareaTerminada ? tareaTerminada : null,
                     correccion,
                 };
 
@@ -171,7 +176,7 @@ function TaskDetailScreen() {
             onConfirm: async () => {
                 try {
                     setLoading(true);
-                    const result = await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado, fechaCreacion, dateRewards: rewardExpires ? dateRewards : null }, selectedPatientId);
+                    const result = await updateTask(taskId, { nombre, descripcion, date, dificultad, selectedRewardId, selectedSubjectId, estado, fechaCreacion, dateRewards: rewardExpires ? dateRewards : null, tareaTerminada: tareaTerminada ? tareaTerminada : null, }, selectedPatientId);
                     if (result?.error) {
                         Toast.show({
                             type: 'error',
