@@ -94,7 +94,7 @@ function ProfileScreen() {
                 Toast.show({
                     type: 'success',
                     text1: 'Exito',
-                    text2: 'Usuario agregado correctamente. Toca aquí para cerrar.',
+                    text2: 'Estudiante agregado correctamente. Toca aquí para cerrar.',
 
                 });
 
@@ -104,7 +104,7 @@ function ProfileScreen() {
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: 'Ocurrió un error al agregar el usuario.',
+                text2: 'Ocurrió un error al agregar el estudiante.',
             });
         } finally {
             setLoadingPatients(false);
@@ -130,7 +130,7 @@ function ProfileScreen() {
                 Toast.show({
                     type: 'success',
                     text1: 'Éxito',
-                    text2: 'Paciente eliminado correctamente. Toca aquí para cerrar.',
+                    text2: 'Estudiante eliminado correctamente. Toca aquí para cerrar.',
 
                 });
             }
@@ -139,7 +139,7 @@ function ProfileScreen() {
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: 'Ocurrió un error al eliminar el paciente. Toca aquí para cerrar.',
+                text2: 'Ocurrió un error al eliminar el estudiante. Toca aquí para cerrar.',
             });
         } finally {
             setLoadingPatients(false); // Se quita el indicador de carga en cualquier caso (éxito o error)
@@ -153,7 +153,7 @@ function ProfileScreen() {
                 onDelete={() => {
                     showConfirmAlert({
                         title: "Confirmar eliminación",
-                        message: `¿Estás seguro que deseas eliminar al usuario "${item.nombreApellido}"?`,
+                        message: `¿Estás seguro que deseas eliminar al estudiante "${item.nombreApellido}"?`,
                         confirmText: "Eliminar",  // Texto personalizado para el botón de confirmación
                         cancelText: "Cancelar",   // Texto del botón de cancelar
                         onConfirm: () => handleDeletePatient(item.id),  // Función para confirmar la eliminación
@@ -179,10 +179,10 @@ function ProfileScreen() {
                     </View>
                     {!isPaciente() ? (
                         <>
-                            <Text style={[globalStyles.lessBoldText, { marginBottom: SPACING.small }]} accessibilityRole="header">Usuarios vinculados</Text>
+                            <Text style={[globalStyles.lessBoldText, { marginBottom: SPACING.small }]} accessibilityRole="header">Estudiantes vinculados</Text>
                             <View style={{ flex: 1 }}>
                                 {loadingPatients ? (
-                                    <LoadingScreen accessibilityLiveRegion="assertive" accessibilityLabel="Cargando pacientes, por favor espere" />
+                                    <LoadingScreen accessibilityLiveRegion="assertive" accessibilityLabel="Cargando estudiantes, por favor espere" />
                                 ) : patients.length === 0 ? (
                                     <View style={globalStyles.centeredContainer}>
                                         <Text style={globalStyles.noDataText}>No hay usuarios vinculados.</Text>
@@ -196,21 +196,21 @@ function ProfileScreen() {
                                 )}
                             </View>
                             <View style={styles.connectionOptions}>
-                                <Text style={[globalStyles.lessBoldText, { marginTop: SPACING.small }]} accessibilityRole="header">Vincular nuevo usuario</Text>
+                                <Text style={[globalStyles.lessBoldText, { marginTop: SPACING.small }]} accessibilityRole="header">Vincular nuevo estudiante</Text>
                                 <TouchableOpacity
                                     style={styles.optionContainer}
                                     onPress={() => setEmailModalVisible(true)}
-                                    accessibilityLabel="Añadir usuario por correo electrónico"
-                                    accessibilityHint="A continuación se abrirá un modal para ingresar el correo del usuario">
+                                    accessibilityLabel="Añadir estudiante por correo electrónico"
+                                    accessibilityHint="A continuación se abrirá un modal para ingresar el correo del estudiante">
                                     <Text style={globalStyles.text}>Añadir con mail</Text>
-                                    <MessageIcon size={24} color="black" accessibilityLabel="Icono de mensaje para añadir usuario por email" />
+                                    <MessageIcon size={24} color="black" accessibilityLabel="Icono de mensaje para añadir estudiante por email" />
                                 </TouchableOpacity>
 
                                 <Pressable
                                     style={styles.optionContainer}
                                     onPress={() => setQRModalVisible(true)}
                                     accessibilityLabel="Añadir usuario mediante código Q R"
-                                    accessibilityHint="A continuación se abrirá la cámara para escanear el Q R de un usuario"
+                                    accessibilityHint="A continuación se abrirá la cámara para escanear el Q R de un estudiante"
                                     accessibilityRole="button"
                                 >
                                     <Text style={globalStyles.text}>Añadir con código QR</Text>

@@ -57,11 +57,11 @@ const UserRewardsScreen = () => {
                         data={transformedPatients}
                         value={selectedPatientId}
                         setValue={setSelectedPatientId}
-                        placeholder="Seleccione un paciente"
+                        placeholder="Seleccione un estudiante"
                         onSelect={handleSelectPatient} // Pasar handleSelectPatient como prop
                     />
                 ) : (
-                    <Text style={styles.noPatientsText}>No se encontraron pacientes.</Text>
+                    <Text style={styles.noPatientsText}>No se encontraron estudiantes.</Text>
                 )}
                 {loading && <LoadingScreen />}
                 {typeof errorMessage === 'string' && errorMessage.length > 0 && (

@@ -71,7 +71,7 @@ const SubjectsListScreen = () => {
                         {renderSubjectList()}
                     </>
                 ) : (
-                    <Text style={styles.noPatientText}>Selecciona un paciente para ver sus materias.</Text>
+                    <Text style={styles.noPatientText}>Selecciona un estudiante para ver sus materias.</Text>
                 )
             )}
 

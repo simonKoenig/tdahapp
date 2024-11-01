@@ -68,7 +68,7 @@ function MyTabs() {
             {role === 'administrador' && (
                 <React.Fragment>
                     <Tab.Screen name="Estadísticas" component={StatisticsStackScreen} options={{
-                        tabBarLabel: 'Estadísticas',
+                        headerShown: false,
                         tabBarIcon: ({ color, size }) => (
                             <ChartBarIcon color={color} size={size} />
                         ),
@@ -126,8 +126,7 @@ function StatisticsStackScreen() {
 
     return (
         <StatisticsStack.Navigator initialRouteName="Statistics" screenOptions={HEADER_STYLE}>
-            <StatisticsStack.Screen name="Statistics" component={StatisticsScreen} />
-
+            <StatisticsStack.Screen name="Statistics" component={StatisticsScreen} options={{ headerShown: true, title: 'Estadísticas' }} />
         </StatisticsStack.Navigator>
     );
 }

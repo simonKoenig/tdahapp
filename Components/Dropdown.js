@@ -11,6 +11,7 @@ const DropdownComponent = ({ data, value, setValue, placeholder, onSelect, searc
             valueField="value"
             placeholder={placeholder}
             value={value}
+            autoScroll={false}
             search={searchActivo}
             searchPlaceholder="Buscar..."
             placeholderStyle={styles.placeholderStyle} // Estilo para el placeholder

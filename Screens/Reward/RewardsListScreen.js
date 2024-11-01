@@ -88,7 +88,7 @@ const RewardsListScreen = ({ route }) => {
                         {renderRewardList()}
                     </>
                 ) : (
-                    <Text style={styles.noPatientText}>Selecciona un paciente para ver sus recompensas.</Text>
+                    <Text style={styles.noPatientText}>Selecciona un estudiante para ver sus recompensas.</Text>
                 )
             )}
             <TouchableOpacity
