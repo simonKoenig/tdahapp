@@ -18,6 +18,8 @@ import 'moment/locale/es';
 moment.locale('es');
 // Estilos globales
 import { globalStyles } from '../Utils/globalStyles';
+import { SectionList } from 'react-native-web';
+import { SPACING } from '../Utils/Constant';
 
 function StatisticsScreen() {
     const { selectedPatientId } = useContext(PatientsContext);
@@ -238,54 +240,57 @@ function StatisticsScreen() {
             ) : (
                 selectedPatientId ? (
                     <View>
-                        <Text style={globalStyles.title}>Estado de las Tareas</Text>
+                            {/* Estado de las tareas */}
+                            <Text style={[globalStyles.title, {marginTop: 5}]}>Estado de las tareas</Text>
 
-                        <View style={globalStyles.centeredContainer}>
-                            <View style={styles.row}>
-                                <Text style={[globalStyles.text, { flex: 1 }]}>Cantidad de tareas:</Text>
-                                <Text style={globalStyles.lessBoldText}>
-                                    {tareasTotales}
-                                </Text>
+                            <View style={globalStyles.centeredContainer}>
+                                <View style={styles.row}>
+                                    <Text style={[globalStyles.text, { flex: 1 }]}>Cantidad de tareas:</Text>
+                                    <Text style={globalStyles.lessBoldText}>
+                                        {tareasTotales}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            <View style={globalStyles.centeredContainer}>
+                                <View style={styles.row}>
+                                    <Text style={[globalStyles.text, { flex: 1 }]}>En progreso:</Text>
+                                    <Text style={globalStyles.lessBoldText}>
+                                        {tareasEnProgreso.length}
+                                    </Text>
+                                </View>
+                        
+
+                            <View style={globalStyles.centeredContainer}>
+                                <View style={styles.row}>
+                                    <Text style={[globalStyles.text, { flex: 1 }]}>Pendientes:</Text>
+                                    <Text style={globalStyles.lessBoldText}>
+                                        {tareasPendientes.length}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            <View style={globalStyles.centeredContainer}>
+                                <View style={styles.row}>
+                                    <Text style={[globalStyles.text, { flex: 1 }]}>Finalizadas:</Text>
+                                    <Text style={globalStyles.lessBoldText}>
+                                        {tareasFinalizadas.length}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            <View style={globalStyles.centeredContainer}>
+                                <View style={styles.row}>
+                                    <Text style={[globalStyles.text, { flex: 1 }]}>Vencidas:</Text>
+                                    <Text style={globalStyles.lessBoldText}>
+                                        {tareasVencidas.length}
+                                    </Text>
+                                </View>
                             </View>
                         </View>
 
-                        <View style={globalStyles.centeredContainer}>
-                            <View style={styles.row}>
-                                <Text style={[globalStyles.text, { flex: 1 }]}>En progreso:</Text>
-                                <Text style={globalStyles.lessBoldText}>
-                                    {tareasEnProgreso.length}
-                                </Text>
-                            </View>
-                        </View>    
-
-                        <View style={globalStyles.centeredContainer}>
-                            <View style={styles.row}>
-                                <Text style={[globalStyles.text, { flex: 1 }]}>Pendientes:</Text>
-                                <Text style={globalStyles.lessBoldText}>
-                                    {tareasPendientes.length}
-                                </Text>
-                            </View>
-                        </View>
-
-                        <View style={globalStyles.centeredContainer}>
-                            <View style={styles.row}>
-                                <Text style={[globalStyles.text, { flex: 1 }]}>Finalizadas:</Text>
-                                <Text style={globalStyles.lessBoldText}>
-                                    {tareasFinalizadas.length}
-                                </Text>
-                            </View>
-                        </View>
-
-                        <View style={globalStyles.centeredContainer}>
-                            <View style={styles.row}>
-                                <Text style={[globalStyles.text, { flex: 1 }]}>Vencidas:</Text>
-                                <Text style={globalStyles.lessBoldText}>
-                                    {tareasVencidas.length}
-                                </Text>
-                            </View>
-                        </View>
-
-                        <Text style={globalStyles.title}>Materias</Text>
+                        {/* Estado de las materias */}
+                        <Text style={[globalStyles.title, {marginTop: SPACING.small}]}>Materias</Text>
 
                         <View style={globalStyles.centeredContainer}>
                             <View style={styles.row}>
@@ -332,7 +337,8 @@ function StatisticsScreen() {
                             </View>
                         </View>
 
-                        <Text style={globalStyles.title}>Productividad</Text>
+                        {/* Productividad */}
+                        <Text style={[globalStyles.title, {marginTop: SPACING.small}]}>Productividad</Text>
                         
                         <View style={globalStyles.centeredContainer}>
                             <View style={styles.row}>
@@ -361,9 +367,18 @@ function StatisticsScreen() {
                             </View>
                         </View>
                         
-                        <GraphPie data={cantidadMateriasConTareas} />
+                        <Text style={[globalStyles.title, {marginTop: SPACING.small}]}>Cantidad de tareas por materia</Text>
+                        <GraphPie data={cantidadMateriasConTareas}/>
+
+                        <Text style={[globalStyles.title, {marginTop: SPACING.small, marginBottom: 5}]}>
+                            Cantidad de tareas finalizadas por día
+                        </Text>
                         <GraphBar cantidadTareasPorDia={cantidadTareasPorDia} />
-                        <GraphBarHours tareasPorHora={tareasPorHora} />
+
+                        <Text style={[globalStyles.title, {marginTop: SPACING.small, marginBottom: 5}]}>
+                            Cantidad de tareas finalizadas por hora
+                        </Text>
+                        <GraphBarHours tareasPorHora={tareasPorHora}/>
                         
                     </View>
                 ) : (

@@ -32,10 +32,9 @@ const GraphBar = ({cantidadTareasPorDia}) => {
     };
 
     return (
-        <View style={globalStyles.container}>
-            <Text style={globalStyles.title} >Cantidad de tareas finalizadas por día</Text>
+        <View>
             { data.length === 0 ? 
-                <Text>No hay tareas</Text>
+                <Text style={globalStyles.noDataText}>No hay tareas</Text>
             : 
                 <View>
                     <BarChart

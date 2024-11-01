@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { PieChart } from 'react-native-chart-kit';
+import { globalStyles } from '../Utils/globalStyles';
 
 const GraphPie = ({ data }) => {
     const screenWidth = Dimensions.get('window').width;
@@ -22,12 +23,11 @@ const GraphPie = ({ data }) => {
     };
 
     return (
-        <View style={styles.container}>
+        <View>
             { data.length === 0 ? 
-                <Text>No hay tareas</Text>
+                <Text style={globalStyles.noDataText}>No hay tareas</Text>
             : 
                 <View>
-                    <Text style={styles.title} >Cantidad de tareas por materia</Text>
                     <PieChart
                         data={data.map((item, index) => ({
                             ...item,
@@ -48,18 +48,5 @@ const GraphPie = ({ data }) => {
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    title: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        paddingHorizontal: 10,
-    },
-});
 
 export default GraphPie;
