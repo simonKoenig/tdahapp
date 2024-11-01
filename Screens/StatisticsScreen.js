@@ -17,7 +17,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 moment.locale('es');
 // Estilos globales
-import {globalStyles} from '../Utils/globalStyles';
+import { globalStyles } from '../Utils/globalStyles';
 
 function StatisticsScreen() {
     const { selectedPatientId } = useContext(PatientsContext);
@@ -50,17 +50,17 @@ function StatisticsScreen() {
                 fetchRewards(patientId),
                 fetchSubjects(patientId),
                 fetchTasks(patientId)]);
-            setLoading(false);  
+            setLoading(false);
         }
     };
 
     // useEffect para filtrar las tareas cuando se selecciona un paciente
-    useEffect(() =>{
+    useEffect(() => {
         if (selectedPatientId && tasks.length > 0 && subjects.length > 0) {
             filtrarTareas();
         }
     }, [selectedPatientId, tasks]);
-    
+
     // función para filtrar las tareas
     const filtrarTareas = () => {
         const cantidadTareasTotales = tasks.length;
@@ -86,7 +86,7 @@ function StatisticsScreen() {
 
     // Función para filtrar las materias que tienen tareas
     const filtrarMaterias = () => {
-        const cantidadMateriasConTareas = contarTareasPorMateria(tasks);  
+        const cantidadMateriasConTareas = contarTareasPorMateria(tasks);
         const cantidadMateriasConTareasEnProgreso = contarTareasPorMateria(tareasEnProgreso);
         const cantidadMateriasConTareasPendiente = contarTareasPorMateria(tareasPendientes);
         const cantidadMateriasConTareasFinalizadas = contarTareasPorMateria(tareasFinalizadas);
@@ -121,8 +121,8 @@ function StatisticsScreen() {
 
         // Convertir el objeto `conteo` a un array de objetos con materia y cantidad
         const materiasOrdenadas = Object.entries(conteo)
-        .map(([materia, cantidad]) => ({ materia, cantidad })) // Convertir a objetos
-        .sort((a, b) => b.cantidad - a.cantidad); // Ordenar de mayor a menor por cantidad
+            .map(([materia, cantidad]) => ({ materia, cantidad })) // Convertir a objetos
+            .sort((a, b) => b.cantidad - a.cantidad); // Ordenar de mayor a menor por cantidad
 
         return materiasOrdenadas;
     };
@@ -139,7 +139,7 @@ function StatisticsScreen() {
 
         // Contar las tareas finalizadas según el día de la semana
         tareasFinalizadas.forEach((tarea) => {
-            const dia = tarea.correccion.correctionDate && tarea.correccion.correctionDate.toDate 
+            const dia = tarea.correccion.correctionDate && tarea.correccion.correctionDate.toDate
                 ? moment(tarea.correccion.correctionDate.toDate()).format('dddd')
                 : '';
 
@@ -153,8 +153,8 @@ function StatisticsScreen() {
             dia,
             cantidad: conteo[dia],
         }));
-        
-        const DiaConMasTareasFinalizadas = cantidadTareasPorDia.reduce((max, item) => 
+
+        const DiaConMasTareasFinalizadas = cantidadTareasPorDia.reduce((max, item) =>
             item.cantidad > max.cantidad ? item : max
         );
 
@@ -169,7 +169,7 @@ function StatisticsScreen() {
             setTiempoPromedioDeFinalizacion("No hay tareas finalizadas");
             return;
         }
-    
+
         const tiempoTotal = tareasFinalizadas.reduce((acc, tarea) => {
 
             if (tarea.fechaCreacion && tarea.fechaCreacion.toDate && tarea.correccion && tarea.correccion.correctionDate && tarea.correccion.correctionDate.toDate) {
@@ -180,25 +180,25 @@ function StatisticsScreen() {
             }
             return acc; // Si alguna fecha es inválida, se ignora esa tarea en el cálculo
         }, 0);
-    
+
         // Promedio en milisegundos
         const tiempoPromedio = tiempoTotal / tareasFinalizadas.length;
-    
+
         // Convertir el tiempo promedio usando Moment.js
         const horas = moment.duration(tiempoPromedio).asHours();
         const dias = moment.duration(tiempoPromedio).asDays();
-    
-        const tiempoPromedioFormateado = 
-            dias >= 1 
-            ? `${Math.floor(dias)} días` 
-            : `${Math.floor(horas)} horas`;
-    
+
+        const tiempoPromedioFormateado =
+            dias >= 1
+                ? `${Math.floor(dias)} días`
+                : `${Math.floor(horas)} horas`;
+
         setTiempoPromedioDeFinalizacion(tiempoPromedioFormateado);
     };
 
     // Función para calcular el horario de mayor productividad
     const calcularHorarioMayorProductividad = (tareasFinalizadas) => {
-    
+
         if (!tareasFinalizadas || tareasFinalizadas.length === 0) {
             setHorarioMayorProductividad("No hay tareas finalizadas");
             return;
@@ -228,11 +228,8 @@ function StatisticsScreen() {
         // Actualizar los estados con los resultados
         setHorarioMayorProductividad(horario);
         setTareasPorHora(tareasPorHoraTemp);
-    
-        console.log(tareasPorHoraTemp);
-        console.log("Hora con + completados", horario);
     };
-    
+
     return (
         <ScrollView style={globalStyles.container}>
             <PatientSelector onPatientSelected={handlePatientSelection} />
@@ -241,38 +238,133 @@ function StatisticsScreen() {
             ) : (
                 selectedPatientId ? (
                     <View>
-                        <Text style={globalStyles.text}>Cantidad de tareas: {tareasTotales}</Text>
-                        <Text style={globalStyles.text}>Tareas en progreso: {tareasEnProgreso.length}</Text>
-                        <Text style={globalStyles.text}>Tareas pendientes: {tareasPendientes.length}</Text>
-                        <Text style={globalStyles.text}>Tareas completadas: {tareasFinalizadas.length}</Text>
-                        <Text style={globalStyles.text}>Tareas vencidas: {tareasVencidas.length}</Text>
-                        <Text style={globalStyles.text}>Materia con más tareas: 
-                            {cantidadMateriasConTareas.length > 0 ? cantidadMateriasConTareas[0].materia : 'No hay materias'}
-                        </Text>
-                        <Text style={globalStyles.text}>Materia con más tareas en progreso: 
-                            {cantidadMateriasConTareasEnProgreso.length > 0 ? cantidadMateriasConTareasEnProgreso[0].materia : 'No hay materias'}
-                        </Text>
-                        <Text style={globalStyles.text}>Materia con más tareas pendientes: 
-                            {cantidadMateriasConTareasPendiente.length > 0 ? cantidadMateriasConTareasPendiente[0].materia : 'No hay materias'}
-                        </Text>
-                        <Text style={globalStyles.text}>Materia con más tareas finalizadas: 
-                            {cantidadMateriasConTareasFinalizadas.length > 0 ? cantidadMateriasConTareasFinalizadas[0].materia : 'No hay materias'}
-                        </Text>
-                        <Text style={globalStyles.text}>Materia con más tareas vencidas: 
-                            {cantidadMateriasConTareasVencidas.length > 0 ? cantidadMateriasConTareasVencidas[0].materia : 'No hay materias'}
-                        </Text>
-                        <Text style={globalStyles.text}>Tiempo promedio de finalización de tareas: 
-                            {tiempoPromedioDeFinalizacion}
-                        </Text>
-                        <Text style={globalStyles.text}>Día de la semana con más tareas finalizadas:
-                            {diaConMasTareasFinalizadas}
-                        </Text>
-                        <Text style={globalStyles.text}>Horario de mayor productividad: 
-                            {horarioMayorProductividad !== null ? `${horarioMayorProductividad}:00` : 'No hay tareas finalizadas'}
-                        </Text>
+                        <Text style={globalStyles.title}>Estado de las Tareas</Text>
+
+                        <View style={globalStyles.centeredContainer}>
+                            <View style={styles.row}>
+                                <Text style={[globalStyles.text, { flex: 1 }]}>Cantidad de tareas:</Text>
+                                <Text style={globalStyles.lessBoldText}>
+                                    {tareasTotales}
+                                </Text>
+                            </View>
+                        </View>
+
+                        <View style={globalStyles.centeredContainer}>
+                            <View style={styles.row}>
+                                <Text style={[globalStyles.text, { flex: 1 }]}>En progreso:</Text>
+                                <Text style={globalStyles.lessBoldText}>
+                                    {tareasEnProgreso.length}
+                                </Text>
+                            </View>
+                        </View>    
+
+                        <View style={globalStyles.centeredContainer}>
+                            <View style={styles.row}>
+                                <Text style={[globalStyles.text, { flex: 1 }]}>Pendientes:</Text>
+                                <Text style={globalStyles.lessBoldText}>
+                                    {tareasPendientes.length}
+                                </Text>
+                            </View>
+                        </View>
+
+                        <View style={globalStyles.centeredContainer}>
+                            <View style={styles.row}>
+                                <Text style={[globalStyles.text, { flex: 1 }]}>Finalizadas:</Text>
+                                <Text style={globalStyles.lessBoldText}>
+                                    {tareasFinalizadas.length}
+                                </Text>
+                            </View>
+                        </View>
+
+                        <View style={globalStyles.centeredContainer}>
+                            <View style={styles.row}>
+                                <Text style={[globalStyles.text, { flex: 1 }]}>Vencidas:</Text>
+                                <Text style={globalStyles.lessBoldText}>
+                                    {tareasVencidas.length}
+                                </Text>
+                            </View>
+                        </View>
+
+                        <Text style={globalStyles.title}>Materias</Text>
+
+                        <View style={globalStyles.centeredContainer}>
+                            <View style={styles.row}>
+                                <Text style={[globalStyles.text, { flex: 1 }]}>Con más tareas:</Text>
+                                <Text style={globalStyles.lessBoldText}>
+                                    {cantidadMateriasConTareas.length > 0 ? cantidadMateriasConTareas[0].materia : 'No hay materias'}
+                                </Text>
+                            </View>
+                        </View>
+
+                        <View style={globalStyles.centeredContainer}>
+                            <View style={styles.row}>
+                                <Text style={[globalStyles.text, { flex: 1 }]}>Con más tareas en progreso:</Text>
+                                <Text style={globalStyles.lessBoldText}>
+                                    {cantidadMateriasConTareasEnProgreso.length > 0 ? cantidadMateriasConTareasEnProgreso[0].materia : 'No hay materias'}
+                                </Text>
+                            </View>
+                        </View>
+
+                        <View style={globalStyles.centeredContainer}>
+                            <View style={styles.row}>
+                                <Text style={[globalStyles.text, { flex: 1 }]}>Con más tareas pendientes:</Text>
+                                <Text style={globalStyles.lessBoldText}>
+                                    {cantidadMateriasConTareasPendiente.length > 0 ? cantidadMateriasConTareasPendiente[0].materia : 'No hay materias'}
+                                </Text>
+                            </View>
+                        </View>
+
+                        <View style={globalStyles.centeredContainer}>
+                            <View style={styles.row}>
+                                <Text style={[globalStyles.text, { flex: 1 }]}>Con más tareas finalizadas:</Text>
+                                <Text style={globalStyles.lessBoldText}>
+                                    {cantidadMateriasConTareasFinalizadas.length > 0 ? cantidadMateriasConTareasFinalizadas[0].materia : 'No hay materias'}
+                                </Text>
+                            </View>
+                        </View>
+
+                        <View style={globalStyles.centeredContainer}>
+                            <View style={styles.row}>
+                                <Text style={[globalStyles.text, { flex: 1 }]}>Con más tareas vencidas:</Text>
+                                <Text style={globalStyles.lessBoldText}>
+                                    {cantidadMateriasConTareasVencidas.length > 0 ? cantidadMateriasConTareasVencidas[0].materia : 'No hay materias'}
+                                </Text>
+                            </View>
+                        </View>
+
+                        <Text style={globalStyles.title}>Productividad</Text>
+                        
+                        <View style={globalStyles.centeredContainer}>
+                            <View style={styles.row}>
+                                <Text style={[globalStyles.text, { flex: 1 }]}>Tiempo promedio de finalización:</Text>
+                                <Text style={globalStyles.lessBoldText}>
+                                    {tiempoPromedioDeFinalizacion}
+                                </Text>
+                            </View>
+                        </View>
+                        
+                        <View style={globalStyles.centeredContainer}>
+                            <View style={styles.row}>
+                                <Text style={[globalStyles.text, { flex: 1 }]}>Día de la semana con más tareas finalizadas:</Text>
+                                <Text style={globalStyles.lessBoldText}>
+                                    {diaConMasTareasFinalizadas}    
+                                </Text>
+                            </View>
+                        </View>
+
+                        <View style={globalStyles.centeredContainer}>
+                            <View style={styles.row}>
+                                <Text style={[globalStyles.text, { flex: 1 }]}>Horario de mayor productividad:</Text>
+                                <Text style={globalStyles.lessBoldText}>
+                                    {horarioMayorProductividad !== null ? `${horarioMayorProductividad}:00` : 'No hay tareas finalizadas'}
+                                </Text>
+                            </View>
+                        </View>
+                        
                         <GraphPie data={cantidadMateriasConTareas} />
                         <GraphBar cantidadTareasPorDia={cantidadTareasPorDia} />
                         <GraphBarHours tareasPorHora={tareasPorHora} />
+                        
                     </View>
                 ) : (
                     <Text style={globalStyles.noPatientText}>Selecciona un paciente para ver sus estadísticas.</Text>
@@ -281,5 +373,16 @@ function StatisticsScreen() {
         </ScrollView>
     );
 }
+
+const styles = StyleSheet.create({
+    row: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginVertical: 5,
+        paddingBottom: 5,
+        width: '80%',
+    },
+});
 
 export default StatisticsScreen;
