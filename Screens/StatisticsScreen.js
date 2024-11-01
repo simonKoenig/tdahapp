@@ -16,6 +16,8 @@ import GraphBarHours from '../Components/GraphBarHours';
 import moment from 'moment';
 import 'moment/locale/es';
 moment.locale('es');
+// Estilos globales
+import {globalStyles} from '../Utils/globalStyles';
 
 function StatisticsScreen() {
     const { selectedPatientId } = useContext(PatientsContext);
@@ -232,72 +234,52 @@ function StatisticsScreen() {
     };
     
     return (
-        <View style={styles.container}>
+        <ScrollView style={globalStyles.container}>
             <PatientSelector onPatientSelected={handlePatientSelection} />
             {loading ? (
                 <LoadingScreen />
             ) : (
                 selectedPatientId ? (
-                    <ScrollView>
-                        <Text style={styles.statText}>Cantidad de tareas: {tareasTotales}</Text>
-                        <Text style={styles.statText}>Tareas en progreso: {tareasEnProgreso.length}</Text>
-                        <Text style={styles.statText}>Tareas pendientes: {tareasPendientes.length}</Text>
-                        <Text style={styles.statText}>Tareas completadas: {tareasFinalizadas.length}</Text>
-                        <Text style={styles.statText}>Tareas vencidas: {tareasVencidas.length}</Text>
-                        <Text style={styles.statText}>Materia con más tareas: 
+                    <View>
+                        <Text style={globalStyles.text}>Cantidad de tareas: {tareasTotales}</Text>
+                        <Text style={globalStyles.text}>Tareas en progreso: {tareasEnProgreso.length}</Text>
+                        <Text style={globalStyles.text}>Tareas pendientes: {tareasPendientes.length}</Text>
+                        <Text style={globalStyles.text}>Tareas completadas: {tareasFinalizadas.length}</Text>
+                        <Text style={globalStyles.text}>Tareas vencidas: {tareasVencidas.length}</Text>
+                        <Text style={globalStyles.text}>Materia con más tareas: 
                             {cantidadMateriasConTareas.length > 0 ? cantidadMateriasConTareas[0].materia : 'No hay materias'}
                         </Text>
-                        <Text style={styles.statText}>Materia con más tareas en progreso: 
+                        <Text style={globalStyles.text}>Materia con más tareas en progreso: 
                             {cantidadMateriasConTareasEnProgreso.length > 0 ? cantidadMateriasConTareasEnProgreso[0].materia : 'No hay materias'}
                         </Text>
-                        <Text style={styles.statText}>Materia con más tareas pendientes: 
+                        <Text style={globalStyles.text}>Materia con más tareas pendientes: 
                             {cantidadMateriasConTareasPendiente.length > 0 ? cantidadMateriasConTareasPendiente[0].materia : 'No hay materias'}
                         </Text>
-                        <Text style={styles.statText}>Materia con más tareas finalizadas: 
+                        <Text style={globalStyles.text}>Materia con más tareas finalizadas: 
                             {cantidadMateriasConTareasFinalizadas.length > 0 ? cantidadMateriasConTareasFinalizadas[0].materia : 'No hay materias'}
                         </Text>
-                        <Text style={styles.statText}>Materia con más tareas vencidas: 
+                        <Text style={globalStyles.text}>Materia con más tareas vencidas: 
                             {cantidadMateriasConTareasVencidas.length > 0 ? cantidadMateriasConTareasVencidas[0].materia : 'No hay materias'}
                         </Text>
-                        <Text style={styles.statText}>Tiempo promedio de finalización de tareas: 
+                        <Text style={globalStyles.text}>Tiempo promedio de finalización de tareas: 
                             {tiempoPromedioDeFinalizacion}
                         </Text>
-                        <Text style={styles.statText}>Día de la semana con más tareas finalizadas:
+                        <Text style={globalStyles.text}>Día de la semana con más tareas finalizadas:
                             {diaConMasTareasFinalizadas}
                         </Text>
-                        <Text style={styles.statText}>Horario de mayor productividad: 
+                        <Text style={globalStyles.text}>Horario de mayor productividad: 
                             {horarioMayorProductividad !== null ? `${horarioMayorProductividad}:00` : 'No hay tareas finalizadas'}
                         </Text>
                         <GraphPie data={cantidadMateriasConTareas} />
                         <GraphBar cantidadTareasPorDia={cantidadTareasPorDia} />
                         <GraphBarHours tareasPorHora={tareasPorHora} />
-                    </ScrollView>
+                    </View>
                 ) : (
-                    <Text style={styles.noPatientText}>Selecciona un paciente para ver sus estadísticas.</Text>
+                    <Text style={globalStyles.noPatientText}>Selecciona un paciente para ver sus estadísticas.</Text>
                 )
             )}
-        </View>
+        </ScrollView>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexGrow: 1,
-        backgroundColor: '#ffffff',
-        padding: 10,
-    },
-    statText: {
-        fontSize: 18,
-        marginVertical: 10,
-    },
-    noPatientText: {
-        textAlign: 'center',
-        fontSize: 18,
-        color: '#666666',
-        marginTop: 20,
-    }
-});
 
 export default StatisticsScreen;

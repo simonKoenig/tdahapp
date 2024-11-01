@@ -1,6 +1,8 @@
 import React from 'react';
 import { Text, View, Dimensions, StyleSheet } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
+import { globalStyles } from '../Utils/globalStyles';
+import { COLORS } from '../Utils/Constant';
 
 const GraphBarHours = ({tareasPorHora}) => {
 
@@ -22,23 +24,23 @@ const GraphBarHours = ({tareasPorHora}) => {
     };
 
     const chartConfig = {
-        backgroundGradientFrom: '#ffffff',
-        backgroundGradientTo: '#ffffff',
-        color: () => '#4c669f',
+        backgroundGradientFrom: COLORS.background,
+        backgroundGradientTo: COLORS.background,
+        color: () => COLORS.primary,
         strokeWidth: 2,
         useShadowColorFromDataset: false,
         formatXLabel: (value) => {
             // Muestra solo labels específicos
             return [0, 4, 8, 12, 16, 20, 23].includes(Number(value)) ? value : '';
         },
-        barPercentage: 0.3, // Cambia este valor para ajustar el tamaño de las barras
+        barPercentage: 0.3,
         
     };
     
 
     return (
-        <View>
-            <Text style={styles.title} >Cantidad de tareas finalizadas por hora</Text>
+        <View style={globalStyles.container}>
+            <Text style={globalStyles.title} >Cantidad de tareas finalizadas por hora</Text>
             { data.length === 0 ? 
                 <Text>No hay tareas</Text>
             : 
@@ -52,21 +54,14 @@ const GraphBarHours = ({tareasPorHora}) => {
                         withInnerLines={false}
                         showValuesOnTopOfBars={true}
                         withHorizontalLabels={false}
-                        style={{ paddingRight: 0 }} // Ajusta el espacio a la derecha
+                        style={{
+                            paddingRight: 0,
+                         }}
                     />
                 </View>
             }
         </View>            
     );
 };
-
-const styles = StyleSheet.create({
-    title: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        paddingHorizontal: 10,
-    },
-});
 
 export default GraphBarHours;

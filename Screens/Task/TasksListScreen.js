@@ -137,7 +137,7 @@ const TaskListScreen = ({ route }) => {
                         onRefresh={handleRefresh}
                     />
                 ) : (
-                    <Text style={styles.noPatientText} accessible={true} accessibilityLabel="Selecciona un paciente para ver sus tareas">
+                    <Text style={globalStyles.noPatientText} accessible={true} accessibilityLabel="Selecciona un paciente para ver sus tareas">
                         Selecciona un paciente para ver sus tareas.
                     </Text>)
             )}
@@ -190,12 +190,6 @@ const styles = StyleSheet.create({
         fontFamily: 'bold',
         marginBottom: SPACING.small,
         color: COLORS.text,
-    },
-    noPatientText: {
-        textAlign: 'center',
-        fontSize: 18,
-        color: COLORS.text,
-        marginTop: SPACING.medium,
     },
 });
 

@@ -121,6 +121,12 @@ export const globalStyles = StyleSheet.create({
         fontSize: FONT_SIZES.medium,
         color: 'gray',  // Usar un color secundario para mensajes menos prominentes
     },
+    noPatientText: {
+        textAlign: 'center',
+        fontSize: 18,
+        color: COLORS.text,
+        marginTop: SPACING.medium,
+    },
     InfoText:
     {
         fontSize: FONT_SIZES.small,
