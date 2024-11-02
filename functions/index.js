@@ -9,7 +9,7 @@ async function getUserTokens(userUID) {
   try {
     const userDoc = await db.collection('usuarios').doc(userUID).get();
     if (!userDoc.exists) {
-      console.log(`El usuario ${userUID} no existe.`);
+      console.log(`El  ${userUID} no existe.`);
       return [];
     }
     const FCMtokens = userDoc.data().FCMtokens || [];
@@ -113,7 +113,7 @@ async function updateTareasVencidas() {
 
         const title = 'Tarea vencida';
         const body = isAdminToken
-          ? `La tarea "${nombreTarea}" del usuario "${userName}" ha vencido.`
+          ? `La tarea "${nombreTarea}" del estudiante "${userName}" ha vencido.`
           : `La tarea "${nombreTarea}" ha vencido.`;
 
         await sendNotification([token], title, body);
@@ -151,7 +151,7 @@ exports.onCreateTarea = functions.firestore
       const userTokens = await getUserTokens(userId);
 
       // Enviar la notificación solo al paciente
-      await sendNotification(userTokens, 'Nueva Tarea Asignada', `Se ha asignado una nueva tarea: "${nombreTarea}".`);
+      await sendNotification(userTokens, 'Nueva tarea Asignada', `Se ha asignado una nueva tarea: "${nombreTarea}".`);
     } catch (error) {
       console.error('Error al enviar la notificación de nueva tarea:', error);
     }
@@ -208,7 +208,7 @@ exports.onUpdateTarea = functions.firestore
         await sendNotification(
           adminTokens,
           'Tarea actualizada',
-          `La tarea "${nombreTarea}" del usuario "${userName}" ha cambiado su estado a "Pendiente".`
+          `La tarea "${nombreTarea}" del estudiante "${userName}" ha cambiado su estado a "Pendiente".`
         );
       } catch (error) {
         console.error('Error al enviar la notificación de cambio de estado a los administradores:', error);
@@ -255,7 +255,7 @@ exports.onUpdateTareaFinalizada = functions.firestore
           await sendNotification(
             filteredAdminTokens,
             'Tarea Finalizada',
-            `La tarea "${nombreTarea}" del usuario "${userName}" ha sido finalizada correctamente.`
+            `La tarea "${nombreTarea}" del estudiante "${userName}" ha sido finalizada correctamente.`
           );
         }
 

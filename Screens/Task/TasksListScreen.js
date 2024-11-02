@@ -21,7 +21,7 @@ moment.locale('es');
 const fechaHoy = moment().format('LL'); // Formato de fecha larga
 
 const TaskListScreen = ({ route }) => {
-    const { tasks = [], fetchTasks } = useContext(TasksContext); // Valor predeterminado para tasks
+    const { tasks = [], fetchTasks, loadingTasks } = useContext(TasksContext); // Valor predeterminado para tasks
     const { user, isPaciente, isLoading } = useContext(AuthContext);
     const { selectedPatientId } = useContext(PatientsContext);
 
@@ -95,7 +95,7 @@ const TaskListScreen = ({ route }) => {
             />
 
             {/* Usar tu componente LoadingScreen si está cargando las tareas y hay un paciente */}
-            {loading ? (
+            {loadingTasks ? (
                 <LoadingScreen accessibilityLabel="Cargando tareas, por favor espere" />
             ) : (
                 selectedPatientId || isPaciente() ? (
@@ -137,8 +137,8 @@ const TaskListScreen = ({ route }) => {
                         onRefresh={handleRefresh}
                     />
                 ) : (
-                    <Text style={globalStyles.noPatientText} accessible={true} accessibilityLabel="Selecciona un paciente para ver sus tareas">
-                        Selecciona un paciente para ver sus tareas.
+                    <Text style={globalStyles.noPatientText} accessible={true} accessibilityLabel="Selecciona un estudiante para ver sus tareas">
+                        Selecciona un estudiante para ver sus tareas.
                     </Text>)
             )}
 
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
         fontFamily: 'bold',
     },
     fechaText: {
-        fontSize: 18,
+        fontSize: 22,
         fontFamily: 'bold',
         marginBottom: SPACING.small,
         color: COLORS.text,

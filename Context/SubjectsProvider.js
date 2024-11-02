@@ -14,21 +14,23 @@ export const SubjectsProvider = ({ children }) => {
     const [subjects, setSubjects] = useState([]);
     const [selectedSubjectId, setSelectedSubjectId] = useState(null);
     const [unsubscribe, setUnsubscribe] = useState(null);
+    const [loadingSubjects, setLoadingSubjects] = useState(false); // Estado de carga
+
 
     useEffect(() => {
         const loadSubjects = async () => {
             // Si el usuario no está autenticado, no hace nada
-            if (!user){
+            if (!user) {
                 return;
             }
             // Si el usuario es un paciente, se suscribe a sus propias recompensas en tiempo real
             if (isPaciente()) {
-                
+
                 // Cancela la suscripción anterior si existe
                 if (unsubscribe) {
                     unsubscribe();
                 }
-                
+
                 // Usa las recompensas en caché si existen
                 const cachedSubjects = await getAsyncStorage(`subjects_${user.uid}`);
                 if (cachedSubjects) {
@@ -59,7 +61,7 @@ export const SubjectsProvider = ({ children }) => {
                 if (unsubscribe) {
                     unsubscribe();
                 }
-                
+
                 // Usa las recompensas en caché si existen, sino las obtiene con el fetch
                 const cachedSubjects = await getAsyncStorage(`subjects_${selectedPatientId}`);
                 console.log('cachedSubjects:', cachedSubjects);
@@ -85,16 +87,19 @@ export const SubjectsProvider = ({ children }) => {
 
     const fetchSubjects = async (uid) => {
         if (uid) {
+            setLoadingSubjects(true); // Activa la carga
             try {
                 console.log('Fetching subjects for UID:', uid);
-                const subjectsRef = collection(db, 'usuarios', uid, 'materias'); // Se crea una referencia a la colección de materias del usuario
-                const subjectsSnapshot = await getDocs(subjectsRef); // Se obtiene un snapshot de la colección de materias
-                const subjectsList = subjectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Se crea una lista de materias a partir del snapshot
-                setSubjects(subjectsList); // Se actualiza el estado de materias con la lista obtenida
+                const subjectsRef = collection(db, 'usuarios', uid, 'materias');
+                const subjectsSnapshot = await getDocs(subjectsRef);
+                const subjectsList = subjectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                setSubjects(subjectsList);
                 await setAsyncStorage(`subjects_${uid}`, subjectsList);
-                return subjectsList; // Se retorna la lista de materias
+                return subjectsList;
             } catch (error) {
                 console.error('Error fetching subjects:', error);
+            } finally {
+                setLoadingSubjects(false); // Desactiva la carga al finalizar
             }
         }
     };
@@ -108,7 +113,7 @@ export const SubjectsProvider = ({ children }) => {
                 const newSubject = { id: docRef.id, ...subject };
                 setSubjects(prevsubjects => [...prevsubjects, newSubject]); // Se actualiza el estado de materias con la nueva materia
                 await addAsyncStorage(`subjects_${uid}`, newSubject);
-                
+
             } catch (error) {
                 console.error('Error adding subject:', error);
             }
@@ -122,7 +127,7 @@ export const SubjectsProvider = ({ children }) => {
         if (uid) {
             try {
                 console.log('Updating subject with ID:', id);
-                console.log('Updated subject:', updatedsubject);   
+                console.log('Updated subject:', updatedsubject);
                 const subjectRef = doc(db, 'usuarios', uid, 'materias', id); // Se crea una referencia al documento de la materia
                 await updateDoc(subjectRef, updatedsubject); // Se actualiza el documento de la materia
                 setSubjects(subjects.map(subject => (subject.id === id ? { id, ...updatedsubject } : subject))); // Se actualiza el estado de materias
@@ -172,7 +177,7 @@ export const SubjectsProvider = ({ children }) => {
     };
 
     return (
-        <SubjectsContext.Provider value={{ subjects, setSubjects, fetchSubjects, addSubject, updateSubject, deleteSubject, getSubject, selectedSubjectId, setSelectedSubjectId }}>
+        <SubjectsContext.Provider value={{ subjects, setSubjects, fetchSubjects, addSubject, updateSubject, deleteSubject, getSubject, selectedSubjectId, setSelectedSubjectId, loadingSubjects }}>
             {children}
         </SubjectsContext.Provider>
     );

@@ -44,24 +44,72 @@ function StatisticsScreen() {
     const [tareasPorHora, setTareasPorHora] = useState(Array(24).fill(0));
     const [diaConMasTareasFinalizadas, setDiaConMasTareasFinalizadas] = useState('');
 
-    // Función para manejar la selección de un paciente
-    const handlePatientSelection = async (patientId) => {
-        if (patientId) {
-            setLoading(true);
-            Promise.all([
-                fetchRewards(patientId),
-                fetchSubjects(patientId),
-                fetchTasks(patientId)]);
-            setLoading(false);
-        }
-    };
+    // useEffect(() => {
+    //     const fetchDataAndProcessStats = async () => {
+    //         if (selectedPatientId) {
+    //             setLoading(true); // Activar loading mientras se cargan y procesan los datos
+    //             await Promise.all([
+    //                 fetchRewards(selectedPatientId),
+    //                 fetchSubjects(selectedPatientId),
+    //                 fetchTasks(selectedPatientId)
+    //             ]);
 
-    // useEffect para filtrar las tareas cuando se selecciona un paciente
+    //             // Procesar estadísticas después de cargar los datos
+    //             filtrarTareas();
+    //             setLoading(false); // Desactivar loading cuando todo esté listo
+    //         }
+    //     };
+
+    //     fetchDataAndProcessStats();
+    // }, [selectedPatientId]);
+
+    // Función para manejar la selección de un paciente
+    // const handlePatientSelection = async (patientId) => {
+    //     if (patientId) {
+    //         setLoading(true);
+    //         await Promise.all([
+    //             fetchRewards(patientId),
+    //             fetchSubjects(patientId),
+    //             fetchTasks(patientId)
+    //         ]);
+    //         setLoading(false); // Finalizar pantalla de carga una vez que todos los datos se hayan cargado
+    //     }
+    // };
+
+    // // useEffect para filtrar las tareas cuando se selecciona un paciente
+    // useEffect(() => {
+    //     if (selectedPatientId && tasks.length > 0 && subjects.length > 0) {
+    //         filtrarTareas();
+    //     }
+    // }, [selectedPatientId, tasks, subjects]);
+
     useEffect(() => {
+        const loadDataAndProcessStats = async () => {
+            if (selectedPatientId) {
+                setLoading(true);
+
+                await Promise.all([
+                    fetchRewards(selectedPatientId),
+                    fetchSubjects(selectedPatientId),
+                    fetchTasks(selectedPatientId)
+                ]);
+
+                setLoading(false);
+            }
+        };
+
+        loadDataAndProcessStats();
+    }, [selectedPatientId]);
+
+    useEffect(() => {
+        // Ejecuta `filtrarTareas` solo cuando `tasks` y `subjects` estén cargados
         if (selectedPatientId && tasks.length > 0 && subjects.length > 0) {
             filtrarTareas();
         }
-    }, [selectedPatientId, tasks]);
+    }, [tasks, subjects]);
+
+
+
 
     // función para filtrar las tareas
     const filtrarTareas = () => {
@@ -123,8 +171,8 @@ function StatisticsScreen() {
 
         // Convertir el objeto `conteo` a un array de objetos con materia y cantidad
         const materiasOrdenadas = Object.entries(conteo)
-            .map(([materia, cantidad]) => ({ materia, cantidad })) // Convertir a objetos
-            .sort((a, b) => b.cantidad - a.cantidad); // Ordenar de mayor a menor por cantidad
+                .map(([materia, cantidad]) => ({ materia, cantidad })) // Convertir a objetos
+                .sort((a, b) => b.cantidad - a.cantidad); // Ordenar de mayor a menor por cantidad
 
         return materiasOrdenadas;
     };
@@ -234,7 +282,7 @@ function StatisticsScreen() {
 
     return (
         <ScrollView style={globalStyles.container}>
-            <PatientSelector onPatientSelected={handlePatientSelection} />
+            <PatientSelector />
             {loading ? (
                 <LoadingScreen />
             ) : (

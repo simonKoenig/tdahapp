@@ -17,7 +17,7 @@ import { AuthContext } from '../../Context/AuthProvider';
 import { PatientsContext } from '../../Context/PatientsProvider';
 
 const RewardsListScreen = ({ route }) => {
-    const { rewards, fetchRewards } = useContext(RewardsContext);
+    const { rewards, fetchRewards, loadingRewards } = useContext(RewardsContext);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedDifficulty, setSelectedDifficulty] = useState('');
     const [refreshing, setRefreshing] = useState(false);
@@ -35,18 +35,15 @@ const RewardsListScreen = ({ route }) => {
 
     const handleRefresh = async () => {
         setRefreshing(true);
-        // setLoading(true);  
         await fetchRewards(selectedPatientId);
         setRefreshing(false);
-        // setLoading(false);  
+
 
     };
 
     const handlePatientSelection = async (patientId) => {
         if (patientId) {
-            setLoading(true);
             await fetchRewards(patientId);
-            setLoading(false);
         }
     };
 
@@ -81,7 +78,7 @@ const RewardsListScreen = ({ route }) => {
                 setValue={setSelectedDifficulty}
                 placeholder="Selecciona una dificultad"
             />
-            {loading ? (
+            {loadingRewards ? (
                 <LoadingScreen />
             ) : (
                 selectedPatientId ? (
@@ -91,7 +88,7 @@ const RewardsListScreen = ({ route }) => {
                         {renderRewardList()}
                     </>
                 ) : (
-                    <Text style={styles.noPatientText}>Selecciona un paciente para ver sus recompensas.</Text>
+                    <Text style={styles.noPatientText}>Selecciona un estudiante para ver sus recompensas.</Text>
                 )
             )}
             <TouchableOpacity

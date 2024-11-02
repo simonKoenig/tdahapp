@@ -14,11 +14,12 @@ export const RewardsProvider = ({ children }) => {
     const [selectedRewardId, setSelectedRewardId] = useState(null);
     const { selectedPatientId } = useContext(PatientsContext);
     const [unsubscribe, setUnsubscribe] = useState(null);
+    const [loadingRewards, setLoadingRewards] = useState(false);
 
     useEffect(() => {
         const loadRewards = async () => {
             // Si el usuario no está autenticado, no hace nada
-            if (!user){
+            if (!user) {
                 return;
             }
             // Si el usuario es un paciente, se suscribe a sus propias recompensas en tiempo real
@@ -28,7 +29,7 @@ export const RewardsProvider = ({ children }) => {
                 if (unsubscribe) {
                     unsubscribe();
                 }
-                
+
                 // Usa las recompensas en caché si existen
                 const cachedRewards = await getAsyncStorage(`rewards_${user.uid}`);
                 if (cachedRewards) {
@@ -59,10 +60,10 @@ export const RewardsProvider = ({ children }) => {
                 if (unsubscribe) {
                     unsubscribe();
                 }
-                
+
                 // Usa las recompensas en caché si existen, sino las obtiene con el fetch
                 const cachedRewards = await getAsyncStorage(`rewards_${selectedPatientId}`);
-                console.log('Cached rewards:', cachedRewards); 
+                console.log('Cached rewards:', cachedRewards);
                 if (cachedRewards) {
                     console.log('Setting rewards from cache');
                     setRewards(cachedRewards);
@@ -84,6 +85,7 @@ export const RewardsProvider = ({ children }) => {
 
     const fetchRewards = async (uid) => {
         if (uid) {
+            setLoadingRewards(true);
             try {
                 console.log('Fetching rewards for UID:', uid);
                 const rewardsRef = collection(db, 'usuarios', uid, 'recompensas');
@@ -94,6 +96,8 @@ export const RewardsProvider = ({ children }) => {
                 return rewardsList;
             } catch (error) {
                 console.error('Error fetching rewards:', error);
+            } finally {
+                setLoadingRewards(false);
             }
         }
     };
@@ -168,7 +172,7 @@ export const RewardsProvider = ({ children }) => {
     };
 
     return (
-        <RewardsContext.Provider value={{ rewards, setRewards, fetchRewards, addReward, updateReward, deleteReward, getReward, selectedRewardId, setSelectedRewardId }}>
+        <RewardsContext.Provider value={{ rewards, setRewards, fetchRewards, addReward, updateReward, deleteReward, getReward, selectedRewardId, setSelectedRewardId, loadingRewards }}>
             {children}
         </RewardsContext.Provider>
     );

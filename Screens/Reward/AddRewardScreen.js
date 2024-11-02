@@ -26,7 +26,7 @@ function AddRewardScreen() {
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: 'No se ha seleccionado un paciente. Toca aquí para cerrar.',
+                text2: 'No se ha seleccionado un estudiante. Toca aquí para cerrar.',
             });
             navigation.goBack();
             return;

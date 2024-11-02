@@ -12,7 +12,7 @@ const ObtainTaskScreen = () => {
     return (
         <View style={[globalStyles.container, { alignItems: 'center' }]}>
             <Image
-                source={require('../../assets/images/regalo.png')}
+                source={require('../../assets/images/gift.png')}
                 style={styles.image}
                 resizeMode="contain"
                 accessible={true}
@@ -32,7 +32,7 @@ const ObtainTaskScreen = () => {
                 ¡Has completado la tarea correctamente!
             </Text>
             <Text
-                style={[globalStyles.title, { fontSize: 25, marginVertical: 20 }]} accessible={true}
+                style={[globalStyles.title, { fontSize: 25, marginVertical: 20, textAlign: 'center' }]} accessible={true}
                 accessibilityLabel={`Puedes reclamar la recompensa: ${recompensaNombre}`}
             >
                 Podés {recompensaNombre}
@@ -68,8 +68,8 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     image: {
-        width: 150,
-        height: 150,
+        width: 250,
+        height: 250,
         marginBottom: 30,
     },
     title: {

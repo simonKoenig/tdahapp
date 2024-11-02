@@ -84,7 +84,7 @@ function AddTaskScreen() {
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: 'No se ha seleccionado un paciente. Toca aquí para cerrar.',
+                text2: 'No se ha seleccionado un estudiante. Toca aquí para cerrar.',
             });
             navigation.goBack();
             return;
@@ -161,19 +161,19 @@ function AddTaskScreen() {
 
             />
 
-            <Text style={globalStyles.label} accessibilityLabel='Campo de selección del paciente'>Paciente</Text>
+            <Text style={globalStyles.label} accessibilityLabel='Campo de selección del paciente'>Estudiante</Text>
             {patients.length > 0 ? (
                 <DropdownComponent
                     data={transformedPatients}
                     value={selectedPatientId}
                     setValue={setSelectedPatientId}
-                    placeholder="Seleccione un paciente"
+                    placeholder="Seleccione un estudiante"
                     onSelect={handleSelectPatient}
                     editable={true}
                     width='80%'
                 />
             ) : (
-                <Text style={styles.noPatientsText}>No se encontraron pacientes.</Text>
+                <Text style={styles.noPatientsText}>No se encontraron estudiantes.</Text>
             )}
         </View>,
         <View style={globalStyles.form}>

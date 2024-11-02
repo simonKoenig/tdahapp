@@ -10,11 +10,10 @@ import LoadingScreen from '../../Components/LoadingScreen';
 import { globalStyles } from '../../Utils/globalStyles';
 
 const SubjectsListScreen = () => {
-    const { subjects, fetchSubjects } = useContext(SubjectsContext);
+    const { subjects, fetchSubjects, loadingSubjects } = useContext(SubjectsContext); // Usar loadingSubjects del contexto
     const { selectedPatientId } = useContext(PatientsContext);
     const [searchTerm, setSearchTerm] = useState('');
     const [refreshing, setRefreshing] = useState(false);
-    const [loading, setLoading] = useState(false);
     const navigation = useNavigation();
 
     // Filtrar materias basadas en el término de búsqueda
@@ -26,18 +25,14 @@ const SubjectsListScreen = () => {
     const handleRefresh = async () => {
         if (selectedPatientId) {
             setRefreshing(true);
-            setLoading(true);
             await fetchSubjects(selectedPatientId);
             setRefreshing(false);
-            setLoading(false);
         }
     };
 
     const handlePatientSelection = async (patientId) => {
         if (patientId) {
-            // setLoading(true);  
             await fetchSubjects(patientId);
-            // setLoading(false);  
         }
     };
 
@@ -66,7 +61,7 @@ const SubjectsListScreen = () => {
                 onSearch={setSearchTerm}
             />
 
-            {loading ? (
+            {loadingSubjects ? ( // Usar loadingSubjects para mostrar LoadingScreen
                 <LoadingScreen />
             ) : (
                 selectedPatientId ? (
@@ -75,9 +70,8 @@ const SubjectsListScreen = () => {
                         <Text style={[globalStyles.lessBoldText]} accessibilityRole="header">Lista de materias</Text>
                         {renderSubjectList()}
                     </>
-
                 ) : (
-                    <Text style={styles.noPatientText}>Selecciona un paciente para ver sus materias.</Text>
+                    <Text style={styles.noPatientText}>Selecciona un estudiante para ver sus materias.</Text>
                 )
             )}
 

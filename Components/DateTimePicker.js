@@ -42,7 +42,7 @@ const DateTimePickerComponent = ({ date, setDate, mode, setMode, show, setShow, 
                 <Text
                     style={[
                         { textAlign: 'center' },
-                        globalStyles.InfoText,
+                        globalStyles.text,
                         !editable && globalStyles.disabledDateText, // Texto gris si no es editable
                     ]}
                 >
@@ -60,7 +60,7 @@ const DateTimePickerComponent = ({ date, setDate, mode, setMode, show, setShow, 
                 <Text
                     style={[
                         { textAlign: 'center' },
-                        globalStyles.InfoText,
+                        globalStyles.text,
                         !editable && globalStyles.disabledDateText, // Texto gris si no es editable
                     ]}
                 >

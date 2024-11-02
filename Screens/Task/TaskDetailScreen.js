@@ -407,11 +407,12 @@ function TaskDetailScreen() {
                     </Text>
                 )}
 
-                {correctionDate && adminName(
+                {correctionDate && adminName && (
                     <Text style={styles.tareaCorregidaText}>
                         Tarea corregida por {adminName} el {moment(correctionDate).format('lll')}
                     </Text>
                 )}
+
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={[globalStyles.button, { flex: 1, marginRight: 10 }]} onPress={handleUpdateTask}>
                         <Text style={globalStyles.buttonText}>Actualizar</Text>

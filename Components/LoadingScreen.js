@@ -26,8 +26,8 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject, // Hace que el componente ocupe toda la pantalla
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#F9F9F4', // Fondo blanco semitransparente para dar la sensación de overlay
-        zIndex: 10, // Asegura que esté por encima del contenido
+        backgroundColor: 'rgba(249, 249, 244, 0.5)', // Fondo blanco semitransparente con opacidad del 50%
+        zIndex: 10,
     },
     loadingText: {
         marginTop: 20,

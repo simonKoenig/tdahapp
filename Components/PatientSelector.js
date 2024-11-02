@@ -4,6 +4,7 @@ import DropdownComponent from './Dropdown';
 import LoadingScreen from './LoadingScreen';
 import { PatientsContext } from '../Context/PatientsProvider';
 import { AuthContext } from '../Context/AuthProvider';
+import { globalStyles } from '../Utils/globalStyles';
 
 const PatientSelector = () => {
     const { isPaciente } = useContext(AuthContext);
@@ -57,13 +58,13 @@ const PatientSelector = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>Paciente</Text>
+            <Text style={styles.label}>Estudiante</Text>
             <View style={styles.dropdownWrapper}>
                 <DropdownComponent
                     data={transformedPatients}
                     value={selectedPatientId}
                     setValue={handleSelectPatient}
-                    placeholder="Selecciona un paciente"
+                    placeholder="Selecciona un estudiante"
                     onAdd={handleAddPatient} // Pasar la función de agregar paciente al componente Dropdown
                     onDelete={handleDeletePatient} // Pasar la función de eliminar paciente al componente Dropdown
                 />
@@ -79,10 +80,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     label: {
-        fontSize: 16,
-        color: '#000',
+        fontSize: 18,
+        color: '#1A1A1A',
         marginBottom: 5,
         paddingRight: 10,
+        fontFamily: 'AtkinsonHyperlegible_400Regular',
+
     },
     dropdownWrapper: {
         flex: 1, // Toma todo el espacio disponible después del label
