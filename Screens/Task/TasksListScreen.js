@@ -190,6 +190,7 @@ const styles = StyleSheet.create({
         fontFamily: 'bold',
         marginBottom: SPACING.small,
         color: COLORS.text,
+        fontFamily: 'AtkinsonHyperlegible_400Regular',
     },
 });
 
