@@ -1,11 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { addSubject } from '../../Context/SubjectsProvider';
-import LoadingScreen from '../../Components/LoadingScreen';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, AccessibilityInfo } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { globalStyles } from '../../Utils/globalStyles';
 import { PLACEHOLDER_TEXT_COLOR } from '../../Utils/globalStyles';
-
 
 import { SubjectsContext } from '../../Context/SubjectsProvider';
 import { useNavigation } from '@react-navigation/native';
@@ -14,12 +11,50 @@ import { PatientsContext } from '../../Context/PatientsProvider';
 function AddSubjectScreen() {
     const [nombre, setNombre] = useState('');
     const [profesor, setProfesor] = useState('');
+    const [nombreError, setNombreError] = useState('');
+    const [profesorError, setProfesorError] = useState('');
     const { addSubject } = useContext(SubjectsContext);
     const { selectedPatientId } = useContext(PatientsContext);
     const [loading, setLoading] = useState(true);
     const navigation = useNavigation();
 
     const handleAddSubject = async () => {
+        // Reinicia los mensajes de error
+        setNombreError('');
+        setProfesorError('');
+
+        let hasError = false;
+        const errors = []; // Array para almacenar mensajes de error
+
+        if (nombre.length === 0) {
+            const errorMsg = 'El nombre de la materia es obligatorio';
+            setNombreError(errorMsg);
+            errors.push(errorMsg); // Añade el mensaje al array
+            hasError = true;
+        }
+
+        if (profesor.length === 0) {
+            const errorMsg = 'El nombre del profesor es obligatorio';
+            setProfesorError(errorMsg);
+            errors.push(errorMsg); // Añade el mensaje al array
+            hasError = true;
+        }
+
+        // Imprime todos los errores en la consola si existen
+        if (hasError) {
+            // Construye el mensaje para el lector de pantalla
+            const accessibilityMessage = `Error al crear una materia. ${errors.join('. ')}`;
+
+            // Anuncia el mensaje para TalkBack o VoiceOver
+            AccessibilityInfo.announceForAccessibility(accessibilityMessage);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Por favor, corrige los errores en el formulario.',
+            });
+            return;
+        }
+
         if (!selectedPatientId) {
             Toast.show({
                 type: 'error',
@@ -28,6 +63,7 @@ function AddSubjectScreen() {
             });
             return;
         }
+
         try {
             setLoading(true);
             const result = await addSubject({ nombre, profesor }, selectedPatientId);
@@ -37,7 +73,6 @@ function AddSubjectScreen() {
                     text1: 'Error',
                     text2: `${result.error} Toca aquí para cerrar.`,
                 });
-
             } else {
                 Toast.show({
                     type: 'success',
@@ -55,27 +90,50 @@ function AddSubjectScreen() {
         } finally {
             setLoading(false);
         }
+    };
 
-    }
     return (
         <View style={globalStyles.form}>
             <Text style={globalStyles.label}>Nombre</Text>
             <TextInput
-                style={globalStyles.input}
+                style={[globalStyles.input, nombreError && styles.errorInput]}
                 placeholder='Nombre de nueva materia'
                 value={nombre}
-                onChangeText={setNombre}
+                onChangeText={(text) => {
+                    setNombre(text);
+                    if (text) setNombreError(''); // Elimina el mensaje de error si el usuario escribe algo
+                }}
                 placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
+                accessibilityLabel="Campo de nombre de la materia"
             />
+            {nombreError ? (
+                <Text
+                    style={styles.errorText}
+                >
+                    {nombreError}
+                </Text>
+            ) : null}
+
             <Text style={globalStyles.label}>Profesor</Text>
             <TextInput
-                style={globalStyles.input}
+                style={[globalStyles.input, profesorError && styles.errorInput]}
                 placeholder='Nombre del profesor'
                 value={profesor}
-                onChangeText={setProfesor}
+                onChangeText={(text) => {
+                    setProfesor(text);
+                    if (text) setProfesorError(''); // Elimina el mensaje de error si el usuario escribe algo
+                }}
                 placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-
+                accessibilityLabel="Campo de nombre del profesor"
             />
+            {profesorError ? (
+                <Text
+                    style={styles.errorText}
+                >
+                    {profesorError}
+                </Text>
+            ) : null}
+
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={[globalStyles.button, { flex: 1 }]} onPress={handleAddSubject}>
                     <Text style={globalStyles.buttonText}>Aceptar</Text>
@@ -86,59 +144,25 @@ function AddSubjectScreen() {
 }
 
 const styles = StyleSheet.create({
-    form: {
-        flex: 1,
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#FFFFFF',
+
+    errorInput: {
+        borderColor: 'red',
+        borderWidth: 2,
     },
-    label: {
-        width: '80%',
-        marginLeft: 10,
-        fontSize: 16,
-        color: '#000',
-        textAlign: 'left', // Alinea el texto a la izquierda
-    },
-    input: {
-        width: '80%',
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 20,
-        padding: 10,
-        marginVertical: 10,
-        backgroundColor: '#D9D9D9',
-    },
-    dropdown: {
-        width: '80%',
-        height: 40,
-        borderColor: '#D9D9D9',
-        borderWidth: 1,
-        borderRadius: 15,
-        paddingHorizontal: 10,
-        marginVertical: 10,
-        backgroundColor: '#D9D9D9',
+    errorText: {
+        color: 'red',
+        fontSize: 14,
+        alignSelf: 'flex-start',
+        marginLeft: '10%',
+        marginBottom: 10,
+        marginTop: -5,
     },
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '80%',
     },
-    button: {
-        flex: 1,
-        height: 50,
-        backgroundColor: '#4c669f',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 20,
-        marginVertical: 10,
-        marginHorizontal: 5,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 18,
-    },
+
 });
 
 export default AddSubjectScreen;
