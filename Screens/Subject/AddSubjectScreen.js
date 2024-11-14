@@ -11,48 +11,43 @@ import { PatientsContext } from '../../Context/PatientsProvider';
 function AddSubjectScreen() {
     const [nombre, setNombre] = useState('');
     const [profesor, setProfesor] = useState('');
-    const [nombreError, setNombreError] = useState('');
-    const [profesorError, setProfesorError] = useState('');
+    const [errors, setErrors] = useState({});
     const { addSubject } = useContext(SubjectsContext);
     const { selectedPatientId } = useContext(PatientsContext);
     const [loading, setLoading] = useState(true);
     const navigation = useNavigation();
 
     const handleAddSubject = async () => {
-        // Reinicia los mensajes de error
-        setNombreError('');
-        setProfesorError('');
 
-        let hasError = false;
-        const errors = []; // Array para almacenar mensajes de error
+        const newErrors = {};
 
         if (nombre.length === 0) {
-            const errorMsg = 'El nombre de la materia es obligatorio';
-            setNombreError(errorMsg);
-            errors.push(errorMsg); // Añade el mensaje al array
-            hasError = true;
+            newErrors.nombre = 'El nombre de la materia es obligatorio';
         }
 
         if (profesor.length === 0) {
-            const errorMsg = 'El nombre del profesor es obligatorio';
-            setProfesorError(errorMsg);
-            errors.push(errorMsg); // Añade el mensaje al array
-            hasError = true;
+            newErrors.profesor = 'El nombre del profesor es obligatorio';
         }
 
-        // Imprime todos los errores en la consola si existen
-        if (hasError) {
+        // Verifica si hay errores
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+
             // Construye el mensaje para el lector de pantalla
-            const accessibilityMessage = `Error al crear una materia. ${errors.join('. ')}`;
+            const accessibilityMessage = `Error al crear una materia. ${Object.values(newErrors).join('. ')}`;
 
             // Anuncia el mensaje para TalkBack o VoiceOver
             AccessibilityInfo.announceForAccessibility(accessibilityMessage);
+
+            // Muestra un Toast general
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: 'Por favor, corrige los errores en el formulario.',
+                text2: 'Por favor, completa los campos vacíos del formulario.',
             });
             return;
+        } else {
+            setErrors({});
         }
 
         if (!selectedPatientId) {
@@ -96,41 +91,37 @@ function AddSubjectScreen() {
         <View style={globalStyles.form}>
             <Text style={globalStyles.label}>Nombre</Text>
             <TextInput
-                style={[globalStyles.input, nombreError && styles.errorInput]}
-                placeholder='Nombre de nueva materia'
+                style={[globalStyles.input, errors.nombre && styles.errorInput]}
+                placeholder='Nombre de l materia'
                 value={nombre}
                 onChangeText={(text) => {
                     setNombre(text);
-                    if (text) setNombreError(''); // Elimina el mensaje de error si el usuario escribe algo
+                    setErrors((prevErrors) => ({ ...prevErrors, nombre: '' })); // Elimina el mensaje de error si el usuario escribe algo
                 }}
                 placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
                 accessibilityLabel="Campo de nombre de la materia"
             />
-            {nombreError ? (
-                <Text
-                    style={styles.errorText}
-                >
-                    {nombreError}
+            {errors.nombre ? (
+                <Text style={styles.errorText}>
+                    {errors.nombre}
                 </Text>
             ) : null}
 
             <Text style={globalStyles.label}>Profesor</Text>
             <TextInput
-                style={[globalStyles.input, profesorError && styles.errorInput]}
+                style={[globalStyles.input, errors.profesor && styles.errorInput]}
                 placeholder='Nombre del profesor'
                 value={profesor}
                 onChangeText={(text) => {
                     setProfesor(text);
-                    if (text) setProfesorError(''); // Elimina el mensaje de error si el usuario escribe algo
+                    setErrors((prevErrors) => ({ ...prevErrors, profesor: '' })); // Elimina el mensaje de error si el usuario escribe algo
                 }}
                 placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
                 accessibilityLabel="Campo de nombre del profesor"
             />
-            {profesorError ? (
-                <Text
-                    style={styles.errorText}
-                >
-                    {profesorError}
+            {errors.profesor ? (
+                <Text style={styles.errorText}>
+                    {errors.profesor}
                 </Text>
             ) : null}
 
@@ -144,7 +135,6 @@ function AddSubjectScreen() {
 }
 
 const styles = StyleSheet.create({
-
     errorInput: {
         borderColor: 'red',
         borderWidth: 2,
@@ -162,7 +152,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '80%',
     },
-
 });
 
 export default AddSubjectScreen;
