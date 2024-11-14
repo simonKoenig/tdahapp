@@ -1,7 +1,7 @@
 import { Timestamp } from 'firebase/firestore';
 // React 
 import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Button, Switch, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Button, Switch, KeyboardAvoidingView, Platform, AccessibilityInfo } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 // Componentes y constantes
 import DropdownComponent from '../../Components/Dropdown';
@@ -38,6 +38,8 @@ function AddTaskScreen() {
     const [fechaCreacion, setFechaCreacion] = useState(''); // Fecha de creación de la tarea
     const [rewardExpires, setRewardExpires] = useState(true); // Estado para manejar si la recompensa se vence
     const [loading, setLoading] = useState(true);
+    const [errors, setErrors] = useState({});
+
 
 
     // Transforma los pacientes para el Dropdown
@@ -77,6 +79,61 @@ function AddTaskScreen() {
         const subjects = await fetchSubjects(patientId);
         const rewards = await fetchRewards(patientId);
         setSelectedPatientId(patientId);
+    };
+
+
+    ///Función para validar el step 1 del form
+
+    const validateStep1 = () => {
+        const newErrors = {};
+        if (nombre.length === 0) {
+            newErrors.nombre = 'El nombre de la tarea es obligatorio';
+        }
+        if (!selectedPatientId) {
+            newErrors.selectedPatientId = 'Debes seleccionar un estudiante';
+        }
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            const accessibilityMessage = `Error al crear una tarea. ${Object.values(newErrors).join('. ')}`;
+            AccessibilityInfo.announceForAccessibility(accessibilityMessage);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Por favor, completa los campos vacíos del formulario.',
+            });
+            return false;
+        } else {
+            setErrors({});
+            return true;
+        }
+    };
+
+    // Función para validar el step 2 del form
+    const validateStep2 = () => {
+        const newErrors = {};
+        if (dificultad.length === 0) {
+            newErrors.dificultad = 'Debes seleccionar una dificultad';
+        }
+        if (!selectedSubjectId) {
+            newErrors.selectedSubjectId = 'Debes seleccionar una materia';
+        }
+        if (!selectedRewardId) {
+            newErrors.selectedRewardId = 'Debes seleccionar una recompensa';
+        }
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            const accessibilityMessage = `Error al crear una tarea. ${Object.values(newErrors).join('. ')}`;
+            AccessibilityInfo.announceForAccessibility(accessibilityMessage);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Por favor, completa los campos vacíos del formulario.',
+            });
+            return false;
+        } else {
+            setErrors({});
+            return true;
+        }
     };
 
     const handleAddTask = async () => {
@@ -131,12 +188,21 @@ function AddTaskScreen() {
             <TextInput
                 accessible={true}
                 accessibilityLabel={`Editar nombre de la tarea. Actualmente es ${nombre}`}
-                style={globalStyles.input}
+                style={[globalStyles.input, errors.nombre && styles.errorInput]}
                 placeholderTextColor={PLACEHOLDER_TEXT_COLOR} // Usar el color definido en los estilos globales
                 placeholder='Nombre de la nueva tarea'
                 value={nombre}
-                onChangeText={setNombre}
+                onChangeText={(text) => {
+                    setNombre(text);
+                    setErrors((prevErrors) => ({ ...prevErrors, nombre: '' }));
+
+                }}
             />
+            {errors.nombre ? (
+                <Text style={styles.errorText}>
+                    {errors.nombre}
+                </Text>
+            ) : null}
 
             <Text style={globalStyles.label} accessibilityLabel="Campo de descripción de la tarea">Descripción</Text>
             <TextInput
@@ -166,50 +232,79 @@ function AddTaskScreen() {
                 <DropdownComponent
                     data={transformedPatients}
                     value={selectedPatientId}
-                    setValue={setSelectedPatientId}
+                    setValue={(value) => {
+                        setSelectedPatientId(value);
+                        setErrors((prevErrors) => ({ ...prevErrors, selectedPatientId: '' })); // Elimina el mensaje de error si el usuario selecciona algo
+                    }}
                     placeholder="Seleccione un estudiante"
                     onSelect={handleSelectPatient}
                     editable={true}
                     width='80%'
                 />
+
             ) : (
                 <Text style={styles.noPatientsText}>No se encontraron estudiantes.</Text>
             )}
+            {errors.selectedPatientId ? (
+                <Text style={styles.errorText}>
+                    {errors.selectedPatientId}
+                </Text>
+            ) : null}
         </View>,
         <View style={globalStyles.form}>
             <Text style={globalStyles.label}>Materia</Text>
             <DropdownComponent
                 data={transformedSubjects}
                 value={selectedSubjectId}
-                setValue={setSelectedSubjectId}
+                setValue={(value) => {
+                    setSelectedSubjectId(value);
+                    setErrors((prevErrors) => ({ ...prevErrors, selectedSubjectId: '' }));
+                }}
                 placeholder="Selecciona una materia"
                 onSelect={handleSelectSubject}
                 width='80%'
                 accessible={true}
                 accessibilityLabel={`Seleccionar la materia de la tarea. Actualmente es ${subjects.find(subject => subject.id === selectedSubjectId)?.nombre || 'Ninguna'}`}
             />
-
+            {errors.selectedSubjectId ? (
+                <Text style={styles.errorText}>
+                    {errors.selectedSubjectId}
+                </Text>
+            ) : null}
             <Text style={globalStyles.label}>Dificultad</Text>
             <DropdownComponent
                 data={dificultades}
                 value={dificultad}
-                setValue={setDificultad}
+                setValue={(value) => {
+                    setDificultad(value);
+                    setErrors((prevErrors) => ({ ...prevErrors, dificultad: '' }));
+                }}
                 placeholder="Selecciona una dificultad"
                 searchActivo={false}
                 width='80%'
             />
-
-
+            {errors.dificultad ? (
+                <Text style={styles.errorText}>
+                    {errors.dificultad}
+                </Text>
+            ) : null}
             <Text style={globalStyles.label}>Recompensa</Text>
             <DropdownComponent
                 data={transformedRewards}
                 value={selectedRewardId}
-                setValue={setSelectedRewardId}
+                setValue={(value) => {
+                    setSelectedRewardId(value);
+                    setErrors((prevErrors) => ({ ...prevErrors, selectedRewardId: '' }));
+                }}
                 placeholder="Selecciona una recompensa"
                 onSelect={handleSelectReward}
                 width='80%'
             />
-
+            {errors.selectedRewardId ? (
+                <Text style={styles.errorText}>
+                    {errors.selectedRewardId}
+                </Text>
+            ) : null}
             <Text style={globalStyles.label}>Vencimiento de la recompensa</Text>
             <DateTimePickerComponent
                 date={dateRewards}
@@ -220,6 +315,11 @@ function AddTaskScreen() {
                 setShow={setShow}
                 editable={rewardExpires}
             />
+            {errors.dateRewards ? (
+                <Text style={styles.errorText}>
+                    {errors.dateRewards}
+                </Text>
+            ) : null}
             <View style={styles.switchContainer}>
                 <Text style={globalStyles.text}>¿La recompensa se vence?</Text>
                 <Switch
@@ -237,7 +337,7 @@ function AddTaskScreen() {
             <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
                 {/* Indicador de pasos + Formulario */}
                 <View style={styles.container} accessible={true} accessibilityLabel="Formulario para agregar tarea">
-                    <MultiStepFormComponent steps={steps} onComplete={handleAddTask} />
+                    <MultiStepFormComponent validateStep={[validateStep1, validateStep2]} steps={steps} onComplete={handleAddTask} />
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -269,6 +369,18 @@ const styles = StyleSheet.create({
     },
     switchText: {
         fontSize: 14,
+    },
+    errorInput: {
+        borderColor: 'red',
+        borderWidth: 2,
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 14,
+        alignSelf: 'flex-start',
+        marginLeft: '10%',
+        marginBottom: 10,
+        marginTop: -5,
     },
 });
 

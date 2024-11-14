@@ -92,11 +92,11 @@ function AddSubjectScreen() {
             <Text style={globalStyles.label}>Nombre</Text>
             <TextInput
                 style={[globalStyles.input, errors.nombre && styles.errorInput]}
-                placeholder='Nombre de l materia'
+                placeholder='Nombre de la materia'
                 value={nombre}
                 onChangeText={(text) => {
                     setNombre(text);
-                    setErrors((prevErrors) => ({ ...prevErrors, nombre: '' })); // Elimina el mensaje de error si el usuario escribe algo
+                    setErrors((prevErrors) => ({ ...prevErrors, nombre: '' }));
                 }}
                 placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
                 accessibilityLabel="Campo de nombre de la materia"
@@ -114,7 +114,7 @@ function AddSubjectScreen() {
                 value={profesor}
                 onChangeText={(text) => {
                     setProfesor(text);
-                    setErrors((prevErrors) => ({ ...prevErrors, profesor: '' })); // Elimina el mensaje de error si el usuario escribe algo
+                    setErrors((prevErrors) => ({ ...prevErrors, profesor: '' }));
                 }}
                 placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
                 accessibilityLabel="Campo de nombre del profesor"

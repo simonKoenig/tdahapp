@@ -35,11 +35,7 @@ function AddRewardScreen() {
         // Verifica si hay errores
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
-
-            // Construye el mensaje para el lector de pantalla
             const accessibilityMessage = `Error al crear una recompensa. ${Object.values(newErrors).join('. ')}`;
-
-            // Anuncia el mensaje para TalkBack o VoiceOver
             AccessibilityInfo.announceForAccessibility(accessibilityMessage);
 
             // Muestra un Toast general
@@ -100,7 +96,7 @@ function AddRewardScreen() {
                 value={nombre}
                 onChangeText={(text) => {
                     setNombre(text);
-                    setErrors((prevErrors) => ({ ...prevErrors, nombre: '' })); // Elimina el mensaje de error si el usuario escribe algo
+                    setErrors((prevErrors) => ({ ...prevErrors, nombre: '' }));
                 }}
                 placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
             />
@@ -116,7 +112,7 @@ function AddRewardScreen() {
                 value={dificultad}
                 setValue={(value) => {
                     setDificultad(value);
-                    setErrors((prevErrors) => ({ ...prevErrors, dificultad: '' })); // Elimina el mensaje de error si el usuario selecciona algo
+                    setErrors((prevErrors) => ({ ...prevErrors, dificultad: '' }));
                 }}
                 placeholder="Selecciona una dificultad"
                 searchActivo={false}
