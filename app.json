@@ -24,6 +24,10 @@
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
+      "statusBar": {
+        "backgroundColor": "#F9F9F4",
+        "barStyle": "light-content"
+      },
       "package": "com.enzo2104.plAAAner"
     },
     "web": {
@@ -47,3 +51,5 @@
     }
   }
 }
+
+

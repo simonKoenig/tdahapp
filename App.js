@@ -7,6 +7,8 @@ import { PatientsProvider } from './Context/PatientsProvider';
 import { SubjectsProvider } from './Context/SubjectsProvider';
 import { TasksProvider } from './Context/TaskProvider';
 import { clearStorage } from './Utils/AsyncStorage';
+import { StatusBar } from 'expo-status-bar';
+
 import {
   useFonts,
   AtkinsonHyperlegible_400Regular,
@@ -46,6 +48,7 @@ const App = () => {
         <TasksProvider>
           <RewardsProvider>
             <SubjectsProvider>
+              <StatusBar style="light" backgroundColor="#F9F9F4" />
               <Navigation />
             </SubjectsProvider>
           </RewardsProvider>
