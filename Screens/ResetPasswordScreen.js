@@ -1,8 +1,9 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { AuthContext } from '../Context/AuthProvider';
 import Toast from 'react-native-toast-message';
 import { globalStyles } from '../Utils/globalStyles';
+import { PLACEHOLDER_TEXT_COLOR } from '../Utils/globalStyles';
 
 const ResetPasswordScreen = () => {
     const { resetPassword} = useContext(AuthContext);
@@ -18,21 +19,25 @@ const ResetPasswordScreen = () => {
             return;
         }
         resetPassword(email);
-        console.log('Email para restablecer contraseña:', email);
     };
 
     return (
-        <View style={globalStyles.container}>
-            <Text style={globalStyles.title}>Restablecer Contraseña</Text>
+        <View style={globalStyles.centeredContainer}>
+            <Text style={globalStyles.label}>Correo electrónico</Text>
             <TextInput
                 style={globalStyles.input}
-                placeholder="Ingrese su correo electrónico"
+                placeholder="ejemplo@mail.com"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
+                accessibilityLabel="Campo de ingreso de mail"
             />
-            <Button title="Enviar" onPress={handleResetPassword} />
+            <TouchableOpacity style={[globalStyles.button, {width: '80%'}]} onPress={handleResetPassword}>
+                <Text style={globalStyles.buttonText}>Enviar</Text>
+            </TouchableOpacity>
+            
         </View>
     );
 };

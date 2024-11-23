@@ -180,10 +180,10 @@ function ProfileStackScreen() {
 
 function AuthStackScreen() {
     return (
-        <AuthStack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
-            <AuthStack.Screen name="Login" component={LoginScreen} />
-            <AuthStack.Screen name="Signup" component={SignUpScreen} />
-            <AuthStack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+        <AuthStack.Navigator initialRouteName="Login" screenOptions={HEADER_STYLE}>
+            <AuthStack.Screen name="Login" component={LoginScreen} options={{ headerShown: false}}/>
+            <AuthStack.Screen name="Signup" component={SignUpScreen} options={{ headerShown: false}}/>
+            <AuthStack.Screen name="ResetPassword" component={ResetPasswordScreen} options={{ headerShown: true, title: 'Reestablecer contraseña' }}/>
         </AuthStack.Navigator>
     );
 }
