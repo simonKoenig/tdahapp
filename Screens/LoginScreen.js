@@ -24,6 +24,10 @@ function LoginScreen() {
         navigation.navigate('Signup');
     }
 
+    const olvideContraseña = () => {
+        navigation.navigate('ResetPassword');
+    }
+
     const iniciarSesion = () => {
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
@@ -67,7 +71,9 @@ function LoginScreen() {
                     </TouchableOpacity>
                 </View>
                 
-                <Text style={styles.olvidePassword}>¿Olvidó su contraseña?</Text>
+                <TouchableOpacity onPress={olvideContraseña}>
+                    <Text style={styles.olvidePassword}>¿Olvidó su contraseña?</Text>
+                </TouchableOpacity>
                 
                 <TouchableOpacity onPress={iniciarSesion} style={styles.boton}>
                     <LinearGradient

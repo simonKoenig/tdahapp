@@ -12,6 +12,7 @@ import LoginScreen from "./Screens/LoginScreen";
 import ProfileScreen from "./Screens/ProfileScreen";
 import StatisticsScreen from "./Screens/StatisticsScreen";
 import SignUpScreen from "./Screens/SingUpScreen";
+import ResetPasswordScreen from "./Screens/ResetPasswordScreen";
 
 //Rewards
 import RewardsListScreen from './Screens/Reward/RewardsListScreen'
@@ -182,6 +183,7 @@ function AuthStackScreen() {
         <AuthStack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
             <AuthStack.Screen name="Login" component={LoginScreen} />
             <AuthStack.Screen name="Signup" component={SignUpScreen} />
+            <AuthStack.Screen name="ResetPassword" component={ResetPasswordScreen} />
         </AuthStack.Navigator>
     );
 }

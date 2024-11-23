@@ -1,8 +1,9 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { Platform, PermissionsAndroid } from 'react-native';
-import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, signOut, sendPasswordResetEmail, fetchSignInMethodsForEmail } from 'firebase/auth';
 import { doc, getDoc, arrayUnion, updateDoc, arrayRemove } from 'firebase/firestore';
-import { db } from '../firebase-config';
+import { auth, db } from '../firebase-config';
+import Toast from 'react-native-toast-message';
 import LoadingScreen from '../Components/LoadingScreen';
 import messaging from '@react-native-firebase/messaging';
 
@@ -167,6 +168,50 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const resetPassword = async (email) => {
+        const auth = getAuth();
+        
+        // Verificar si el mail está registrado
+        const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+        console.log(signInMethods);
+        if (signInMethods.length === 0) {
+            // Si el array está vacío, significa que el correo no está registrado
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'No se encontró ningún usuario con este correo. Toca aquí para cerrar.',
+            });
+            return;
+        }
+        
+        await sendPasswordResetEmail(auth, email)
+        .then(() => {
+
+            Toast.show({
+                type: 'success',
+                text1: 'Éxito',
+                text2: 'Correo de restablecimiento de contraseña enviado. Toca aquí para cerrar.',
+            });
+
+        })
+        .catch((error) => {
+            auth.languageCode = 'es';
+            let message = 'Ocurrió un error. Inténtalo de nuevo.';
+
+            if (error.code === 'auth/invalid-email') {
+                message = 'Por favor, proporciona un correo válido.';
+            } else if (error.code === 'auth/user-not-found') {
+                message = 'No se encontró ningún usuario con este correo.';
+            }
+
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: message + ' Toca aquí para cerrar.',
+            });
+        });
+    }
+
     if (isLoading) {
         return <LoadingScreen />;
     }
@@ -174,7 +219,7 @@ export const AuthProvider = ({ children }) => {
     const isPaciente = () => role === 'paciente';
 
     return (
-        <AuthContext.Provider value={{ user, role, isAuthenticated, login, logout, isPaciente }}>
+        <AuthContext.Provider value={{ user, role, isAuthenticated, login, logout, isPaciente, resetPassword }}>
             {children}
         </AuthContext.Provider>
     );
