@@ -40,10 +40,9 @@ const PriorityBadge = ({ tipo, valor }) => {
 
 const styles = StyleSheet.create({
     priorityContainer: {
-        paddingHorizontal: 10,
+        paddingHorizontal: 12.5,
         paddingVertical: 5,
         borderRadius: 5,
-        paddingHorizontal: 12,
         borderRadius: 5,
     },
     priorityText: {

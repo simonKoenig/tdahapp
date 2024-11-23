@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, AccessibilityInfo } from 'react-native';
 import DropdownComponent from '../../Components/Dropdown';
 import { dificultades } from '../../Utils/Constant';
 import LoadingScreen from '../../Components/LoadingScreen';
@@ -14,14 +14,41 @@ import { PatientsContext } from '../../Context/PatientsProvider';
 function AddRewardScreen() {
     const [nombre, setNombre] = useState('');
     const [dificultad, setDificultad] = useState('');
+    const [errors, setErrors] = useState({});
     const { addReward } = useContext(RewardsContext);
     const { selectedPatientId } = useContext(PatientsContext);
     const [loading, setLoading] = useState(true);
-
     const navigation = useNavigation();
 
-
     const handleAddReward = async () => {
+        // Reinicia los mensajes de error
+        const newErrors = {};
+
+        if (nombre.length === 0) {
+            newErrors.nombre = 'El nombre de la recompensa es obligatorio';
+        }
+
+        if (dificultad.length === 0) {
+            newErrors.dificultad = 'Debes seleccionar una dificultad';
+        }
+
+        // Verifica si hay errores
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            const accessibilityMessage = `Error al crear una recompensa. ${Object.values(newErrors).join('. ')}`;
+            AccessibilityInfo.announceForAccessibility(accessibilityMessage);
+
+            // Muestra un Toast general
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Por favor, completa los campos vacíos del formulario.',
+            });
+            return;
+        } else {
+            setErrors({});
+        }
+
         if (!selectedPatientId) {
             Toast.show({
                 type: 'error',
@@ -31,6 +58,7 @@ function AddRewardScreen() {
             navigation.goBack();
             return;
         }
+
         try {
             setLoading(true);
             const result = await addReward({ nombre, dificultad }, selectedPatientId);
@@ -57,29 +85,46 @@ function AddRewardScreen() {
         } finally {
             setLoading(false);
         }
-
-    }
+    };
 
     return (
         <View style={globalStyles.form}>
             <Text style={globalStyles.label}>Nombre</Text>
             <TextInput
-                style={globalStyles.input}
-                placeholder='Nombre de nueva tarea'
+                style={[globalStyles.input, errors.nombre && styles.errorInput]}
+                placeholder='Nombre de la recompensa'
                 value={nombre}
-                onChangeText={setNombre}
+                onChangeText={(text) => {
+                    setNombre(text);
+                    setErrors((prevErrors) => ({ ...prevErrors, nombre: '' }));
+                }}
                 placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
             />
+            {errors.nombre ? (
+                <Text style={styles.errorText}>
+                    {errors.nombre}
+                </Text>
+            ) : null}
+
             <Text style={globalStyles.label}>Dificultad</Text>
             <DropdownComponent
                 data={dificultades}
                 value={dificultad}
-                setValue={setDificultad}
+                setValue={(value) => {
+                    setDificultad(value);
+                    setErrors((prevErrors) => ({ ...prevErrors, dificultad: '' }));
+                }}
                 placeholder="Selecciona una dificultad"
                 searchActivo={false}
                 width='80%'
                 placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
             />
+            {errors.dificultad ? (
+                <Text style={styles.errorText}>
+                    {errors.dificultad}
+                </Text>
+            ) : null}
+
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={[globalStyles.button, { flex: 1 }]} onPress={handleAddReward}>
                     <Text style={globalStyles.buttonText}>Aceptar</Text>
@@ -90,58 +135,22 @@ function AddRewardScreen() {
 }
 
 const styles = StyleSheet.create({
-    form: {
-        flex: 1,
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#FFFFFF',
+    errorInput: {
+        borderColor: 'red',
+        borderWidth: 2,
     },
-    label: {
-        width: '80%',
-        marginLeft: 10,
-        fontSize: 16,
-        color: '#000',
-        textAlign: 'left', // Alinea el texto a la izquierda
-    },
-    input: {
-        width: '80%',
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 20,
-        padding: 10,
-        marginVertical: 10,
-        backgroundColor: '#D9D9D9',
-    },
-    dropdown: {
-        width: '80%',
-        height: 40,
-        borderColor: '#D9D9D9',
-        borderWidth: 1,
-        borderRadius: 15,
-        paddingHorizontal: 10,
-        marginVertical: 10,
-        backgroundColor: '#D9D9D9',
+    errorText: {
+        color: 'red',
+        fontSize: 14,
+        alignSelf: 'flex-start',
+        marginLeft: '10%',
+        marginBottom: 10,
+        marginTop: -5,
     },
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '80%',
-    },
-    button: {
-        flex: 1,
-        height: 50,
-        backgroundColor: '#4c669f',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 20,
-        marginVertical: 10,
-        marginHorizontal: 5,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 18,
     },
 });
 

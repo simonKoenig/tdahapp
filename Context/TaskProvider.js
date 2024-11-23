@@ -48,7 +48,6 @@ export const TasksProvider = ({ children }) => {
                 setUnsubscribe(() => newUnsubscribe);
             } else {
                 if (!selectedPatientId) {
-                    console.error('No selected patient ID');
                     setLoadingTasks(false); // Cambia a false cuando se cargan del caché
                     return;
                 }

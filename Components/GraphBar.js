@@ -1,11 +1,10 @@
 import React from 'react';
-import { Text, View, Dimensions, StyleSheet } from 'react-native';
+import { Text, View, Dimensions, ScrollView } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
 import { globalStyles } from '../Utils/globalStyles';
 import { COLORS } from '../Utils/Constant';
 
-const GraphBar = ({cantidadTareasPorDia}) => {
-    
+const GraphBar = ({ cantidadTareasPorDia }) => {
     if (cantidadTareasPorDia === undefined) {
         console.log('cantidadTareasPorDia es undefined');
         return null;
@@ -16,13 +15,13 @@ const GraphBar = ({cantidadTareasPorDia}) => {
         datasets: [
             {
                 data: cantidadTareasPorDia.map((item) => item.cantidad),
-                color: () => COLORS.primary
-            }
-        ]
+                color: () => COLORS.primary,
+            },
+        ],
     };
 
     const screenWidth = Dimensions.get('window').width * 0.9;
-    
+
     const chartConfig = {
         backgroundGradientFrom: COLORS.background,
         backgroundGradientTo: COLORS.background,
@@ -33,26 +32,28 @@ const GraphBar = ({cantidadTareasPorDia}) => {
 
     return (
         <View>
-            { data.length === 0 ? 
+            {data.datasets[0].data.length === 0 ? (
                 <Text style={globalStyles.noDataText}>No hay tareas</Text>
-            : 
-                <View>
-                    <BarChart
-                        data={data}
-                        width={screenWidth}
-                        height={220}
-                        chartConfig={chartConfig}
-                        fromZero={true}
-                        withInnerLines={false}
-                        showValuesOnTopOfBars={true}
-                        withHorizontalLabels={false}
-                        style={{
-                            paddingRight: 0,
-                        }}
-                    />
-                </View>
-            }
-        </View>            
+            ) : (
+                <ScrollView horizontal>
+                    <View>
+                        <BarChart
+                            data={data}
+                            width={screenWidth * 1.5} // Aumenta el ancho para permitir desplazamiento
+                            height={220}
+                            chartConfig={chartConfig}
+                            fromZero={true}
+                            withInnerLines={false}
+                            showValuesOnTopOfBars={true}
+                            withHorizontalLabels={false}
+                            style={{
+                                paddingRight: 0,
+                            }}
+                        />
+                    </View>
+                </ScrollView>
+            )}
+        </View>
     );
 };
 

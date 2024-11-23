@@ -3,17 +3,21 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { globalStyles } from '../Utils/globalStyles';
 
 
-const MultiStepFormComponent = ({ steps, onComplete }) => {
+const MultiStepFormComponent = ({ steps, onComplete, validateStep }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const totalSteps = steps.length;
 
   const handleNext = () => {
-    if (currentStep < totalSteps - 1) {
-      setCurrentStep(prevStep => prevStep + 1);
-    } else {
-      onComplete && onComplete(); // Si llega al final, llama la función onComplete
+    if (!validateStep || validateStep[currentStep]()) {
+      if (currentStep < totalSteps - 1) {
+        setCurrentStep(prevStep => prevStep + 1);
+      } else {
+        // Validación del último paso
+        onComplete && onComplete();
+      }
     }
   };
+
 
   const handlePrevious = () => {
     if (currentStep > 0) {
@@ -55,7 +59,7 @@ const MultiStepFormComponent = ({ steps, onComplete }) => {
             <Text style={globalStyles.buttonText}>Siguiente</Text>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity onPress={onComplete} style={[globalStyles.button, { flex: 1 }]}>
+          <TouchableOpacity onPress={handleNext} style={[globalStyles.button, { flex: 1 }]}>
             <Text style={globalStyles.buttonText}>Aceptar</Text>
           </TouchableOpacity>
         )}

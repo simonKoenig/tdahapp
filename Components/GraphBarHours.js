@@ -1,16 +1,15 @@
 import React from 'react';
-import { Text, View, Dimensions, StyleSheet } from 'react-native';
+import { Text, View, Dimensions, StyleSheet, ScrollView } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
 import { globalStyles } from '../Utils/globalStyles';
 import { COLORS } from '../Utils/Constant';
 
-const GraphBarHours = ({tareasPorHora}) => {
-
+const GraphBarHours = ({ tareasPorHora }) => {
     if (tareasPorHora === undefined) {
         console.log('tareasPorHora es undefined');
         return null;
     }
-    
+
     const screenWidth = Dimensions.get('window').width * 0.9;
 
     const data = {
@@ -30,36 +29,33 @@ const GraphBarHours = ({tareasPorHora}) => {
         strokeWidth: 2,
         useShadowColorFromDataset: false,
         formatXLabel: (value) => {
-            // Muestra solo labels específicos
             return [0, 4, 8, 12, 16, 20, 23].includes(Number(value)) ? value : '';
         },
         barPercentage: 0.3,
-        
     };
-    
 
     return (
         <View>
-            { data.length === 0 ? 
+            {data.length === 0 ? (
                 <Text style={globalStyles.noDataText}>No hay tareas</Text>
-            : 
-                <View>
-                    <BarChart
-                        data={data}
-                        width={screenWidth}
-                        height={220}
-                        chartConfig={chartConfig}
-                        fromZero={true}
-                        withInnerLines={false}
-                        showValuesOnTopOfBars={true}
-                        withHorizontalLabels={false}
-                        style={{
-                            paddingRight: 0,
-                         }}
-                    />
-                </View>
-            }
-        </View>            
+            ) : (
+                <ScrollView horizontal>
+                    <View>
+                        <BarChart
+                            data={data}
+                            width={screenWidth * 1.5} // Ancho mayor para permitir desplazamiento
+                            height={220}
+                            chartConfig={chartConfig}
+                            fromZero={true}
+                            withInnerLines={false}
+                            showValuesOnTopOfBars={true}
+                            withHorizontalLabels={false}
+                            style={{ paddingRight: 0 }}
+                        />
+                    </View>
+                </ScrollView>
+            )}
+        </View>
     );
 };
 
