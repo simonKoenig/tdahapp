@@ -4,6 +4,7 @@ import { AuthContext } from '../Context/AuthProvider';
 import Toast from 'react-native-toast-message';
 import { globalStyles } from '../Utils/globalStyles';
 import { PLACEHOLDER_TEXT_COLOR } from '../Utils/globalStyles';
+import { COLORS } from '../Utils/Constant';
 
 const ResetPasswordScreen = () => {
     const { resetPassword} = useContext(AuthContext);
@@ -22,7 +23,7 @@ const ResetPasswordScreen = () => {
     };
 
     return (
-        <View style={globalStyles.centeredContainer}>
+        <View style={[globalStyles.centeredContainer, {backgroundColor:COLORS.background}]}>
             <Text style={globalStyles.label}>Correo electrónico</Text>
             <TextInput
                 style={globalStyles.input}
