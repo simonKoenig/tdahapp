@@ -107,38 +107,10 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 10,
     },
-    boton: {
-        width: '100%',
-        height: 50,
-        borderRadius: 30,
-        marginTop: 20,
-    },
-    gradient: {
-        flex: 1,
-        borderRadius: 30,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    sesion: {
-        fontSize: 20,
-        color: 'white',
-    },
     olvidePassword: {
         color: 'blue',
         marginTop: 10,
         marginBottom: 20,
-    },
-    botonCrearCuenta: {
-        backgroundColor: '#fff',
-        borderColor: '#4c669f',
-        borderWidth: 1,
-        marginTop: 10,
-    },
-    crearCuenta: {
-        fontSize: 20,
-        color: '#4c669f',
-        textAlign: 'center',
-        padding: 10,
     },
 });
 

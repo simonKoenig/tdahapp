@@ -135,16 +135,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 10,
     },
-    picker: {
-        width: '80%',
-        height: 40,
-        borderColor: '#D9D9D9',
-        borderWidth: 1,
-        borderRadius: 15,
-        paddingHorizontal: 10,
-        marginVertical: 10,
-        backgroundColor: '#D9D9D9',
-    },
     errorContainer: {
         marginVertical: 8,
         padding: 10,
@@ -152,7 +142,6 @@ const styles = StyleSheet.create({
         borderRadius: 5,
 
     },
-
     errorMessage: {
         color: 'red',
         fontSize: 16,
