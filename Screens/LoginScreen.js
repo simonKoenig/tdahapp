@@ -1,18 +1,16 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as React from 'react';
-
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../firebase-config';
-
 import { useNavigation } from '@react-navigation/native';
 import { EyeIcon, EyeOffIcon } from '../Components/Icons';
+import { globalStyles } from '../Utils/globalStyles';
+import { PLACEHOLDER_TEXT_COLOR, SPACING } from '../Utils/Constant';
 
 
 function LoginScreen() {
     const navigation = useNavigation();
-
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [isPasswordVisible, setIsPasswordVisible] = React.useState(false); // Estado para la visibilidad de la contraseña
@@ -33,7 +31,6 @@ function LoginScreen() {
             .then((userCredential) => {
                 console.log('Sesión iniciada');
                 const user = userCredential.user;
-                // Aquí puedes redirigir al usuario o realizar alguna acción adicional
             })
             .catch((error) => {
                 console.log(error);
@@ -42,27 +39,38 @@ function LoginScreen() {
     }
 
     return (
-        <View style={styles.mainContainer}>
-            <View style={styles.container}>
-                <Text style={styles.titulo}>Hola</Text>
-                <Text style={styles.subtitulo}>Iniciar sesión</Text>
-                
+        <View style={globalStyles.container}>
+        
+            <Text style={[globalStyles.title, {fontSize: 60, textAlign:'center'}]}>plAAAner</Text>
+            <Text style={[globalStyles.lessBoldText, {textAlign:'center', paddingTop:SPACING.medium}]}>Bienvenido</Text>
+            
+            <View style={globalStyles.form}>
+                <Text style={globalStyles.label} accessibilityLabel="Campo del correo electrónico">Correo electrónico</Text>
                 <TextInput 
+                    accessible={true}
                     onChangeText={(text) => setEmail(text)} 
-                    style={styles.TextInput} 
-                    placeholder='Email' 
+                    style={globalStyles.input} 
+                    placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
+                    placeholder='ejemplo@mail.com'
                     value={email}
+                    autoCapitalize="none"
+                    keyboardType="email-address"
                 />
                 
+                <Text style={globalStyles.label} accessibilityLabel='Campo de ingreso de contraseña'>Contraseña</Text>
                 <View style={styles.passwordContainer}>
                     <TextInput
+                        accessible={true}
                         onChangeText={(text) => setPassword(text)}
-                        style={styles.TextInputPassword}
-                        placeholder='Password'
+                        style={[globalStyles.input, {width: '100%'}]}
+                        placeholder='Ingrese su contraseña'
+                        placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
                         secureTextEntry={!isPasswordVisible} 
                         value={password}
+                        autoCapitalize="none"
+
                     />
-                    <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+                    <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={styles.eyeIcon}>
                         {isPasswordVisible ? (
                             <EyeIcon color="gray" size={24} /> 
                         ) : (
@@ -75,68 +83,40 @@ function LoginScreen() {
                     <Text style={styles.olvidePassword}>¿Olvidó su contraseña?</Text>
                 </TouchableOpacity>
                 
-                <TouchableOpacity onPress={iniciarSesion} style={styles.boton}>
-                    <LinearGradient
-                        colors={['#4c669f', '#3b5998', '#192f6a']}
-                        style={styles.gradient}
-                    >
-                        <Text style={styles.sesion}>Iniciar sesión</Text>
-                    </LinearGradient>
+                <TouchableOpacity onPress={iniciarSesion} style={[globalStyles.button, {width:'80%'}]}>
+                        <Text style={globalStyles.buttonText}>Iniciar sesión</Text>
                 </TouchableOpacity>
                 
-                <TouchableOpacity onPress={crearCuenta} style={[styles.boton, styles.botonCrearCuenta]}>
-                    <Text style={styles.crearCuenta}>Crear cuenta</Text>
+                <TouchableOpacity onPress={crearCuenta} style={[globalStyles.backbutton, {width:'80%'}]}>
+                    <Text style={globalStyles.backbuttonText}>Crear cuenta</Text>
                 </TouchableOpacity>
             </View>
+        
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    mainContainer: {
-        backgroundColor: '#f1f1f1',
-        flex: 1,
-    },
     container: {
         backgroundColor: '#f1f1f1',
         alignItems: 'center',
         justifyContent: 'center',
         padding: 20,
     },
-    titulo: {
-        fontSize: 60,
-        color: '#344340',
-        fontWeight: 'bold',
-    },
     subtitulo: {
         fontSize: 24,
         color: 'gray',
         marginBottom: 30,
     },
-    TextInput: {
-        padding: 10,
-        paddingStart: 20,
-        width: '100%',
-        height: 50,
-        marginTop: 20,
-        color: 'gray',
-        borderRadius: 30,
-        backgroundColor: '#fff',
-    },
     passwordContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        width: '100%',
-        backgroundColor: '#fff',
-        borderRadius: 30,
-        paddingHorizontal: 10,
-        marginTop: 20,
+        width: '80%',
     },
-    TextInputPassword: {
-        flex: 1, // Ocupar todo el espacio disponible
-        paddingVertical: 10,
-        paddingLeft: 10,
-        color: 'gray',
+    eyeIcon: {
+        zIndex: 1,
+        position: 'absolute',
+        right: 10,
     },
     boton: {
         width: '100%',
