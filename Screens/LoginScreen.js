@@ -68,7 +68,7 @@ function LoginScreen() {
                 Toast.show({
                     type: 'error',
                     text1: 'Error',
-                    text2: 'Correo electrónico o contraseña incorrectos',
+                    text2: 'Correo electrónico o contraseña incorrectos. Toca aquí para cerrar.',
                 });
             })
     }
