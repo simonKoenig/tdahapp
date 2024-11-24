@@ -97,17 +97,6 @@ function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#f1f1f1',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 20,
-    },
-    subtitulo: {
-        fontSize: 24,
-        color: 'gray',
-        marginBottom: 30,
-    },
     passwordContainer: {
         flexDirection: 'row',
         alignItems: 'center',

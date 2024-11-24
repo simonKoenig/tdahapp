@@ -4,13 +4,12 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } f
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase-config';
 import { useNavigation } from '@react-navigation/native';
-import { roles } from '../Utils/Constant';
 import DropdownComponent from '../Components/Dropdown';
 import { EyeIcon, EyeOffIcon } from '../Components/Icons';
-
+import { roles, PLACEHOLDER_TEXT_COLOR } from '../Utils/Constant';
+import { globalStyles } from '../Utils/globalStyles';
 
 function SignUpScreen() {
-
     const navigation = useNavigation();
 
     const [email, setEmail] = useState('');
@@ -56,53 +55,66 @@ function SignUpScreen() {
     };
 
     return (
-        <View style={styles.form}>
-            <Text style={styles.label}>Nombre y apellido</Text>
+        <View style={globalStyles.form}>
+            <Text style={globalStyles.label}>Nombre y apellido</Text>
             <TextInput
-                style={styles.input}
+                style={globalStyles.input}
                 value={nombreApellido}
                 onChangeText={setNombreApellido}
+                placeholder='Ingrese su nombre y apellido'
+                placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
             />
-            <Text style={styles.label}>Correo electrónico</Text>
-            <TextInput
-                style={styles.input}
+
+            <Text style={globalStyles.label} accessibilityLabel="Campo del correo electrónico">Correo electrónico</Text>
+            <TextInput 
+                accessible={true}
+                onChangeText={(text) => setEmail(text)} 
+                style={globalStyles.input} 
+                placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
+                placeholder='ejemplo@mail.com'
                 value={email}
-                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
             />
-            <Text style={styles.label}>Contraseña</Text>
-            <View style={styles.passwordContainer}>
-                <TextInput
-                    style={styles.inputPassword}
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry={!isPasswordVisible} // Mostrar u ocultar la contraseña
-                />
-                <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
-                    {isPasswordVisible ? (
-                        <EyeOffIcon color="black" size={24} /> // Usar ícono para ocultar contraseña
-                    ) : (
-                        <EyeIcon color="black" size={24} /> // Usar ícono para mostrar contraseña
-                    )}
-                </TouchableOpacity>
-            </View>
-            <Text style={styles.label}>Seleccione el rol</Text>
+
+            <Text style={globalStyles.label} accessibilityLabel='Campo de ingreso de contraseña'>Contraseña</Text>
+                <View style={styles.passwordContainer}>
+                    <TextInput
+                        accessible={true}
+                        onChangeText={(text) => setPassword(text)}
+                        style={[globalStyles.input, {width: '100%'}]}
+                        placeholder='Ingrese su contraseña'
+                        placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
+                        secureTextEntry={!isPasswordVisible} 
+                        value={password}
+                        autoCapitalize="none"
+
+                    />
+                    <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={styles.eyeIcon}>
+                        {isPasswordVisible ? (
+                            <EyeIcon color="gray" size={24} /> 
+                        ) : (
+                            <EyeOffIcon color="gray" size={24} /> 
+                        )}
+                    </TouchableOpacity>
+                </View>
+
+            <Text style={globalStyles.label}>Seleccione el rol</Text>
             <DropdownComponent
                 data={roles}
                 value={role}
                 setValue={setRole}
-                placeholder="Seleccione un role"
+                placeholder="Seleccione un rol"
                 onSelect={(value) => console.log('Selected:', value)}
                 width='80%'
                 searchActivo={false}
             />
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-                    <Text style={styles.buttonText}>Registrar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={handleCancel}>
-                    <Text style={styles.buttonText}>Cancelar</Text>
-                </TouchableOpacity>
-            </View>
+            
+            <TouchableOpacity style={[globalStyles.button, {width:'80%'}]} onPress={handleSignUp}>
+                <Text style={globalStyles.buttonText}>Registrarse</Text>
+            </TouchableOpacity>
+            
+            
             {typeof errorMessage === 'string' && errorMessage.length > 0 && (
                 <View style={styles.errorContainer}>
                     <Text style={styles.errorMessage}>{errorMessage}</Text>
@@ -113,43 +125,15 @@ function SignUpScreen() {
 }
 
 const styles = StyleSheet.create({
-    form: {
-        flex: 1,
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#FFFFFF',
-    },
-    label: {
-        width: '80%',
-        marginLeft: 10,
-        fontSize: 16,
-        color: '#000',
-        textAlign: 'left', // Alinea el texto a la izquierda
-    },
-    input: {
-        width: '80%',
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 20,
-        padding: 10,
-        marginVertical: 10,
-        backgroundColor: '#D9D9D9',
-    },
     passwordContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         width: '80%',
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 20,
-        padding: 10,
-        marginVertical: 10,
-        backgroundColor: '#D9D9D9',
     },
-    inputPassword: {
-        flex: 1, // Para que ocupe el espacio disponible
+    eyeIcon: {
+        zIndex: 1,
+        position: 'absolute',
+        right: 10,
     },
     picker: {
         width: '80%',
@@ -160,25 +144,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         marginVertical: 10,
         backgroundColor: '#D9D9D9',
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '80%',
-    },
-    button: {
-        flex: 1,
-        height: 50,
-        backgroundColor: '#4c669f',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 20,
-        marginVertical: 10,
-        marginHorizontal: 5,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 18,
     },
     errorContainer: {
         marginVertical: 8,

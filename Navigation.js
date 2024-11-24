@@ -182,7 +182,7 @@ function AuthStackScreen() {
     return (
         <AuthStack.Navigator initialRouteName="Login" screenOptions={HEADER_STYLE}>
             <AuthStack.Screen name="Login" component={LoginScreen} options={{ headerShown: true, title:'Iniciar sesión'}}/>
-            <AuthStack.Screen name="Signup" component={SignUpScreen} options={{ headerShown: true, title:'Registrarse'}}/>
+            <AuthStack.Screen name="Signup" component={SignUpScreen} options={{ headerShown: true, title:'Crear cuenta'}}/>
             <AuthStack.Screen name="ResetPassword" component={ResetPasswordScreen} options={{ headerShown: true, title: 'Reestablecer contraseña' }}/>
         </AuthStack.Navigator>
     );
