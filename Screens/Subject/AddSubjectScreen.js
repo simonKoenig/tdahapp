@@ -91,7 +91,7 @@ function AddSubjectScreen() {
         <View style={globalStyles.form}>
             <Text style={globalStyles.label}>Nombre</Text>
             <TextInput
-                style={[globalStyles.input, errors.nombre && styles.errorInput]}
+                style={[globalStyles.input, errors.nombre && globalStyles.errorInput]}
                 placeholder='Nombre de la materia'
                 value={nombre}
                 onChangeText={(text) => {
@@ -102,14 +102,14 @@ function AddSubjectScreen() {
                 accessibilityLabel="Campo de nombre de la materia"
             />
             {errors.nombre ? (
-                <Text style={styles.errorText}>
+                <Text style={globalStyles.errorText}>
                     {errors.nombre}
                 </Text>
             ) : null}
 
             <Text style={globalStyles.label}>Profesor</Text>
             <TextInput
-                style={[globalStyles.input, errors.profesor && styles.errorInput]}
+                style={[globalStyles.input, errors.profesor && globalStyles.errorInput]}
                 placeholder='Nombre del profesor'
                 value={profesor}
                 onChangeText={(text) => {
@@ -120,7 +120,7 @@ function AddSubjectScreen() {
                 accessibilityLabel="Campo de nombre del profesor"
             />
             {errors.profesor ? (
-                <Text style={styles.errorText}>
+                <Text style={globalStyles.errorText}>
                     {errors.profesor}
                 </Text>
             ) : null}
@@ -135,18 +135,6 @@ function AddSubjectScreen() {
 }
 
 const styles = StyleSheet.create({
-    errorInput: {
-        borderColor: 'red',
-        borderWidth: 2,
-    },
-    errorText: {
-        color: 'red',
-        fontSize: 14,
-        alignSelf: 'flex-start',
-        marginLeft: '10%',
-        marginBottom: 10,
-        marginTop: -5,
-    },
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',

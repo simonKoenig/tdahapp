@@ -149,7 +149,19 @@ export const globalStyles = StyleSheet.create({
         color: 'white',
         fontSize: 24,
         fontFamily: 'bold',
-    }
+    },
+    errorInput: {
+        borderColor: 'red',
+        borderWidth: 2,
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 14,
+        alignSelf: 'flex-start',
+        marginLeft: '10%',
+        marginBottom: 10,
+        marginTop: -5,
+    },
 });
 
 export const PLACEHOLDER_TEXT_COLOR = COLORS.infoText;
