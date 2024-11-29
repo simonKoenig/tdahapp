@@ -33,13 +33,13 @@ plAAAner/
 ├── assets/             # Recursos estáticos (imágenes, íconos, etc.)
 ├── Components/         # Componentes reutilizables
 ├── Contexts/           # Contextos de React
-	├── AuthProvider.js		    # Autenticación de los usuarios
+	├── AuthProvider.js		# Autenticación de los usuarios
 	├── PatientsProvider.js		# Usuarios vinculados por parte del administrador
 	├── RewardsProvider.js		# Recompensas para los estudiantes
 	├── SubjectsProvider.js		# Materias para los estudiantes
-	├── TaskProvider.js		    # Tareas para los estudiantes
+	├── TaskProvider.js		# Tareas para los estudiantes
 ├── functions/          # Google Cloud Functions
-├── Modals/			   # Modales de la aplicación
+├── Modals/		# Modales de la aplicación
 ├── Screens/            # Pantallas de la aplicación
 ├── Utils/              # Constantes globales y funciones auxiliares
 ├── .firebaserc         # Información sobre el proyecto Firebase
